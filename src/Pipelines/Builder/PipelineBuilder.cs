@@ -28,13 +28,14 @@ public class PipelineBuilder : IAddInputBuilder, IAddHandlerBuilder, IAddDispatc
         _handlerType = type;
         var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type);
         _serviceCollection.RegisterGenericTypesAsScoped(types);
-        
+
         return this;
     }
 
     public IAddPipelineBehaviorsBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
-        _serviceCollection.AddScoped<DispatcherInterceptor>(x => new DispatcherInterceptor(x, _handlerType));
+        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
+            new DispatcherInterceptor(x, _inputType, _handlerType));
         _serviceCollection.AddScoped<TDispatcher>(x =>
         {
             var interceptor = x.GetService<DispatcherInterceptor>();

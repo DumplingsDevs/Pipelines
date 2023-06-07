@@ -5,12 +5,14 @@ namespace Pipelines;
 public class DispatcherInterceptor : IInterceptor
 {
     private readonly Type _handlerType;
+    private readonly Type _inputType;
     private readonly IServiceProvider _serviceProvider;
 
-    public DispatcherInterceptor(IServiceProvider serviceProvider, Type handlerType)
+    public DispatcherInterceptor(IServiceProvider serviceProvider, Type inputType, Type handlerType)
     {
-        _handlerType = handlerType;
         _serviceProvider = serviceProvider;
+        _inputType = inputType;
+        _handlerType = handlerType;
     }
 
     public void Intercept(IInvocation invocation)
