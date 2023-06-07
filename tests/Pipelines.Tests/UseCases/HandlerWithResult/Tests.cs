@@ -12,7 +12,7 @@ public class Tests
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
         
-        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(nameof(ICommandDispatcher.SendAsync), assembly, typeof(ICommandHandler<,>));
+        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly,typeof(ICommand<>), typeof(ICommandHandler<,>));
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetDispatcher<ICommandDispatcher>();
     }

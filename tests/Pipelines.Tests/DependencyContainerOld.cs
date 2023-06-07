@@ -14,8 +14,9 @@ public class DependencyContainerOld
         _services.AddScoped<ICommandHandler<ExampleCommand>, ExampleCommandHandler>();
         _services
             .AddPipeline()
+            .AddInput(typeof(ICommand))
             .AddHandler(typeof(ICommandHandler<>), typeof(DependencyContainerOld).Assembly)
-            .AddDispatcher<ICommandDispatcher>(nameof(ICommandDispatcher.SendAsync))
+            .AddDispatcher<ICommandDispatcher>()
             .Build();
     }
 
