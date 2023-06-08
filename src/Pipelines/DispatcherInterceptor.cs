@@ -1,21 +1,22 @@
-using System.Reflection;
 using Castle.DynamicProxy;
 
 namespace Pipelines;
 
 public class DispatcherInterceptor : IInterceptor
 {
-    private readonly HandlerOptions _handlerOptions;
+    private readonly Type _handlerType;
+    private readonly Type _inputType;
     private readonly IServiceProvider _serviceProvider;
-    public DispatcherInterceptor(HandlerOptions handlerOptions, IServiceProvider serviceProvider)
+
+    public DispatcherInterceptor(IServiceProvider serviceProvider, Type inputType, Type handlerType)
     {
-        _handlerOptions = handlerOptions;
         _serviceProvider = serviceProvider;
+        _inputType = inputType;
+        _handlerType = handlerType;
     }
 
     public void Intercept(IInvocation invocation)
     {
-        var methodName = invocation.Method.Name;
         var arguments = invocation.Arguments;
 
         var result = HandleExecutedMethod(arguments);
@@ -27,7 +28,7 @@ public class DispatcherInterceptor : IInterceptor
         // invocation.ReturnValue = "Tutaj trzeba ustawi zwracaną wartośc - czyli w naszym przypadku będzie to rezultat z handlera";
         // invocation.Proceed(); - tego nie używamy ponieważ nie ma klasy (to działa trochę jak pipeline - może będziemy mogli to wykorzystac do implementacji behavior?
     }
-    
+
     private object? HandleExecutedMethod(object[] args)
     {
         // for now get first - but we should filter args and look for object that implements input interface - or just try to match the best method
@@ -35,35 +36,31 @@ public class DispatcherInterceptor : IInterceptor
         var inputType = input.GetType();
         var resultType = GetResultType(inputType);
 
-        foreach (var handlerType in _handlerOptions.Types)
+        Type handlerTypeWithInput;
+        if (resultType is null)
         {
-            Type handlerTypeWithInput;
-            if (resultType is null)
-            {
-                handlerTypeWithInput = handlerType.MakeGenericType(inputType);
-            }
-            else
-            {
-                var inputAndResultTypes = new[] { inputType, resultType };
-                handlerTypeWithInput= handlerType.MakeGenericType(inputAndResultTypes);
-            }
-            
-            var handler = _serviceProvider.GetService(handlerTypeWithInput);
-
-            // What if handler contains more items 
-            var method = handler.GetType().GetMethods()
-                .FirstOrDefault(x => x.GetParameters().Any(y => y.ParameterType == inputType));
-
-            return method.Invoke(handler, args);
+            handlerTypeWithInput = _handlerType.MakeGenericType(inputType);
         }
+        else
+        {
+            var inputAndResultTypes = new[] { inputType, resultType };
+            handlerTypeWithInput = _handlerType.MakeGenericType(inputAndResultTypes);
+        }
+
+        var handler = _serviceProvider.GetService(handlerTypeWithInput);
+
+        // What if handler contains more items 
+        var method = handler.GetType().GetMethods()
+            .FirstOrDefault(x => x.GetParameters().Any(y => y.ParameterType == inputType));
+
+        return method.Invoke(handler, args);
+
 
         // find handler
         // trigger method
         //return result
-
-        return null;
     }
-    
+
     private static Type? GetResultType(Type queryType)
     {
         //TO DO- get only proper Interface

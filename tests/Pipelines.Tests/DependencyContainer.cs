@@ -13,13 +13,14 @@ public class DependencyContainer
         _services = new ServiceCollection();
     }
 
-    public void RegisterPipeline<TDispatcher>(string nameOfDispatcherMethod, Assembly handlersAssembly,
-        Type handlerType) where TDispatcher : class
+    public void RegisterPipeline<TDispatcher>(Assembly handlersAssembly,
+        Type inputType, Type handlerType) where TDispatcher : class
     {
         _services
             .AddPipeline()
+            .AddInput(inputType)
             .AddHandler(handlerType, handlersAssembly)
-            .AddDispatcher<TDispatcher>(nameOfDispatcherMethod)
+            .AddDispatcher<TDispatcher>()
             .Build();
     }
 
