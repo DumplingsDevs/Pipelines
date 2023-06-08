@@ -1,5 +1,6 @@
 using System.Reflection;
 using Castle.DynamicProxy;
+using Pipelines.Exceptions;
 
 namespace Pipelines;
 
@@ -25,17 +26,14 @@ public class DispatcherInterceptor : IInterceptor
         {
             invocation.ReturnValue = result;
         }
-
-        // invocation.ReturnValue = "Tutaj trzeba ustawi zwracaną wartośc - czyli w naszym przypadku będzie to rezultat z handlera";
-        // invocation.Proceed(); - tego nie używamy ponieważ nie ma klasy (to działa trochę jak pipeline - może będziemy mogli to wykorzystac do implementacji behavior?
     }
 
     private object? HandleExecutedMethod(object[] args)
     {
         ValidateArgs(args);
-        
+
         var inputType = args.First().GetType();
-        
+
         var handler = GetHandlerService(inputType);
 
         var method = GetHandlerMethod(handler, inputType);
@@ -54,16 +52,14 @@ public class DispatcherInterceptor : IInterceptor
         switch (methods.Count)
         {
             case 0:
-                throw new Exception($"(TODO) Cannot find method in {handler.GetType().Name} which accepts input of type {inputType.Name}");
+                throw new HandlerMethodNotImplementedException(handler.GetType().Name, inputType.Name);
             case > 1:
-                throw new Exception($"(TODO) handler should implement only one method with input of type {inputType}");
+                throw new MultipleHandlerMethodsException(inputType.Name);
         }
 
         var method = methods.First();
 
-        // think how to validate method because basically we have two types of method:
-        // - only with input
-        // - with input and CancellationToken
+        // TO DO think how to validate method - do we need to validate method? Maybe it's enough to validate HandlerType interface in builder
 
         return method;
     }
@@ -76,10 +72,11 @@ public class DispatcherInterceptor : IInterceptor
             ? _handlerType.MakeGenericType(inputType)
             : _handlerType.MakeGenericType(inputType, resultType);
 
-        var handler =  _serviceProvider.GetService(handlerTypeWithInput);
+        var handler = _serviceProvider.GetService(handlerTypeWithInput);
+
         if (handler is null)
         {
-            throw new Exception("(TODO) Handler is not registered");
+            throw new HandlerNotRegisteredException();
         }
 
         return handler;
@@ -87,10 +84,16 @@ public class DispatcherInterceptor : IInterceptor
 
     private void ValidateArgs(object[] args)
     {
-        // Exception when args == 0 || args > 1
-        // var input = args.FirstOrDefault();
-        // Exception when input is null
-        // Exception when input.GetType != _inputType 
+        var input = args.FirstOrDefault();
+
+        if (input is null)
+        {
+            throw new InputNullReferenceException();
+        }
+
+        // TO DO - validate args and their type.
+        // Remember that we can pass CancellationToken.
+        // Also in args there will be object that implements e.g. ICommand so we need to check if that object implements required input type
     }
 
     private static Type? GetResultType(Type queryType)
