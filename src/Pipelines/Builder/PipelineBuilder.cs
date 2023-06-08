@@ -6,7 +6,7 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder;
 
-public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineBehaviorsBuilder
+public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
@@ -32,7 +32,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineBehaviorsBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
+    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));

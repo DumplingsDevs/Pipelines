@@ -2,5 +2,5 @@ namespace Pipelines.Builder.Interfaces;
 
 public interface IDispatcherBuilder
 {
-    public IPipelineBehaviorsBuilder AddDispatcher<TDispatcher>() where TDispatcher : class;
+    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class;
 }
