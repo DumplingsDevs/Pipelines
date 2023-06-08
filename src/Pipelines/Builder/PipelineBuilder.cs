@@ -6,7 +6,7 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder;
 
-public class PipelineBuilder : IAddInputBuilder, IAddHandlerBuilder, IAddDispatcherBuilder, IAddPipelineBehaviorsBuilder
+public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineBehaviorsBuilder
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
@@ -17,13 +17,13 @@ public class PipelineBuilder : IAddInputBuilder, IAddHandlerBuilder, IAddDispatc
         _serviceCollection = serviceCollection;
     }
 
-    public IAddHandlerBuilder AddInput(Type type)
+    public IHandlerBuilder AddInput(Type type)
     {
         _inputType = type;
         return this;
     }
 
-    public IAddDispatcherBuilder AddHandler(Type type, Assembly assembly)
+    public IDispatcherBuilder AddHandler(Type type, Assembly assembly)
     {
         _handlerType = type;
         var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type);
@@ -32,7 +32,7 @@ public class PipelineBuilder : IAddInputBuilder, IAddHandlerBuilder, IAddDispatc
         return this;
     }
 
-    public IAddPipelineBehaviorsBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
+    public IPipelineBehaviorsBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));

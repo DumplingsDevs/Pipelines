@@ -6,7 +6,7 @@ namespace Pipelines;
 
 public static class Extension
 {
-    public static IAddInputBuilder AddPipeline(this IServiceCollection service)
+    public static IInputBuilder AddPipeline(this IServiceCollection service)
     {
         return new PipelineBuilder(service);
     }
