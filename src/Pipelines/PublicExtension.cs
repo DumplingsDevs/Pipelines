@@ -11,29 +11,3 @@ public static class Extension
         return new PipelineBuilder(service);
     }
 }
-
-
-
-
-//ICommandDisptcher
-//ICommandHandler
-//ICommand
-//ICommandResult
-
-//IQueryDisptcher
-//IQueryHandler
-//IQuery
-//IQuery
-
-//LoggingPipelineBehaviour
-
-/*
-        services.AddPipeline(List<Assembly>)
-            .AddDispatcher<ICommandDisptcher>(nameof(ICommandDisptcher))
-            .AddHandler<ICommandHandler>(nameof(ICommandHandler.HandleAsync))
-            .AddInput<ICommand>()
-            .AddResult<ICommandResult>()
-            .AddPipelineBehaviour<LoggingPipelineBehaviour>()
-            .AddPipelineBehaviour<LoggingPipelineBehaviour>();
-
-*/
