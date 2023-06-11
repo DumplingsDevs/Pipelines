@@ -1,4 +1,4 @@
-namespace Pipelines;
+namespace Pipelines.Exceptions;
 
 internal class MultipleHandlerMethodsException : Exception
 {

@@ -1,8 +1,9 @@
-namespace Pipelines;
+namespace Pipelines.Exceptions;
 
 internal class InputNullReferenceException : Exception
 {
-    public InputNullReferenceException() : base("Cannot handle input with null value")
+    private const string ErrorMessage = "Cannot handle input with null value";
+    public InputNullReferenceException() : base(ErrorMessage)
     {
         
     }

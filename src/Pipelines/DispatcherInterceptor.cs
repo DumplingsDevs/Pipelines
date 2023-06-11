@@ -32,7 +32,7 @@ public class DispatcherInterceptor : IInterceptor
     {
         ValidateArgs(args);
 
-        var inputType = args.First().GetType();
+        var inputType = GetInputType(args);
 
         var handler = GetHandlerService(inputType);
 
@@ -94,6 +94,11 @@ public class DispatcherInterceptor : IInterceptor
         // TO DO - validate args and their type.
         // Remember that we can pass CancellationToken.
         // Also in args there will be object that implements e.g. ICommand so we need to check if that object implements required input type
+    }
+    
+    private static Type GetInputType(object[] args)
+    {
+        return args.First().GetType();
     }
 
     private static Type? GetResultType(Type queryType)
