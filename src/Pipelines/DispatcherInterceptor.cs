@@ -1,4 +1,6 @@
+using System.Reflection;
 using Castle.DynamicProxy;
+using Pipelines.Exceptions;
 
 namespace Pipelines;
 
@@ -24,41 +26,79 @@ public class DispatcherInterceptor : IInterceptor
         {
             invocation.ReturnValue = result;
         }
-
-        // invocation.ReturnValue = "Tutaj trzeba ustawi zwracaną wartośc - czyli w naszym przypadku będzie to rezultat z handlera";
-        // invocation.Proceed(); - tego nie używamy ponieważ nie ma klasy (to działa trochę jak pipeline - może będziemy mogli to wykorzystac do implementacji behavior?
     }
 
     private object? HandleExecutedMethod(object[] args)
     {
-        // for now get first - but we should filter args and look for object that implements input interface - or just try to match the best method
-        var input = args.FirstOrDefault();
-        var inputType = input.GetType();
+        ValidateArgs(args);
+
+        var inputType = GetInputType(args);
+
+        var handler = GetHandlerService(inputType);
+
+        var method = GetHandlerMethod(handler, inputType);
+
+        return method.Invoke(handler, args);
+    }
+
+    private static MethodInfo GetHandlerMethod(object handler, Type inputType)
+    {
+        var methods = handler.GetType()
+            .GetMethods()
+            .Where(x => x.GetParameters()
+                .Any(y => y.ParameterType == inputType))
+            .ToList();
+
+        switch (methods.Count)
+        {
+            case 0:
+                throw new HandlerMethodNotImplementedException(handler.GetType().Name, inputType.Name);
+            case > 1:
+                throw new MultipleHandlerMethodsException(inputType.Name);
+        }
+
+        var method = methods.First();
+
+        // TO DO think how to validate method - do we need to validate method? Maybe it's enough to validate HandlerType interface in builder
+
+        return method;
+    }
+
+    private object GetHandlerService(Type inputType)
+    {
         var resultType = GetResultType(inputType);
 
-        Type handlerTypeWithInput;
-        if (resultType is null)
-        {
-            handlerTypeWithInput = _handlerType.MakeGenericType(inputType);
-        }
-        else
-        {
-            var inputAndResultTypes = new[] { inputType, resultType };
-            handlerTypeWithInput = _handlerType.MakeGenericType(inputAndResultTypes);
-        }
+        var handlerTypeWithInput = resultType is null
+            ? _handlerType.MakeGenericType(inputType)
+            : _handlerType.MakeGenericType(inputType, resultType);
 
         var handler = _serviceProvider.GetService(handlerTypeWithInput);
 
-        // What if handler contains more items 
-        var method = handler.GetType().GetMethods()
-            .FirstOrDefault(x => x.GetParameters().Any(y => y.ParameterType == inputType));
+        if (handler is null)
+        {
+            throw new HandlerNotRegisteredException();
+        }
 
-        return method.Invoke(handler, args);
+        return handler;
+    }
 
+    private void ValidateArgs(object[] args)
+    {
+        var input = args.FirstOrDefault();
 
-        // find handler
-        // trigger method
-        //return result
+        if (input is null)
+        {
+            throw new InputNullReferenceException();
+        }
+
+        // TO DO - validate args and their type.
+        // Remember that we can pass CancellationToken.
+        // Also in args there will be object that implements e.g. ICommand so we need to check if that object implements required input type
+    }
+    
+    private static Type GetInputType(object[] args)
+    {
+        return args.First().GetType();
     }
 
     private static Type? GetResultType(Type queryType)
