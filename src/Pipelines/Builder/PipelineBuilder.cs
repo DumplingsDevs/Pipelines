@@ -48,11 +48,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public void Build()
-    {
-        //To do validation!
-    }
-
     public IPipelineBuildBuilder AddDecorators(Type decoratorGenericType, params Type[] decorators)
     {
         _decoratorType = decoratorGenericType;
@@ -63,5 +58,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         }
 
         return this;
+    }
+    
+    public void Build()
+    {
+        //Dispatcher, Handler and Decorator implements method with same input / output parameters
+        //Dispatcher, Handler and Decorator have same input type as provided in AddInput method
+        //InputType shouldn't be object type
+        //Only one method handle should be implemented in Dispatcher, Handler and Decorator
     }
 }

@@ -43,6 +43,7 @@ public class DispatcherInterceptor : IInterceptor
 
     private static MethodInfo GetHandlerMethod(object handler, Type inputType)
     {
+        //TO DO - we need to think about it twice - there could be situation, when you have private methods or public by mistake which takes same input parameter!
         var methods = handler.GetType()
             .GetMethods()
             .Where(x => x.GetParameters()
