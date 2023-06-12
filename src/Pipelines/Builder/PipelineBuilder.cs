@@ -6,11 +6,13 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder;
 
-public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder
+public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder,
+    IPipelineBuildBuilder
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
     private Type _inputType = null!;
+    private Type _decoratorType = null!;
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -49,5 +51,17 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public void Build()
     {
         //To do validation!
+    }
+
+    public IPipelineBuildBuilder AddDecorators(Type decoratorGenericType, params Type[] decorators)
+    {
+        _decoratorType = decoratorGenericType;
+
+        foreach (var decorator in decorators)
+        {
+            _serviceCollection.AddScoped(_decoratorType, decorator);
+        }
+
+        return this;
     }
 }
