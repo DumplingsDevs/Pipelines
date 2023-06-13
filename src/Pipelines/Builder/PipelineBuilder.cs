@@ -2,6 +2,7 @@ using System.Reflection;
 using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Interfaces;
+using Pipelines.Builder.Validators;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder;
@@ -13,6 +14,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Type _handlerType = null!;
     private Type _inputType = null!;
     private Type _decoratorType = null!;
+    private Type _dispatcherType = null!;
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -36,6 +38,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
+        _dispatcherType = typeof(TDispatcher);
+        
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));
         _serviceCollection.AddScoped<TDispatcher>(x =>
@@ -63,7 +67,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public void Build()
     {
         //Dispatcher, Handler and Decorator implements method with same input / output parameters
-        //Dispatcher, Handler and Decorator have same input type as provided in AddInput method
+        InputTypeShouldBeSameAsProvidedInBuilder.Validate(_inputType, _handlerType, _dispatcherType);
         //InputType shouldn't be object type
         //Only one method handle should be implemented in Dispatcher, Handler and Decorator
     }
