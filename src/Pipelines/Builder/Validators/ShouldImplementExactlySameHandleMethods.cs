@@ -1,6 +1,8 @@
+using Pipelines.Exceptions;
+
 namespace Pipelines.Builder.Validators;
 
-public class ShouldImplementExactlySameHandleMethods
+public static class ShouldImplementExactlySameHandleMethods
 {
-    
+  
 }
