@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Interfaces;
 
-public interface IPipelineDecoratorBuilder
+public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
 {
-    public void Build();
+    public IPipelineBuildBuilder AddDecorators(Type decoratorGenericType, params Type[] decorators);
 }
