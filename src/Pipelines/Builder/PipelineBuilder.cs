@@ -66,8 +66,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     
     public void Build()
     {
-        //Dispatcher, Handler and Decorator implements method with same input / output parameters
-        InputTypeShouldBeSameAsProvidedInBuilder.Validate(_inputType, _handlerType, _dispatcherType);
+        InputTypeShouldBeClassOrRecord.Validate(_inputType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
+        ShouldImplementExactlySameHandleMethods.Validate(_handlerType, _dispatcherType);
     }
 }
