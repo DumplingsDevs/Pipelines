@@ -1,5 +1,6 @@
-using Pipelines.Tests.UseCases.HandlerWithResult.Sample;
 using Pipelines.Tests.UseCases.HandlerWithResult.Types;
+using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+using ExampleCommand = Pipelines.Tests.UseCases.HandlerWithResult.Sample.ExampleCommand;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResult;
 

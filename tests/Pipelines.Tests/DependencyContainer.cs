@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
 
 namespace Pipelines.Tests;
 
@@ -21,6 +22,7 @@ public class DependencyContainer
             .AddInput(inputType)
             .AddHandler(handlerType, handlersAssembly)
             .AddDispatcher<TDispatcher>()
+            .AddDecorators(typeof(LoggingDecorator<,>))
             .Build();
     }
 
