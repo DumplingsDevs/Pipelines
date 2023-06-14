@@ -39,7 +39,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
         _dispatcherType = typeof(TDispatcher);
-        
+
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));
         _serviceCollection.AddScoped<TDispatcher>(x =>
@@ -63,11 +63,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
         return this;
     }
-    
+
     public void Build()
     {
-        InputTypeShouldBeClassOrRecord.Validate(_inputType);
+        AllProvidedTypeShouldInterface.Validate(_inputType, _handlerType, _dispatcherType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
-        ShouldImplementExactlySameHandleMethods.Validate(_inputType,_handlerType, _dispatcherType);
+        ShouldImplementExactlySameHandleMethods.Validate(_inputType, _handlerType, _dispatcherType);
     }
 }
