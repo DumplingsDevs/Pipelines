@@ -68,6 +68,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         InputTypeShouldBeClassOrRecord.Validate(_inputType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
-        ShouldImplementExactlySameHandleMethods.Validate(_handlerType, _dispatcherType);
+        ShouldImplementExactlySameHandleMethods.Validate(_inputType,_handlerType, _dispatcherType);
     }
 }
