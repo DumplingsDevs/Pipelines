@@ -6,6 +6,8 @@ namespace Pipelines.Tests.Builder.Validators.ShouldImplementExactlySameHandleMet
 
 public class ShouldImplementExactlySameHandleMethodsTests
 {
+    private static readonly Type InputType = typeof(HandleParameters);
+
     [Test]
     public void Validate_DifferentMethodName_Passes()
     {
@@ -14,7 +16,7 @@ public class ShouldImplementExactlySameHandleMethodsTests
         var typeToValidateTwo = typeof(IHandleMethodButDifferentName);
 
         // Act
-        ShouldImplementExactlySameHandleMethods.Validate(typeToValidateOne, typeToValidateTwo);
+        ShouldImplementExactlySameHandleMethods.Validate(InputType, typeToValidateOne, typeToValidateTwo);
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
@@ -29,7 +31,7 @@ public class ShouldImplementExactlySameHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<HandleMethodMismatchException>(() =>
-            ShouldImplementExactlySameHandleMethods.Validate(typeToValidateOne, typeToValidateTwo));
+            ShouldImplementExactlySameHandleMethods.Validate(InputType, typeToValidateOne, typeToValidateTwo));
     }
 
     [Test]
@@ -41,7 +43,7 @@ public class ShouldImplementExactlySameHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<HandleMethodMismatchException>(() =>
-            ShouldImplementExactlySameHandleMethods.Validate(typeToValidateOne, typeToValidateTwo));
+            ShouldImplementExactlySameHandleMethods.Validate(InputType, typeToValidateOne, typeToValidateTwo));
     }
 
     [Test]
@@ -53,7 +55,7 @@ public class ShouldImplementExactlySameHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<HandleMethodMismatchException>(() =>
-            ShouldImplementExactlySameHandleMethods.Validate(typeToValidateOne, typeToValidateTwo));
+            ShouldImplementExactlySameHandleMethods.Validate(InputType, typeToValidateOne, typeToValidateTwo));
     }
 
     [Test]
@@ -64,7 +66,7 @@ public class ShouldImplementExactlySameHandleMethodsTests
         var typeToValidateTwo = typeof(IHandleMethod);
 
         // Act
-        ShouldImplementExactlySameHandleMethods.Validate(typeToValidateOne, typeToValidateTwo);
+        ShouldImplementExactlySameHandleMethods.Validate(InputType, typeToValidateOne, typeToValidateTwo);
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
