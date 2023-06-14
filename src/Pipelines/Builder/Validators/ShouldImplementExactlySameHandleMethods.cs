@@ -28,7 +28,7 @@ internal static class ShouldImplementExactlySameHandleMethods
 
     private static string GetHandleMethod(Type type)
     {
-        var method = type.GetMethods(BindingFlags.Public)
+        var method = type.GetMethods()
             .Select(m => $"{GetParametersSignature(m)}-{m.ReturnType.FullName}").First();
         
         return method;
