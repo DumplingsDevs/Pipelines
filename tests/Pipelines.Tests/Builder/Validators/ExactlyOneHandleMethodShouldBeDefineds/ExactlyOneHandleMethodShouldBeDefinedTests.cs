@@ -43,4 +43,32 @@ public class ExactlyOneHandleMethodShouldBeDefinedTests
         Assert.Throws<MultipleHandlerMethodsException>(() =>
             ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate));
     }
+    
+    [Test]
+    public void Validate_HandlerInterface_OneValidHandleMethod_Passes()
+    {
+        // Arrange
+        var inputType = typeof(ICommand<>);
+        var typeToValidate = typeof(ICommandHandler<,>);
+
+        // Act
+        ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate);
+
+        // Assert
+        Assert.Pass(); 
+    }
+    
+    [Test]
+    public void Validate_DispatcherInterface_OneValidHandleMethod_Passes()
+    {
+        // Arrange
+        var inputType = typeof(ICommand<>);
+        var typeToValidate = typeof(ICommandDispatcher);
+
+        // Act
+        ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate);
+
+        // Assert
+        Assert.Pass(); 
+    }
 }
