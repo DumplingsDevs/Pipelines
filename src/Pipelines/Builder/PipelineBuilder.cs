@@ -13,7 +13,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
     private Type _inputType = null!;
-    private List<Type> _decorators = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -29,31 +28,10 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IDispatcherBuilder AddHandler(Type type, Assembly assembly)
     {
         _handlerType = type;
-        //quick workaround to filter out decorators
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type).Where(x => !x.Name.Contains("Logging"));
+
+        //TO DO - how to filter out decorators? Maybe we can assume that something IS NOT a decorator when there is no handler in constructor?
+        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type).Where(x => !x.Name.Contains("Logging") && !x.Name.Contains("Tracing"));
         _serviceCollection.RegisterGenericTypesAsScoped(types);
-        
-        // foreach (var handlerType in types)
-        // {
-        //     var interfaces = handlerType.GetInterfaces();
-        //     foreach (var @interface in interfaces)
-        //     {
-        //         if (@interface.IsGenericType)
-        //         {
-        //             _serviceCollection.AddScoped(@interface, sp =>
-        //             {
-        //                 var decoratorType = _decorators.First();
-        //                 var resultType = _inputType.GetGenericArguments();
-        //                 
-        //                 var decoratorGeneric = decoratorType.MakeGenericType(_inputType, resultType.First());
-        //                 
-        //                 var handler = ActivatorUtilities.CreateInstance(sp, handlerType);
-        //                 var decorator = ActivatorUtilities.CreateInstance(sp, decoratorType , new[] { handler });
-        //                 return decorator;
-        //             });
-        //         }
-        //     }
-        // }
 
         return this;
     }
@@ -74,60 +52,37 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineBuildBuilder AddDecorators(params Type[] decorators)
     {
-        _decorators.AddRange(decorators);
         foreach (var decoratorType in decorators)
         {
-            // _serviceCollection.AddScoped(decorator);
-            // _serviceCollection.AddScoped(_decoratorType, decorator);
-
-
-            int a = 0;
             for (var i = _serviceCollection.Count - 1; i >= 0; i--)
             {
                 var serviceDescriptor = _serviceCollection[i];
-
+                
                 if (serviceDescriptor.ServiceType is DecoratedType)
                 {
                     continue; // Service has already been decorated.
                 }
 
-                // if (!strategy.CanDecorate(serviceDescriptor.ServiceType))
-                // {
-                //     continue; // Unable to decorate using the specified strategy.
-                // }
-
-                if (!serviceDescriptor.ServiceType.Name.Contains("CommandHandler"))
+                if (!CanDecorate(serviceDescriptor.ServiceType, decoratorType))
                 {
-                    continue;
+                    continue; // decorator is not compatible with ServiceType
                 }
-                
+
                 var decoratedType = new DecoratedType(serviceDescriptor.ServiceType);
-
                 _serviceCollection.Add(serviceDescriptor.WithServiceType(decoratedType));
-
-                _serviceCollection[i] = serviceDescriptor.WithImplementationFactory(CreateDecorator(decoratedType, decoratorType));
+                
+                var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
+                _serviceCollection[i] = serviceDescriptor.WithImplementationFactory(implementationFactory);
             }
         }
 
         return this;
     }
-    
-    private Func<IServiceProvider, object> CreateDecorator(Type serviceType, Type decoratorType)
-    {
 
-            var genericArguments = serviceType.GetGenericArguments();
-            var closedDecorator = decoratorType.MakeGenericType(genericArguments);
+    private static bool CanDecorate(Type serviceType, Type decoratorType) =>
+        serviceType is { IsGenericType: true, IsGenericTypeDefinition: false } 
+        && serviceType.HasCompatibleGenericArguments(decoratorType);
 
-            return TypeDecorator(serviceType, closedDecorator);
-
-    }
-    
-    private static Func<IServiceProvider, object> TypeDecorator(Type serviceType, Type decoratorType) => serviceProvider =>
-    {
-        var instanceToDecorate = serviceProvider.GetRequiredService(serviceType);
-        return ActivatorUtilities.CreateInstance(serviceProvider, decoratorType, instanceToDecorate);
-    };
-    
     public void Build()
     {
         //Dispatcher, Handler and Decorator implements method with same input / output parameters

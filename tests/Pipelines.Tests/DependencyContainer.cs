@@ -22,7 +22,7 @@ public class DependencyContainer
             .AddInput(inputType)
             .AddHandler(handlerType, handlersAssembly)
             .AddDispatcher<TDispatcher>()
-            .AddDecorators(typeof(LoggingDecorator<,>))
+            .AddDecorators(typeof(LoggingDecorator<,>), typeof(TracingDecorator<,>))
             .Build();
     }
 
