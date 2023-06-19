@@ -1,6 +1,4 @@
 namespace Pipelines.Tests.Builder.Validators.ExactlyOneHandleMethodShouldBeDefineds.Types;
 
-public class ExampleClass
-{
-    
-}
+public interface INoMethod<in TCommand, TResult> where TCommand : ICommand<TResult>
+{ }

@@ -6,69 +6,40 @@ namespace Pipelines.Tests.Builder.Validators.ExactlyOneHandleMethodShouldBeDefin
 
 public class ExactlyOneHandleMethodShouldBeDefinedTests
 {
-    [Test]
-    public void Validate_NoValidHandleMethod_ThrowsHandlerMethodNotImplementedException()
-    {
-        // Arrange
-        var inputType = typeof(ExampleClass);
-        var typeToValidate = typeof(NoValidHandleMethodClass);
-
-        // Act & Assert
-        Assert.Throws<HandlerMethodNotImplementedException>(() =>
-            ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate));
-    }
+    private static readonly Type InputType = typeof(ICommand<>);
 
     [Test]
     public void Validate_OneValidHandleMethod_Passes()
     {
         // Arrange
-        var inputType = typeof(ExampleClass);
-        var typeToValidate = typeof(TwoMethodWithOneValidHandleMethodClass);
+        var typeToValidate = typeof(ISingleMethod<,>);
 
         // Act
-        ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(InputType, typeToValidate);
 
         // Assert
-        Assert.Pass(); 
+        Assert.Pass();
     }
 
     [Test]
     public void Validate_MultipleValidHandleMethods_ThrowsMultipleHandlerMethodsException()
     {
         // Arrange
-        var inputType = typeof(ExampleClass);
-        var typeToValidate = typeof(MultipleValidHandleMethodClass);
+        var typeToValidate = typeof(IMultipleHandleMethod);
 
         // Act & Assert
         Assert.Throws<MultipleHandlerMethodsException>(() =>
-            ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate));
+            ExactlyOneHandleMethodShouldBeDefined.Validate(InputType, typeToValidate));
     }
-    
+
     [Test]
-    public void Validate_HandlerInterface_OneValidHandleMethod_Passes()
+    public void Validate_InterfaceWithoutMethod_OneValidHandleMethod_ThrowsHandlerMethodNotImplementedException()
     {
         // Arrange
-        var inputType = typeof(ICommand<>);
-        var typeToValidate = typeof(ICommandHandler<,>);
+        var typeToValidate = typeof(INoMethod<,>);
 
-        // Act
-        ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate);
-
-        // Assert
-        Assert.Pass(); 
-    }
-    
-    [Test]
-    public void Validate_DispatcherInterface_OneValidHandleMethod_Passes()
-    {
-        // Arrange
-        var inputType = typeof(ICommand<>);
-        var typeToValidate = typeof(ICommandDispatcher);
-
-        // Act
-        ExactlyOneHandleMethodShouldBeDefined.Validate(inputType, typeToValidate);
-
-        // Assert
-        Assert.Pass(); 
+        // Act & Assert
+        Assert.Throws<HandlerMethodNotImplementedException>(() =>
+            ExactlyOneHandleMethodShouldBeDefined.Validate(InputType, typeToValidate));
     }
 }
