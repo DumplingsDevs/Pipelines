@@ -38,12 +38,12 @@ internal static class ValidateHandlerHandleMethod
     {
         if (isVoidMethod && expectedResultTypes.Any())
         {
-            throw new Exception("Expected no void method");
+            throw new Exception("Expected method with result");
         }
 
-        if (!isVoidMethod && expectedResultTypes.Any())
+        if (!isVoidMethod && !expectedResultTypes.Any())
         {
-            throw new Exception("Expected method with result");
+            throw new Exception("Expected void");
         }
     }
 

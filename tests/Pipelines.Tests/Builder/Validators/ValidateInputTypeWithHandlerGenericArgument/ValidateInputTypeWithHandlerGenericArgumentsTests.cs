@@ -60,6 +60,6 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         // Act & Assert
         Assert.Throws<Exception>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType,
-                handlerType)); // if no exception was thrown, the test passes
+                handlerType));
     }
 }
