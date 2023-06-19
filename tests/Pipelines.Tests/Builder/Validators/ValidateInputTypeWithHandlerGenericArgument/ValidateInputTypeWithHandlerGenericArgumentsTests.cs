@@ -1,11 +1,11 @@
 using Pipelines.Builder.Validators;
-using Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types;
+using Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types;
 using DiffNamespaceICommand =
-    Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types.DiffNamespace.ICommand;
+    Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types.DiffNamespace.ICommand;
 
-namespace Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers;
+namespace Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument;
 
-public class ValidateHandleMethodInHandlersTests
+public class ValidateInputTypeWithHandlerGenericArgumentsTests
 {
     [Test]
     public void Validate_InputWithOneResultTypeMethodMatchesHandlerMethod_Passes()
@@ -15,7 +15,7 @@ public class ValidateHandleMethodInHandlersTests
         var inputType = typeof(ICommandWithResult<>);
 
         // Act
-        ValidateHandleMethodInHandler.Validate(inputType, commandHandler);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
@@ -29,7 +29,7 @@ public class ValidateHandleMethodInHandlersTests
         var inputType = typeof(ICommandWithTwoResults<,>);
 
         // Act
-        ValidateHandleMethodInHandler.Validate(inputType, commandHandler);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
@@ -43,7 +43,7 @@ public class ValidateHandleMethodInHandlersTests
         var inputType = typeof(ICommand);
 
         // Act
-        ValidateHandleMethodInHandler.Validate(inputType, commandHandler);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
@@ -59,7 +59,7 @@ public class ValidateHandleMethodInHandlersTests
     {
         // Act & Assert
         Assert.Throws<Exception>(() =>
-            ValidateHandleMethodInHandler.Validate(inputType,
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType,
                 handlerType)); // if no exception was thrown, the test passes
     }
 }

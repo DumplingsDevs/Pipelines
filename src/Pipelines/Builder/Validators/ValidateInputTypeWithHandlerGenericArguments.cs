@@ -1,9 +1,7 @@
 namespace Pipelines.Builder.Validators;
 
-internal static class ValidateHandleMethodInHandler
+internal static class ValidateInputTypeWithHandlerGenericArguments
 {
-    //var z = type.GetGenericArguments().First().GetGenericParameterConstraints().First();
-
     //remember to validate if inputType have generic type. Return value should be same.
 
     internal static void Validate(Type inputType, Type handlerType)
@@ -16,22 +14,15 @@ internal static class ValidateHandleMethodInHandler
                 throw new Exception();
         }
 
-        if (InputTypeNotMatchFirstGenericParameterConstraint(inputType, genericArguments.First()))
+        if (InputTypeNotMatchGenericArgumentConstraint(inputType, genericArguments.First()))
         {
             throw new Exception();
         }
-
-        var methods = handlerType
-            .GetMethods()
-            .Where(x => x.GetParameters()
-                .Any(y => y.ParameterType == inputType))
-            .ToList();
     }
 
-    private static bool InputTypeNotMatchFirstGenericParameterConstraint(Type inputType, Type handlerGenericParameter)
+    private static bool InputTypeNotMatchGenericArgumentConstraint(Type inputType, Type handlerGenericParameter)
     {
         var handlerInputConstraint = handlerGenericParameter.GetGenericParameterConstraints();
-        //GenericTypeArguments
         if (handlerInputConstraint.Length is 0 or > 2)
         {
             throw new Exception();
@@ -40,7 +31,7 @@ internal static class ValidateHandleMethodInHandler
         var handleInputType = handlerInputConstraint.First();
 
         //Its enough to validate namespaces + GenericTypeArguments. It will check if:
-        //handler use expected input (due to namespaces matches)
+        // handler use expected input (due to namespaces matches)
         //within same namespace, type with same generic argument lenght can not exists (build error) 
         ValidateNamespaces();
         ValidateGenericTypeArgumentsLenght(inputType, handleInputType);

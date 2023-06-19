@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types;
+namespace Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types;
 
 public interface ICommandHandler<in TCommand> where TCommand : ICommand
 {
