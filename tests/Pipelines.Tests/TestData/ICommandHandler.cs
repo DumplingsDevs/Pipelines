@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.TestData;
 
-public interface ICommandHandlerWithResult<in TCommand> where TCommand : ICommandWithResult
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
 {
     public Task<string> HandleAsync(TCommand command);
 }

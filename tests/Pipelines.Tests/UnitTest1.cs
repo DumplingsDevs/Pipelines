@@ -17,7 +17,7 @@ public class Tests
     [Test]
     public async Task Test1()
     {
-        var request = new ExampleCommandWithResult("My test request", 128);
+        var request = new ExampleCommand("My test request", 128);
 
         var result = await _commandDispatcher.SendAsync(request);
             

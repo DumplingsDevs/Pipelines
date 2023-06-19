@@ -1,5 +1,5 @@
 namespace Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types;
 
-public interface ICommand<TResult>
+public interface ICommandWithResult<TResult>
 {
 }

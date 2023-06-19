@@ -1,4 +1,5 @@
 using Pipelines.Builder.Validators;
+using Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types;
 using Pipelines.Tests.TestData;
 
 namespace Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers;
@@ -9,8 +10,8 @@ public class ValidateHandleMethodInHandlersTests
     public void Validate_DifferentMethodName_Passes()
     {
         // Arrange
-        var commandHandler = typeof(ICommandHandlerWithResult<>);
-        var inputType = typeof(ICommandWithResult);
+        var commandHandler = typeof(ICommandHandler<>);
+        var inputType = typeof(ICommandWithResult<>);
 
         // Act
         ValidateHandleMethodInHandler.Validate(inputType, commandHandler);

@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.TestData;
 
-public interface ICommandWithResult
+public interface ICommand
 {
     
 }

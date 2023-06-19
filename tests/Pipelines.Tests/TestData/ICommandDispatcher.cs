@@ -2,5 +2,5 @@ namespace Pipelines.Tests.TestData;
 
 public interface ICommandDispatcher
 {
-    public Task<string> SendAsync(ICommandWithResult commandWithResult);
+    public Task<string> SendAsync(ICommand commandWithResult);
 }
