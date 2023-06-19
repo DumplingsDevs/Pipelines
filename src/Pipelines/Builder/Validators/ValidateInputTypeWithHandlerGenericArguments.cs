@@ -2,8 +2,6 @@ namespace Pipelines.Builder.Validators;
 
 internal static class ValidateInputTypeWithHandlerGenericArguments
 {
-    //remember to validate if inputType have generic type. Return value should be same.
-
     internal static void Validate(Type inputType, Type handlerType)
     {
         var genericArguments = handlerType.GetGenericArguments();
