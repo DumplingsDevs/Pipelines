@@ -1,5 +1,7 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types;
+using DiffNamespaceICommand =
+    Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers.Types.DiffNamespace.ICommand;
 
 namespace Pipelines.Tests.Builder.Validators.ValidateHandleMethodInHandlers;
 
@@ -18,7 +20,7 @@ public class ValidateHandleMethodInHandlersTests
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
     }
-    
+
     [Test]
     public void Validate_InputWithTwoResultTypesMatchesHandlerMethod_Passes()
     {
@@ -32,7 +34,7 @@ public class ValidateHandleMethodInHandlersTests
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
     }
-    
+
     [Test]
     public void Validate_InputWithoutResultMatchesHandlerMethod_Passes()
     {
@@ -45,5 +47,19 @@ public class ValidateHandleMethodInHandlersTests
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
+    }
+
+    [Test]
+    [TestCase(typeof(ICommand), typeof(ICommandHandlerWithResult<,>))]
+    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandler<>))]
+    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandlerWithTwoResults<,,>))]
+    [TestCase(typeof(ICommandWithTwoResults<,>), typeof(ICommandHandlerWithResult<,>))]
+    [TestCase(typeof(DiffNamespaceICommand), typeof(ICommandHandler<>))]
+    public void Validate_InputNotMatchHandlerMethod_ThrowException(Type inputType, Type handlerType)
+    {
+        // Act & Assert
+        Assert.Throws<Exception>(() =>
+            ValidateHandleMethodInHandler.Validate(inputType,
+                handlerType)); // if no exception was thrown, the test passes
     }
 }
