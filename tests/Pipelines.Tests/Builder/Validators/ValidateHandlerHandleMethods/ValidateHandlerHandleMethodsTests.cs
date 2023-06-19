@@ -7,9 +7,9 @@ namespace Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods;
 public class ValidateHandlerHandleMethodsTests
 {
     [Test]
-    [TestCase(typeof(ICommandHandlerWithResult<,>))]
-    [TestCase(typeof(IVoidCommandHandler<>))]
-    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>))]
+    [TestCase(typeof(ICommandHandlerWithResult<,>), TestName = "ICommandHandlerWithResult")]
+    [TestCase(typeof(IVoidCommandHandler<>), TestName = "IVoidCommandHandler")]
+    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")]
     public void Validate_GenericArgumentsMatchesHandlerMethod_Passes(Type handlerType)
     {
         // Act
@@ -20,10 +20,10 @@ public class ValidateHandlerHandleMethodsTests
     }
     
     [Test]
-    [TestCase(typeof(IReturnResultExpectedVoid<,>))]
-    [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>))]
-    [TestCase(typeof(IReturnTwoValuesExpectedOne<,>))]
-    [TestCase(typeof(IVoidWithExpectedResult<>))]
+    [TestCase(typeof(IReturnResultExpectedVoid<,>), TestName = "IReturnResultExpectedVoid")]
+    [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
+    [TestCase(typeof(IReturnTwoValuesExpectedOne<,>), TestName = "IReturnTwoValuesExpectedOne")]
+    [TestCase(typeof(IVoidWithExpectedResult<>), TestName = "IVoidWithExpectedResult")]
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsException(Type handlerType)
     {
         // Act & Assert
