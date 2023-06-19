@@ -8,7 +8,7 @@ internal static class ValidateHandlerHandleMethod
     {
         var genericArguments = handlerType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().FirstOrDefault();
-        
+
         if (handleMethod == null)
         {
             throw new Exception();
@@ -19,7 +19,12 @@ internal static class ValidateHandlerHandleMethod
         var methodReturnTypes = handleMethod.GetReturnTypes();
 
         ValidateVoidMethod(isVoidMethod, expectedResultTypes);
-        ValidateResultTypeCount(expectedResultTypes.Count, methodReturnTypes.Count);
+        
+        if (!isVoidMethod)
+        {
+            ValidateResultTypeCount(expectedResultTypes.Count, methodReturnTypes.Count);
+        }
+        
         ValidateResultTypeMatch(expectedResultTypes, methodReturnTypes);
     }
 
@@ -36,40 +41,29 @@ internal static class ValidateHandlerHandleMethod
 
     private static void ValidateVoidMethod(bool isVoidMethod, List<Type> expectedResultTypes)
     {
-        if (isVoidMethod && expectedResultTypes.Any())
+        switch (isVoidMethod)
         {
-            throw new Exception("Expected method with result");
-        }
+            case true when expectedResultTypes.Any():
+                throw new Exception("Expected method with result");
 
-        if (!isVoidMethod && !expectedResultTypes.Any())
-        {
-            throw new Exception("Expected void");
+            case false when !expectedResultTypes.Any():
+                throw new Exception("Expected void");
         }
     }
 
-    private static void ValidateResultTypeCount(int expectedResultTypesLength, int methodReturnTypesLength)
+    private static void ValidateResultTypeCount(int expectedResultTypesLength,
+        int methodReturnTypesLength)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
             throw new Exception("Result type count mismatch");
         }
     }
-    
+
     private static List<Type> GetResultTypes(Type[] genericArguments)
     {
         return genericArguments.Length < 1
             ? new List<Type>()
             : genericArguments.Skip(1).Take(genericArguments.Length - 1).ToList();
-    }
-
-    private static void ValidateGenericTypeArgumentsLenght(Type inputType, Type handleInputType)
-    {
-        var inputGenericArguments = inputType.GetGenericArguments();
-        var handleGenericArguments = handleInputType.GetGenericArguments();
-
-        if (inputGenericArguments.Length != handleGenericArguments.Length)
-        {
-            throw new Exception();
-        }
     }
 }
