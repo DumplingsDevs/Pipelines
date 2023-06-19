@@ -32,4 +32,18 @@ public class ValidateHandleMethodInHandlersTests
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
     }
+    
+    [Test]
+    public void Validate_InputWithoutResultMatchesHandlerMethod_Passes()
+    {
+        // Arrange
+        var commandHandler = typeof(ICommandHandler<>);
+        var inputType = typeof(ICommand);
+
+        // Act
+        ValidateHandleMethodInHandler.Validate(inputType, commandHandler);
+
+        // Assert
+        Assert.Pass(); // if no exception was thrown, the test passes
+    }
 }
