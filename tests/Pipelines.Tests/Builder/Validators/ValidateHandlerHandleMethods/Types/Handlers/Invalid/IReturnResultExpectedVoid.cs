@@ -2,7 +2,7 @@ using Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Inpu
 
 namespace Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Handlers.Invalid;
 
-public interface IReturnResultExpectedVoid<in TCommand, TResult> where TCommand : ICommand
+public interface IReturnResultExpectedVoid<in TCommand> where TCommand : ICommand
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<int> HandleAsync(TCommand command, CancellationToken token);
 }

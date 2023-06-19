@@ -20,7 +20,7 @@ public class ValidateHandlerHandleMethodsTests
     }
     
     [Test]
-    [TestCase(typeof(IReturnResultExpectedVoid<,>), TestName = "IReturnResultExpectedVoid")]
+    [TestCase(typeof(IReturnResultExpectedVoid<>), TestName = "IReturnResultExpectedVoid")]
     [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
     [TestCase(typeof(IReturnTwoValuesExpectedOne<,>), TestName = "IReturnTwoValuesExpectedOne")]
     [TestCase(typeof(IVoidWithExpectedResult<>), TestName = "IVoidWithExpectedResult")]

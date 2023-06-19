@@ -9,10 +9,31 @@ public static class MethodInfoExtensions
         var returnTypes = new List<Type>();
         var returnType = methodInfo.ReturnType;
 
-        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+        if (returnType.IsGenericType)
         {
-            var taskType = returnType.GetGenericArguments()[0];
-            returnTypes.Add(taskType);
+            var genericTypeDefinition = returnType.GetGenericTypeDefinition();
+
+            if (genericTypeDefinition == typeof(Task<>))
+            {
+                var taskType = returnType.GetGenericArguments()[0];
+                
+                if (taskType.IsGenericType)
+                {
+                    returnTypes.AddRange(taskType.GetGenericArguments());
+                }
+                else
+                {
+                    returnTypes.Add(taskType);
+                }
+            }
+            else if (genericTypeDefinition == typeof(Tuple<>))
+            {
+                returnTypes.AddRange(returnType.GetGenericArguments());
+            }
+            else
+            {
+                returnTypes.Add(returnType);
+            }
         }
         else
         {
@@ -21,7 +42,7 @@ public static class MethodInfoExtensions
 
         return returnTypes;
     }
-    
+
     public static bool IsVoidOrTaskReturnType(this MethodInfo methodInfo)
     {
         var returnType = methodInfo.ReturnType;
