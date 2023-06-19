@@ -8,4 +8,9 @@ public class ExampleCommandHandler : ICommandHandler<ExampleCommand, ExampleComm
     {
         return Task.FromResult(new ExampleCommandResult(command.Value));
     }
+    
+    public Task<ExampleCommandResult> HandleAsync1(ExampleCommand command, CancellationToken token)
+    {
+        return Task.FromResult(new ExampleCommandResult(command.Value));
+    }
 }

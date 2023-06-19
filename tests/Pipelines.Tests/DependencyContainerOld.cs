@@ -11,11 +11,11 @@ public class DependencyContainerOld
     public DependencyContainerOld()
     {
         _services = new ServiceCollection();
-        _services.AddScoped<ICommandHandler<ExampleCommand>, ExampleCommandHandler>();
+        _services.AddScoped<ICommandHandlerWithResult<ExampleCommandWithResult>, ExampleCommandHandlerWithResult>();
         _services
             .AddPipeline()
-            .AddInput(typeof(ICommand))
-            .AddHandler(typeof(ICommandHandler<>), typeof(DependencyContainerOld).Assembly)
+            .AddInput(typeof(ICommandWithResult))
+            .AddHandler(typeof(ICommandHandlerWithResult<>), typeof(DependencyContainerOld).Assembly)
             .AddDispatcher<ICommandDispatcher>()
             .Build();
     }
