@@ -1,8 +1,8 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Exceptions;
-using Pipelines.Tests.Builder.Validators.AllProvidedTypeShouldInterfaces.Types;
+using Pipelines.Tests.Builder.Validators.AllProvidedTypeShouldBeInterfaces.Types;
 
-namespace Pipelines.Tests.Builder.Validators.AllProvidedTypeShouldInterfaces;
+namespace Pipelines.Tests.Builder.Validators.AllProvidedTypeShouldBeInterfaces;
 
 public class AllProvidedTypeShouldInterfaceTests
 {
@@ -14,7 +14,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.DoesNotThrow(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
     
     [Test]
@@ -25,7 +25,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
     
     [Test]
@@ -69,7 +69,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
     
     [Test]
@@ -80,7 +80,7 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
     
     [Test]
@@ -91,6 +91,6 @@ public class AllProvidedTypeShouldInterfaceTests
 
         // Act & Assert
         Assert.Throws<InvalidTypeException>(() =>
-            AllProvidedTypeShouldInterface.Validate(inputType));
+            AllProvidedTypeShouldBeInterface.Validate(inputType));
     }
 }
