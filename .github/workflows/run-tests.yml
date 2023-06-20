@@ -37,8 +37,7 @@ jobs:
           covered=$(grep -oP '(?<=<line.*total=")[0-9]+' coverage-report/Summary/index.htm | paste -sd+ - | bc)
           echo "Total lines: $total"
           echo "Covered lines: $covered"
-          percentage=$(echo "scale=2; $covered / $total * 100" | bc)
-          echo "::set-output name=coverage-percentage::$percentage"
+          echo "::set-output name=coverage-percentage::$covered / $total * 100"
 
       - name: Display coverage percentage
-        run: echo "Code coverage: ${{ steps.coverage.outputs.coverage-percentage }}%"
+        run: echo "Code coverage" ${{ steps.coverage.outputs.coverage-percentage }}
