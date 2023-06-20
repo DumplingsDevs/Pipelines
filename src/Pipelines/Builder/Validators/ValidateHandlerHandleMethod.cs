@@ -32,7 +32,10 @@ internal static class ValidateHandlerHandleMethod
     {
         for (var i = 0; i < expectedResultTypes.Count; i++)
         {
-            if (expectedResultTypes[0].FullName != methodReturnTypes[0].FullName)
+            var expectedResultType = expectedResultTypes[i];
+            var methodReturnType = methodReturnTypes[i];
+
+            if (expectedResultType != methodReturnType)
             {
                 throw new Exception("Return type mismatch");
             }
