@@ -1,14 +1,14 @@
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
 public class
-    DedicatedLoggingDecorator : IRequestHandler<ExampleRequest,
+    ExampleRequestValidator : IRequestHandler<ExampleRequest,
         ExampleCommandResult>
 {
     private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
 
-    public DedicatedLoggingDecorator(
+    public ExampleRequestValidator(
         IRequestHandler<ExampleRequest, ExampleCommandResult> handler)
     {
         _handler = handler;
@@ -17,9 +17,9 @@ public class
     public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
         CancellationToken token)
     {
-        Console.WriteLine($"[DedicatedLoggingDecorator] Start of handling {request.GetType().Name}");
+        Console.WriteLine($"[ExampleRequestValidator] Start of handling {request.GetType().Name}");
         var result = await _handler.HandleAsync(request, token);
-        Console.WriteLine($"[DedicatedLoggingDecorator] Stop of handling {request.GetType().Name}");
+        Console.WriteLine($"[ExampleRequestValidator] Stop of handling {request.GetType().Name}");
 
         return result;
     }

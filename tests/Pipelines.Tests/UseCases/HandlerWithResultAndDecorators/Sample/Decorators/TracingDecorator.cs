@@ -1,6 +1,6 @@
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
 public class TracingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TResult> where TCommand : IRequest<TResult>
 {

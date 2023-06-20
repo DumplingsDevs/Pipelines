@@ -1,6 +1,6 @@
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
 public class LoggingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TResult> where TCommand : IRequest<TResult>
 {

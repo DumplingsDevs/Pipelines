@@ -1,6 +1,5 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
 
 namespace Pipelines.Tests;
 
@@ -15,14 +14,14 @@ public class DependencyContainer
     }
 
     public void RegisterPipeline<TDispatcher>(Assembly handlersAssembly,
-        Type inputType, Type handlerType) where TDispatcher : class
+        Type inputType, Type handlerType, Type[]? decorators = null) where TDispatcher : class
     {
         _services
             .AddPipeline()
             .AddInput(inputType)
             .AddHandler(handlerType, handlersAssembly)
             .AddDispatcher<TDispatcher>()
-            .AddDecorators(typeof(LoggingDecorator<,>), typeof(TracingDecorator<,>), typeof(DedicatedLoggingDecorator))
+            .AddDecorators(decorators ?? Array.Empty<Type>())
             .Build();
     }
 
