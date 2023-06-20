@@ -50,11 +50,11 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     }
 
     [Test]
-    [TestCase(typeof(ICommand), typeof(ICommandHandlerWithResult<,>))]
-    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandler<>))]
-    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandlerWithTwoResults<,,>))]
-    [TestCase(typeof(ICommandWithTwoResults<,>), typeof(ICommandHandlerWithResult<,>))]
-    [TestCase(typeof(DiffNamespaceICommand), typeof(ICommandHandler<>))]
+    [TestCase(typeof(ICommand), typeof(ICommandHandlerWithResult<,>), TestName = "Void command with, Handler with one result")]
+    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandler<>), TestName = "Command with one result,void Handler")]
+    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandlerWithTwoResults<,,>), TestName = "Command with one result, Handler with two results")]
+    [TestCase(typeof(ICommandWithTwoResults<,>), typeof(ICommandHandlerWithResult<,>), TestName = "Command with two Results, Handler with one result")]
+    [TestCase(typeof(DiffNamespaceICommand), typeof(ICommandHandler<>), TestName = "Command from different namespace, not match Input type from Handler")]
     public void Validate_InputNotMatchHandlerMethod_ThrowException(Type inputType, Type handlerType)
     {
         // Act & Assert

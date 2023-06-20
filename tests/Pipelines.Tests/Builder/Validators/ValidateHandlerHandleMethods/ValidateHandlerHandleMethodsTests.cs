@@ -24,6 +24,7 @@ public class ValidateHandlerHandleMethodsTests
     [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
     [TestCase(typeof(IReturnTwoValuesExpectedOne<,>), TestName = "IReturnTwoValuesExpectedOne")]
     [TestCase(typeof(IVoidWithExpectedResult<>), TestName = "IVoidWithExpectedResult")]
+    [TestCase(typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>), TestName = "IReturnTwoValuesExpectedTwoTypeMismatch")]
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsException(Type handlerType)
     {
         // Act & Assert
