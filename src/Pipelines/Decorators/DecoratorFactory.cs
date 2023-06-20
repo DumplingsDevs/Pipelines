@@ -7,11 +7,17 @@ public static class DecoratorFactory
     internal static Func<IServiceProvider, object> CreateDecorator(Type serviceType, Type decoratorType)
     {
 
-        var genericArguments = serviceType.GetGenericArguments();
-        var closedDecorator = decoratorType.MakeGenericType(genericArguments);
+        if (decoratorType.IsGenericType)
+        {
+            var genericArguments = serviceType.GetGenericArguments();
+            var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
-        return TypeDecorator(serviceType, closedDecorator);
-
+            return TypeDecorator(serviceType, closedDecorator);
+        }
+        else
+        {
+            return TypeDecorator(serviceType, decoratorType);
+        }
     }
     
     private static Func<IServiceProvider, object> TypeDecorator(Type serviceType, Type decoratorType) => serviceProvider =>

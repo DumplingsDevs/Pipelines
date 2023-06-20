@@ -29,7 +29,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         _handlerType = handlerType;
 
-        //TO DO - how to filter out decorators? Maybe we can assume that something IS NOT a decorator when there is no handler in constructor?
         var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
             .WhereConstructorDoesNotHaveParameter(handlerType);
 
