@@ -25,12 +25,14 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IDispatcherBuilder AddHandler(Type type, Assembly assembly)
+    public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
-        _handlerType = type;
+        _handlerType = handlerType;
 
         //TO DO - how to filter out decorators? Maybe we can assume that something IS NOT a decorator when there is no handler in constructor?
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type).Where(x => !x.Name.Contains("Logging") && !x.Name.Contains("Tracing"));
+        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
+            .WhereConstructorDoesNotHaveParameter(handlerType);
+
         _serviceCollection.RegisterGenericTypesAsScoped(types);
 
         return this;
@@ -57,7 +59,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
             for (var i = _serviceCollection.Count - 1; i >= 0; i--)
             {
                 var serviceDescriptor = _serviceCollection[i];
-                
+
                 if (serviceDescriptor.ServiceType is DecoratedType)
                 {
                     continue; // Service has already been decorated.
@@ -70,7 +72,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
                 var decoratedType = new DecoratedType(serviceDescriptor.ServiceType);
                 _serviceCollection.Add(serviceDescriptor.WithServiceType(decoratedType));
-                
+
                 var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
                 _serviceCollection[i] = serviceDescriptor.WithImplementationFactory(implementationFactory);
             }
@@ -80,7 +82,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     }
 
     private static bool CanDecorate(Type serviceType, Type decoratorType) =>
-        serviceType is { IsGenericType: true, IsGenericTypeDefinition: false } 
+        serviceType is { IsGenericType: true, IsGenericTypeDefinition: false }
         && serviceType.HasCompatibleGenericArguments(decoratorType);
 
     public void Build()
