@@ -1,5 +1,5 @@
 namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
-public interface IDecoratorCommand<TResult>
+public interface IRequest<TResult>
 {
 }

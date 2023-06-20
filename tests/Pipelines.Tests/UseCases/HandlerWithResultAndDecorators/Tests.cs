@@ -5,7 +5,7 @@ namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators;
 
 public class Tests
 {
-    private readonly IDecoratorCommandDispatcher _decoratorCommandDispatcher;
+    private readonly IRequestDispatcher _requestDispatcher;
     private readonly DependencyContainer _dependencyContainer;
 
     public Tests()
@@ -13,20 +13,20 @@ public class Tests
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
 
-        _dependencyContainer.RegisterPipeline<IDecoratorCommandDispatcher>(assembly, typeof(IDecoratorCommand<>),
-            typeof(IDecoratorCommandHandler<,>));
+        _dependencyContainer.RegisterPipeline<IRequestDispatcher>(assembly, typeof(IRequest<>),
+            typeof(IRequestHandler<,>));
         _dependencyContainer.BuildContainer();
-        _decoratorCommandDispatcher = _dependencyContainer.GetDispatcher<IDecoratorCommandDispatcher>();
+        _requestDispatcher = _dependencyContainer.GetDispatcher<IRequestDispatcher>();
     }
 
     [Test]
     public async Task HappyPath()
     {
         //Arrange
-        var request = new DecoratorExampleDecoratorCommand("My test request");
+        var request = new ExampleRequest("My test request");
 
         //Act
-        var result = await _decoratorCommandDispatcher.SendAsync(request, new CancellationToken());
+        var result = await _requestDispatcher.SendAsync(request, new CancellationToken());
 
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request Changed"));
