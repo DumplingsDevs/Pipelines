@@ -28,7 +28,7 @@ jobs:
       - name: Calculate coverage percentage
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
-          reportgenerator "-reports:./lcov/*.xml" "-targetdir:coverage-report" "-reporttypes:HtmlInline_AzurePipelines"
+          reportgenerator "-reports:./lcov/**/*.xml" "-targetdir:coverage-report" "-reporttypes:HtmlInline_AzurePipelines"
 
       - name: Extract coverage percentage
         id: coverage
@@ -40,4 +40,4 @@ jobs:
           echo "::set-output name=coverage-percentage::$covered / $total * 100"
 
       - name: Display coverage percentage
-        run: echo "Code coverage" ${{ steps.coverage.outputs.coverage-percentage }}
+        run: echo "Code coverage" ${{ steps.calculate-coverage.outputs.coverage-percentage }}
