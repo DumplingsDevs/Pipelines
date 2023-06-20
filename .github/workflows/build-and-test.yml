@@ -19,7 +19,6 @@ jobs:
       - name: Determine required .NET SDK version
         id: dotnet-version
         run: |
-          cd Pipelines
           export DOTNET_VERSION=$(dotnet --list-sdks | awk '/7\.0\./ {print $1; exit}')
           echo "::set-output name=dotnet-version::$DOTNET_VERSION"
 
