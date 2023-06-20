@@ -19,19 +19,16 @@ jobs:
       - name: Determine required .NET SDK version
         id: dotnet-version
         run: |
-          export DOTNET_INSTALL_DIR="$HOME/.dotnet"
-          export DOTNET_INSTALL_SCRIPT_URL="https://dot.net/v1/dotnet-install.sh"
-          curl -Lsfo dotnet-install.sh $DOTNET_INSTALL_SCRIPT_URL
-          chmod +x dotnet-install.sh
-
-          export DOTNET_VERSION=$(./dotnet-install.sh --list-sdks | awk '/7\.0\./ {print $1; exit}')
+          cd Pipelines
+          export DOTNET_VERSION=$(dotnet --list-sdks | awk '/7\.0\./ {print $1; exit}')
           echo "::set-output name=dotnet-version::$DOTNET_VERSION"
 
       - name: Download and install .NET SDK
         run: |
           export DOTNET_INSTALL_DIR="$HOME/.dotnet"
+          export DOTNET_VERSION="${{ steps.dotnet-version.outputs.dotnet-version }}"
           export DOTNET_INSTALL_SCRIPT_URL="https://dot.net/v1/dotnet-install.sh"
-          export DOTNET_INSTALL_ARGS="--install-dir $DOTNET_INSTALL_DIR --version ${{ steps.dotnet-version.outputs.dotnet-version }} --no-path"
+          export DOTNET_INSTALL_ARGS="--install-dir $DOTNET_INSTALL_DIR --version $DOTNET_VERSION --no-path"
 
           mkdir -p "$DOTNET_INSTALL_DIR"
           curl -Lsfo dotnet-install.sh $DOTNET_INSTALL_SCRIPT_URL
