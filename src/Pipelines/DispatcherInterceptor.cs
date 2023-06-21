@@ -44,7 +44,8 @@ public class DispatcherInterceptor : IInterceptor
     private static MethodInfo GetHandlerMethod(object handler, Type inputType)
     {
         //TO DO - we need to think about it twice - there could be situation, when you have private methods or public by mistake which takes same input parameter!
-        // To solve that, maybe we can use Attributes? Even attribute could be provided in builder
+        // To solve that, maybe we can use Attributes? Even attribute could be provided in builde
+        // Handler with Result Tests proves that state
         
         var methods = handler.GetType()
             .GetMethods()
