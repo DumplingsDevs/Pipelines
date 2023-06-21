@@ -1,5 +1,6 @@
-using Pipelines.Tests.UseCases.HandlerWithResult.Sample;
 using Pipelines.Tests.UseCases.HandlerWithResult.Types;
+using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+using ExampleCommand = Pipelines.Tests.UseCases.HandlerWithResult.Sample.ExampleCommand;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResult;
 
@@ -14,7 +15,7 @@ public class Tests
         
         _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly,typeof(ICommand<>), typeof(ICommandHandler<,>));
         _dependencyContainer.BuildContainer();
-        _commandDispatcher = _dependencyContainer.GetDispatcher<ICommandDispatcher>();
+        _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
     }
     
     [Test]

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
+using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
 using Pipelines.Builder.Validators;
 using Pipelines.Utils;
@@ -13,8 +14,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
     private Type _inputType = null!;
-    private Type _decoratorType = null!;
     private Type _dispatcherType = null!;
+    private Type[] _decorators = null!;
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -27,10 +28,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IDispatcherBuilder AddHandler(Type type, Assembly assembly)
+    public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
-        _handlerType = type;
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, type);
+        _handlerType = handlerType;
+
+        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
+            .WhereConstructorDoesNotHaveParameter(handlerType);
+
         _serviceCollection.RegisterGenericTypesAsScoped(types);
 
         return this;
@@ -52,14 +56,9 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineBuildBuilder AddDecorators(Type decoratorGenericType, params Type[] decorators)
+    public IPipelineBuildBuilder AddDecorators(params Type[] decorators)
     {
-        _decoratorType = decoratorGenericType;
-
-        foreach (var decorator in decorators)
-        {
-            _serviceCollection.AddScoped(_decoratorType, decorator);
-        }
+        _decorators = decorators;
 
         return this;
     }
@@ -70,5 +69,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateHandlerHandleMethod.Validate(_handlerType);
+
+        _serviceCollection.AddDecorators(_decorators);
     }
 }

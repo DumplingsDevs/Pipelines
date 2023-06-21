@@ -4,5 +4,5 @@ namespace Pipelines.Builder.Interfaces;
 
 public interface IHandlerBuilder
 {
-    public IDispatcherBuilder AddHandler(Type type, Assembly assembly);
+    public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly);
 }
