@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Pipelines.Decorators;
+namespace Pipelines.Utils;
 
 internal static class ServiceDescriptorExtensions
 {

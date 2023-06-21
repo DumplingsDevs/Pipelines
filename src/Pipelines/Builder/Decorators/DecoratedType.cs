@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Pipelines.Decorators;
+namespace Pipelines.Builder.Decorators;
 
-public class DecoratedType : Type
+internal class DecoratedType : Type
 {
     public DecoratedType(Type type) => ProxiedType = type;
     private Type ProxiedType { get; }

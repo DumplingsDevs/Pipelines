@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Pipelines.Decorators;
+namespace Pipelines.Builder.Decorators;
 
-public static class DecoratorFactory
+internal static class DecoratorFactory
 {
     internal static Func<IServiceProvider, object> CreateDecorator(Type serviceType, Type decoratorType)
     {

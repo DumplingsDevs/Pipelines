@@ -1,8 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Internal;
-
-namespace Pipelines.Decorators;
+﻿namespace Pipelines.Utils;
 
 internal static class ReflectionExtensions
 {
@@ -22,19 +18,17 @@ internal static class ReflectionExtensions
                 return false;
             }
         }
-        else
-        {
-            var genericInterfaceType = genericTypeDefinition.GetInterfaces().First().GetGenericTypeDefinition();
+
+        var genericInterfaceType = genericTypeDefinition.GetInterfaces().First().GetGenericTypeDefinition();
             
-            try
-            {
-                _ = genericInterfaceType.MakeGenericType(genericArguments);
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
+        try
+        {
+            _ = genericInterfaceType.MakeGenericType(genericArguments);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
         }
 
     }
