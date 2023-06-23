@@ -7,6 +7,8 @@ internal static class ValidateHandlerHandleMethod
 {
     internal static void Validate(Type handlerType)
     {
+        ParamValidator.NotNull(handlerType, nameof(handlerType));
+        
         var genericArguments = handlerType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().FirstOrDefault();
 

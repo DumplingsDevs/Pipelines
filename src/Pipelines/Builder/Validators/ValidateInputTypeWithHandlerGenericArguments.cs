@@ -1,20 +1,26 @@
+using Pipelines.Exceptions;
+using Pipelines.Utils;
+
 namespace Pipelines.Builder.Validators;
 
 internal static class ValidateInputTypeWithHandlerGenericArguments
 {
     internal static void Validate(Type inputType, Type handlerType)
     {
+        ParamValidator.NotNull(inputType, nameof(inputType));
+        ParamValidator.NotNull(handlerType, nameof(handlerType));
+        
         var genericArguments = handlerType.GetGenericArguments();
 
         switch (genericArguments.Length)
         {
             case 0:
-                throw new Exception();
+                throw new GenericArgumentsNotFoundException(handlerType);
         }
 
         if (InputTypeNotMatchGenericArgumentConstraint(inputType, genericArguments.First()))
         {
-            throw new Exception();
+            throw new InputTypeMismatchException(inputType, genericArguments.First());
         }
     }
 
@@ -23,14 +29,16 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
         var handlerInputConstraint = handlerGenericParameter.GetGenericParameterConstraints();
         if (handlerInputConstraint.Length is 0 or > 2)
         {
-            throw new Exception();
+            throw new InvalidConstraintLengthException(handlerGenericParameter);
         }
 
         var handleInputType = handlerInputConstraint.First();
 
-        //Its enough to validate namespaces + GenericTypeArguments. It will check if:
-        // handler use expected input (due to namespaces matches)
-        //within same namespace, type with same generic argument lenght can not exists (build error) 
+        // Validating both the namespaces and the GenericTypeArguments is sufficient in this case.
+        // This approach ensures the following checks:
+        // 1. The handler uses the expected input type as defined by matching namespaces.
+        // 2. Within the same namespace, a type with the same generic argument length cannot exist as it would result in a build error.
+
         ValidateNamespaces();
         ValidateGenericTypeArgumentsLenght(inputType, handleInputType);
 
@@ -41,7 +49,7 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
             var handleInputNamespace = handleInputType.Namespace + "." + handleInputType.Name;
             if (!handleInputNamespace.Equals(inputType.FullName))
             {
-                throw new Exception();
+                throw new NamespaceMismatchException(handleInputNamespace, inputType.FullName);
             }
         }
     }
@@ -53,7 +61,7 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
 
         if (inputGenericArguments.Length != handleGenericArguments.Length)
         {
-            throw new Exception();
+            throw new GenericArgumentsLengthMismatchException(inputGenericArguments.Length, handleGenericArguments.Length);
         }
     }
 }
