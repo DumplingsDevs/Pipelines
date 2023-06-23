@@ -17,9 +17,9 @@ public static class ParamValidator
             throw new ArgumentNullException(arrayName);
         }
         
-        if (array.Length <= 1)
+        if (array.Length < 1)
         {
-            throw new ArgumentException("Array must have more than one element", arrayName);
+            throw new ArgumentException("Array must have at least one element", arrayName);
         }
     }
 }
