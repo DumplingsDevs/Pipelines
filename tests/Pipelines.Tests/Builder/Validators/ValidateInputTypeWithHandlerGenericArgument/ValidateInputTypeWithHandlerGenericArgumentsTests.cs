@@ -82,43 +82,43 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(ICommandHandlerWithResult<,>);
 
         // Act & Assert
-        Assert.Throws<ResultTypeCountMismatchException>(() =>
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
     [Test]
-    public void Validate_CommandWithOneResultWithVoidHandler_ThrowsResultTypeCountMismatchException()
+    public void Validate_CommandWithOneResultWithVoidHandler_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
         var inputType = typeof(ICommandWithResult<>);
         var handlerType = typeof(ICommandHandler<>);
 
         // Act & Assert
-        Assert.Throws<ResultTypeCountMismatchException>(() =>
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
     [Test]
-    public void Validate_CommandWithOneResultWithHandlerWithTwoResults_ThrowsResultTypeCountMismatchException()
+    public void Validate_CommandWithOneResultWithHandlerWithTwoResults_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
         var inputType = typeof(ICommandWithResult<>);
         var handlerType = typeof(ICommandHandlerWithTwoResults<,,>);
 
         // Act & Assert
-        Assert.Throws<ResultTypeCountMismatchException>(() =>
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
     [Test]
-    public void Validate_CommandWithTwoResultsWithHandlerWithOneResult_ThrowsResultTypeCountMismatchException()
+    public void Validate_CommandWithTwoResultsWithHandlerWithOneResult_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
         var inputType = typeof(ICommandWithTwoResults<,>);
         var handlerType = typeof(ICommandHandlerWithResult<,>);
 
         // Act & Assert
-        Assert.Throws<ResultTypeCountMismatchException>(() =>
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
