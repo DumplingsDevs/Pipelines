@@ -28,7 +28,7 @@ public class ValidateHandlerHandleMethodsTests
         Type handlerType = typeof(IReturnResultExpectedVoid<>);
 
         // Act & Assert
-        Assert.Throws<ExpectedMethodWithResultException>(() =>
+        Assert.Throws<ExpectedVoidMethodException>(() =>
             ValidateHandlerHandleMethod.Validate(handlerType));
     }
 
