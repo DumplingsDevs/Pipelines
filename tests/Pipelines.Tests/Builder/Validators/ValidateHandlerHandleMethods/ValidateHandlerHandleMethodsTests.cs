@@ -8,6 +8,17 @@ namespace Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods;
 public class ValidateHandlerHandleMethodsTests
 {
     [Test]
+    public void Validate_NullInputType_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Type handlerType = null;
+        
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidateHandlerHandleMethod.Validate(handlerType));
+    }
+
+    [Test]
     [TestCase(typeof(ICommandHandlerWithResult<,>), TestName = "ICommandHandlerWithResult")]
     [TestCase(typeof(IVoidCommandHandler<>), TestName = "IVoidCommandHandler")]
     [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")]
