@@ -65,6 +65,7 @@ internal static class ValidateHandlerHandleMethod
 
     private static List<Type> GetResultTypes(Type[] genericArguments)
     {
+        //Skip first generic argument because it is InputType
         return genericArguments.Length < 1
             ? new List<Type>()
             : genericArguments.Skip(1).Take(genericArguments.Length - 1).ToList();
