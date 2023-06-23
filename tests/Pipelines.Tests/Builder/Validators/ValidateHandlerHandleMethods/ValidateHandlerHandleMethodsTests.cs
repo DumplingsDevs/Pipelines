@@ -1,4 +1,5 @@
 using Pipelines.Builder.Validators;
+using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Handlers.Invalid;
 using Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Handlers.Valid;
 
@@ -15,20 +16,51 @@ public class ValidateHandlerHandleMethodsTests
         // Act
         ValidateHandlerHandleMethod.Validate(handlerType);
 
+        
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
     }
-    
+
     [Test]
-    [TestCase(typeof(IReturnResultExpectedVoid<>), TestName = "IReturnResultExpectedVoid")]
-    [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
+    public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsExpectedResultException()
+    {
+        // Arrange
+        Type handlerType = typeof(IReturnResultExpectedVoid<>);
+
+        // Act & Assert
+        Assert.Throws<ExpectedMethodWithResultException>(() =>
+            ValidateHandlerHandleMethod.Validate(handlerType));
+    }
+
+    [Test]
+    public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsExpectedVoidException()
+    {
+        // Arrange
+        Type handlerType = typeof(IVoidWithExpectedResult<>);
+
+        // Act & Assert
+        Assert.Throws<ExpectedVoidMethodException>(() =>
+            ValidateHandlerHandleMethod.Validate(handlerType));
+    }
+
+    [Test]
     [TestCase(typeof(IReturnTwoValuesExpectedOne<,>), TestName = "IReturnTwoValuesExpectedOne")]
-    [TestCase(typeof(IVoidWithExpectedResult<>), TestName = "IVoidWithExpectedResult")]
-    [TestCase(typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>), TestName = "IReturnTwoValuesExpectedTwoTypeMismatch")]
-    public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsException(Type handlerType)
+    [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
+    public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsReturnCountMismatchException(Type handlerType)
     {
         // Act & Assert
-        Assert.Throws<Exception>(() =>
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
+            ValidateHandlerHandleMethod.Validate(handlerType));
+    }
+
+    [Test]
+    public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsReturnTypeMismatchException()
+    {
+        // Arrange
+        Type handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
+
+        // Act & Assert
+        Assert.Throws<ReturnTypeMismatchException>(() =>
             ValidateHandlerHandleMethod.Validate(handlerType));
     }
 }
