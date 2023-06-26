@@ -1,11 +1,11 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Exceptions;
-using Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Handlers.Invalid;
-using Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods.Types.Handlers.Valid;
+using Pipelines.Tests.Builder.Validators.ValidateResultTypesWithHandlerGenericArgument.Types.Handlers.Invalid;
+using Pipelines.Tests.Builder.Validators.ValidateResultTypesWithHandlerGenericArgument.Types.Handlers.Valid;
 
-namespace Pipelines.Tests.Builder.Validators.ValidateHandlerHandleMethods;
+namespace Pipelines.Tests.Builder.Validators.ValidateResultTypesWithHandlerGenericArgument;
 
-public class ValidateHandlerHandleMethodsTests
+public class ValidateResultTypesWithHandlerGenericArgumentsTests
 {
     [Test]
     public void Validate_NullInputType_ThrowsArgumentNullException()
@@ -15,7 +15,7 @@ public class ValidateHandlerHandleMethodsTests
         
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            ValidateHandlerHandleMethod.Validate(handlerType));
+            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class ValidateHandlerHandleMethodsTests
     public void Validate_GenericArgumentsMatchesHandlerMethod_Passes(Type handlerType)
     {
         // Act
-        ValidateHandlerHandleMethod.Validate(handlerType);
+        ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType);
 
         
         // Assert
@@ -40,7 +40,7 @@ public class ValidateHandlerHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<ExpectedVoidMethodException>(() =>
-            ValidateHandlerHandleMethod.Validate(handlerType));
+            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class ValidateHandlerHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<ExpectedVoidMethodException>(() =>
-            ValidateHandlerHandleMethod.Validate(handlerType));
+            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class ValidateHandlerHandleMethodsTests
     {
         // Act & Assert
         Assert.Throws<ResultTypeCountMismatchException>(() =>
-            ValidateHandlerHandleMethod.Validate(handlerType));
+            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
     [Test]
@@ -72,6 +72,6 @@ public class ValidateHandlerHandleMethodsTests
 
         // Act & Assert
         Assert.Throws<ReturnTypeMismatchException>(() =>
-            ValidateHandlerHandleMethod.Validate(handlerType));
+            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 }

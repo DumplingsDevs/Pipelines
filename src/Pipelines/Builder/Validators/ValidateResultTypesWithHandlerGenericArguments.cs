@@ -3,7 +3,7 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators;
 
-internal static class ValidateHandlerHandleMethod
+internal static class ValidateResultTypesWithHandlerGenericArguments
 {
     internal static void Validate(Type handlerType)
     {
