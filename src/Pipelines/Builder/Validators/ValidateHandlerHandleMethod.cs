@@ -1,3 +1,4 @@
+using Pipelines.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators;
@@ -6,19 +7,21 @@ internal static class ValidateHandlerHandleMethod
 {
     internal static void Validate(Type handlerType)
     {
+        ParamValidator.NotNull(handlerType, nameof(handlerType));
+        
         var genericArguments = handlerType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().FirstOrDefault();
 
         if (handleMethod == null)
         {
-            throw new Exception();
+            throw new HandleMethodNotFoundException(handlerType);
         }
 
         var expectedResultTypes = GetResultTypes(genericArguments);
         var isVoidMethod = handleMethod.IsVoidOrTaskReturnType();
         var methodReturnTypes = handleMethod.GetReturnTypes();
 
-        ValidateVoidMethod(isVoidMethod, expectedResultTypes);
+        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
         
         if (!isVoidMethod)
         {
@@ -37,34 +40,34 @@ internal static class ValidateHandlerHandleMethod
 
             if (expectedResultType != methodReturnType)
             {
-                throw new Exception("Return type mismatch");
+                throw new ReturnTypeMismatchException(expectedResultType, methodReturnType);
             }
         }
     }
 
-    private static void ValidateVoidMethod(bool isVoidMethod, List<Type> expectedResultTypes)
+    private static void ValidateVoidMethod(bool isVoidMethod, List<Type> expectedResultTypes, Type handlerType)
     {
         switch (isVoidMethod)
         {
             case true when expectedResultTypes.Any():
-                throw new Exception("Expected method with result");
+                throw new ExpectedMethodWithResultException(handlerType);
 
             case false when !expectedResultTypes.Any():
-                throw new Exception("Expected void");
+                throw new ExpectedVoidMethodException(handlerType);
         }
     }
 
-    private static void ValidateResultTypeCount(int expectedResultTypesLength,
-        int methodReturnTypesLength)
+    private static void ValidateResultTypeCount(int expectedResultTypesLength, int methodReturnTypesLength)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
-            throw new Exception("Result type count mismatch");
+            throw new ResultTypeCountMismatchException(expectedResultTypesLength, methodReturnTypesLength);
         }
     }
 
     private static List<Type> GetResultTypes(Type[] genericArguments)
     {
+        //24.06.2023 - Since the first generic argument is the input type (InputType), it is disregarded when obtaining the result types
         return genericArguments.Length < 1
             ? new List<Type>()
             : genericArguments.Skip(1).Take(genericArguments.Length - 1).ToList();
