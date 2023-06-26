@@ -26,8 +26,9 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
 
     private static bool InputTypeNotMatchGenericArgumentConstraint(Type inputType, Type handlerGenericParameter)
     {
+        //Only one constraint is expected for 
         var handlerInputConstraint = handlerGenericParameter.GetGenericParameterConstraints();
-        if (handlerInputConstraint.Length is 0 or > 2)
+        if (handlerInputConstraint.Length is not 1)
         {
             throw new InvalidConstraintLengthException(handlerGenericParameter);
         }
@@ -39,20 +40,9 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
         // 1. Within the same namespace, a type with the same generic argument length cannot exist as it would result in a build error.
         // 2. The handler uses the expected input type as defined by matching namespaces.
         ValidateGenericTypeArgumentsLenght(inputType, handleInputType);
-        ValidateNamespaces();
+        TypeNamespaceValidator.Validate(handleInputType,inputType);
 
         return false;
-
-        void ValidateNamespaces()
-        {
-            var handleInputNamespace = handleInputType.Namespace + "." + handleInputType.Name;
-            var inputTypeFullname = inputType.FullName ?? handleInputType.Namespace + "." + handleInputType.Name;
-            
-            if (!handleInputNamespace.Equals(inputTypeFullname))
-            {
-                throw new NamespaceMismatchException(handleInputNamespace, inputTypeFullname);
-            }
-        }
     }
 
     private static void ValidateGenericTypeArgumentsLenght(Type inputType, Type handleInputType)

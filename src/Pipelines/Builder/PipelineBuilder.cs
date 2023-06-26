@@ -67,8 +67,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         AllProvidedTypesShouldBeInterface.Validate(_inputType, _handlerType, _dispatcherType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
+        MethodShouldHaveAtLeastOneParameter.Validate(_handlerType, _dispatcherType);
+        
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
+        
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
 
         _serviceCollection.AddDecorators(_decorators);
     }
