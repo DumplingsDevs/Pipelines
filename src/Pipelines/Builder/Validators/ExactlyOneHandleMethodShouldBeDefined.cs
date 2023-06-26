@@ -3,7 +3,7 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators;
 
-public static class ExactlyOneHandleMethodShouldBeDefined
+internal static class ExactlyOneHandleMethodShouldBeDefined
 {
     internal static void Validate(Type inputType, params Type[] typesToValidate)
     {
