@@ -46,9 +46,11 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
         void ValidateNamespaces()
         {
             var handleInputNamespace = handleInputType.Namespace + "." + handleInputType.Name;
-            if (!handleInputNamespace.Equals(inputType.FullName))
+            var inputTypeFullname = inputType.FullName ?? handleInputType.Namespace + "." + handleInputType.Name;
+            
+            if (!handleInputNamespace.Equals(inputTypeFullname))
             {
-                throw new NamespaceMismatchException(handleInputNamespace, inputType.FullName);
+                throw new NamespaceMismatchException(handleInputNamespace, inputTypeFullname);
             }
         }
     }
