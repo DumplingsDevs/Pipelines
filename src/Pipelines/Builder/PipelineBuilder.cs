@@ -14,7 +14,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Type _handlerType = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
-    private List<Type> _decorators = new();
+    private DecoratorsBuilder _decoratorsBuilder = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -62,7 +62,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateHandlerHandleMethod.Validate(_handlerType);
 
-        _serviceCollection.AddDecorators(_decorators);
+        _serviceCollection.AddDecorators(_decoratorsBuilder.BuildDecorators());
     }
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
@@ -70,7 +70,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decorators.Add(genericDecorator);
+        _decoratorsBuilder.AddDecorator(genericDecorator);
 
         return this;
     }
@@ -80,7 +80,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decorators.Add(typeof(T));
+        _decoratorsBuilder.AddDecorator(typeof(T));
 
         return this;
     }
@@ -88,11 +88,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        var builder = new ClosedTypeDecoratorsBuilder(assemblies, _handlerType);
-
-        action(builder);
-        
-        _decorators.AddRange(builder.GetDecoratorTypes());
+        _decoratorsBuilder.AddDecorators(action, _handlerType, assemblies);
 
         return this;
     }

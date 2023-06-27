@@ -1,9 +1,9 @@
 using System.Reflection;
 using Pipelines.Builder.Interfaces;
 
-namespace Pipelines.Builder;
+namespace Pipelines.Builder.Decorators;
 
-public class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
+internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
 {
     private readonly Assembly[] _assemblies;
     private readonly Type _handlerType;
