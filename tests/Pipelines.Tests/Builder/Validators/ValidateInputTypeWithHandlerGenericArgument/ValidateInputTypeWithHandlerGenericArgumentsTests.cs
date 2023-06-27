@@ -1,4 +1,5 @@
 using Pipelines.Builder.Validators;
+using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types;
 using DiffNamespaceICommand =
     Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types.DiffNamespace.ICommand;
@@ -7,6 +8,30 @@ namespace Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGeneric
 
 public class ValidateInputTypeWithHandlerGenericArgumentsTests
 {
+    [Test]
+    public void Validate_NullInputType_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Type inputType = null;
+        var handlerType = typeof(ICommandHandler<>);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+
+    [Test]
+    public void Validate_NullHandlerType_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var inputType = typeof(ICommand);
+        Type handlerType = null;
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+    
     [Test]
     public void Validate_InputWithOneResultTypeMethodMatchesHandlerMethod_Passes()
     {
@@ -49,17 +74,63 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         Assert.Pass(); // if no exception was thrown, the test passes
     }
 
-    [Test]
-    [TestCase(typeof(ICommand), typeof(ICommandHandlerWithResult<,>), TestName = "Void command with, Handler with one result")]
-    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandler<>), TestName = "Command with one result,void Handler")]
-    [TestCase(typeof(ICommandWithResult<>), typeof(ICommandHandlerWithTwoResults<,,>), TestName = "Command with one result, Handler with two results")]
-    [TestCase(typeof(ICommandWithTwoResults<,>), typeof(ICommandHandlerWithResult<,>), TestName = "Command with two Results, Handler with one result")]
-    [TestCase(typeof(DiffNamespaceICommand), typeof(ICommandHandler<>), TestName = "Command from different namespace, not match Input type from Handler")]
-    public void Validate_InputNotMatchHandlerMethod_ThrowException(Type inputType, Type handlerType)
+[Test]
+    public void Validate_VoidCommandWithHandlerWithOneResult_ThrowsResultTypeCountMismatchException()
     {
+        // Arrange
+        var inputType = typeof(ICommand);
+        var handlerType = typeof(ICommandHandlerWithResult<,>);
+
         // Act & Assert
-        Assert.Throws<Exception>(() =>
-            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType,
-                handlerType));
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+
+    [Test]
+    public void Validate_CommandWithOneResultWithVoidHandler_ThrowsGenericArgumentsLengthMismatchException()
+    {
+        // Arrange
+        var inputType = typeof(ICommandWithResult<>);
+        var handlerType = typeof(ICommandHandler<>);
+
+        // Act & Assert
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+
+    [Test]
+    public void Validate_CommandWithOneResultWithHandlerWithTwoResults_ThrowsGenericArgumentsLengthMismatchException()
+    {
+        // Arrange
+        var inputType = typeof(ICommandWithResult<>);
+        var handlerType = typeof(ICommandHandlerWithTwoResults<,,>);
+
+        // Act & Assert
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+
+    [Test]
+    public void Validate_CommandWithTwoResultsWithHandlerWithOneResult_ThrowsGenericArgumentsLengthMismatchException()
+    {
+        // Arrange
+        var inputType = typeof(ICommandWithTwoResults<,>);
+        var handlerType = typeof(ICommandHandlerWithResult<,>);
+
+        // Act & Assert
+        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
+
+    [Test]
+    public void Validate_CommandFromDifferentNamespaceWithHandlerNotMatchInputType_ThrowsNamespaceMismatchException()
+    {
+        // Arrange
+        var inputType = typeof(DiffNamespaceICommand);
+        var handlerType = typeof(ICommandHandler<>);
+
+        // Act & Assert
+        Assert.Throws<NamespaceMismatchException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 }
