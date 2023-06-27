@@ -73,6 +73,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
         
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _handlerType);
 
         _serviceCollection.AddDecorators(_decorators);
     }

@@ -10,7 +10,7 @@ internal static class ValidateInputTypeWithDispatcherMethodParameters
         ParamValidator.NotNull(dispatcherType, nameof(dispatcherType));
 
         var handleMethod = dispatcherType.GetMethods().First();
-        var dispatcherInputType = handleMethod.GetParameters().First().GetType();
+        var dispatcherInputType = handleMethod.GetParameters().First().ParameterType;
 
         TypeNamespaceValidator.Validate(inputType, dispatcherInputType);
     }
