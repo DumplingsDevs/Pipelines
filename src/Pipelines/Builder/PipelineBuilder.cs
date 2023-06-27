@@ -8,14 +8,13 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder;
 
-public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder,
-    IPipelineBuildBuilder
+public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
-    private Type[] _decorators = null!;
+    private List<Type> _decorators = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -56,13 +55,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineBuildBuilder AddDecorators(params Type[] decorators)
-    {
-        _decorators = decorators;
-
-        return this;
-    }
-
     public void Build()
     {
         AllProvidedTypesShouldBeInterface.Validate(_inputType, _handlerType, _dispatcherType);
@@ -71,5 +63,37 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateHandlerHandleMethod.Validate(_handlerType);
 
         _serviceCollection.AddDecorators(_decorators);
+    }
+
+    public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
+    {
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        _decorators.Add(genericDecorator);
+
+        return this;
+    }
+
+    public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
+    {
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        _decorators.Add(typeof(T));
+
+        return this;
+    }
+
+    public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
+        params Assembly[] assemblies)
+    {
+        var builder = new ClosedTypeDecoratorsBuilder(assemblies, _handlerType);
+
+        action(builder);
+        
+        _decorators.AddRange(builder.GetDecoratorTypes());
+
+        return this;
     }
 }

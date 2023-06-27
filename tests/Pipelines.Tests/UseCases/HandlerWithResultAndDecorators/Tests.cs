@@ -1,3 +1,4 @@
+using System.Reflection;
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
@@ -14,10 +15,20 @@ public class Tests
     {
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
-
         _dependencyContainer.RegisterPipeline<IRequestDispatcher>(assembly, typeof(IRequest<>),
-            typeof(IRequestHandler<,>),
-            new[] { typeof(LoggingDecorator<,>), typeof(TracingDecorator<,>), typeof(ExampleRequestValidator) });
+            typeof(IRequestHandler<,>), builder =>
+            {
+                builder
+                    .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+                    .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
+                    .WithClosedTypeDecorators(x =>
+                    {
+                        // x.WithNamePattern("Validator");
+                        x.WithImplementedInterface<IValidator>();
+                        // x.WithInheritedClass<ValidatorBase>();
+                        // x.WithAttribute<ValidatorAttribute>();
+                    }, Assembly.GetExecutingAssembly());
+            });
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
 
@@ -37,15 +48,14 @@ public class Tests
 
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request Changed"));
-        Assert.That(_state.Status,
-            Is.EquivalentTo(new List<string>
-            {
-                "ExampleRequestValidator",
-                "TracingDecorator",
-                "LoggingDecorator",
-                "LoggingDecorator",
-                "TracingDecorator",
-                "ExampleRequestValidator"
-            }));
+        CollectionAssert.AreEqual(new List<string>
+        {
+            "ExampleRequestValidator",
+            "TracingDecorator",
+            "LoggingDecorator",
+            "LoggingDecorator",
+            "TracingDecorator",
+            "ExampleRequestValidator"
+        }, _state.Status);
     }
 }

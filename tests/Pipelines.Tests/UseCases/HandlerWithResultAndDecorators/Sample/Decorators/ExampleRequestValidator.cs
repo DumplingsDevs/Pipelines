@@ -2,9 +2,10 @@ using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
+[Validator]
 public class
-    ExampleRequestValidator : IRequestHandler<ExampleRequest,
-        ExampleCommandResult>
+    ExampleRequestValidator : ValidatorBase, IRequestHandler<ExampleRequest,
+        ExampleCommandResult>, IValidator
 {
     private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
     private readonly DecoratorsState _state;

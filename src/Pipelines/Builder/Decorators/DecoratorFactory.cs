@@ -14,10 +14,8 @@ internal static class DecoratorFactory
 
             return TypeDecorator(serviceType, closedDecorator);
         }
-        else
-        {
-            return TypeDecorator(serviceType, decoratorType);
-        }
+
+        return TypeDecorator(serviceType, decoratorType);
     }
     
     private static Func<IServiceProvider, object> TypeDecorator(Type serviceType, Type decoratorType) => serviceProvider =>
