@@ -15,13 +15,11 @@ public class LoggingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TRe
 
     public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
     {
-        _state.Status.Add("LoggingDecorator");
+        _state.Status.Add(typeof(LoggingDecorator<,>).Name);
 
-        Console.WriteLine($"[LoggingDecorator] Start of handling {request.GetType().Name}");
         var result = await _handler.HandleAsync(request, token);
-        Console.WriteLine($"[LoggingDecorator] Stop of handling {request.GetType().Name}");
 
-        _state.Status.Add("LoggingDecorator");
+        _state.Status.Add(typeof(LoggingDecorator<,>).Name);
         
         return result;
     }

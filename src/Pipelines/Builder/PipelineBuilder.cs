@@ -62,7 +62,9 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateHandlerHandleMethod.Validate(_handlerType);
 
-        _serviceCollection.AddDecorators(_decoratorsBuilder.GetDecorators());
+        var decorators = _decoratorsBuilder.GetDecorators();
+        decorators.Reverse();
+        _serviceCollection.AddDecorators(decorators);
     }
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)

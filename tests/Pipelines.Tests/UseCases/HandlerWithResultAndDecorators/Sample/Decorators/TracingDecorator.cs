@@ -15,13 +15,11 @@ public class TracingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TRe
 
     public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
     {
-        _state.Status.Add("TracingDecorator");
+        _state.Status.Add(typeof(TracingDecorator<,>).Name);
 
-        Console.WriteLine($"[TracingDecorator] Start of handling {request.GetType().Name}");
         var result = await _handler.HandleAsync(request, token);
-        Console.WriteLine($"[TracingDecorator] Stop of handling {request.GetType().Name}");
 
-        _state.Status.Add("TracingDecorator");
+        _state.Status.Add(typeof(TracingDecorator<,>).Name);
 
         return result;
     }

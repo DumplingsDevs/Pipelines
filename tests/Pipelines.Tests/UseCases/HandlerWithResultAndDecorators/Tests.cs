@@ -23,10 +23,10 @@ public class Tests
                     .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
                     .WithClosedTypeDecorators(x =>
                     {
-                        // x.WithNamePattern("Validator");
-                        x.WithImplementedInterface<IValidator>();
-                        // x.WithInheritedClass<ValidatorBase>();
-                        // x.WithAttribute<ValidatorAttribute>();
+                        x.WithImplementedInterface<IDecorator>();
+                        x.WithInheritedClass<BaseDecorator>();
+                        x.WithAttribute<DecoratorAttribute>();
+                        x.WithNameContaining("FourthRequestDecoratorUniqueNameForSearch");
                     }, Assembly.GetExecutingAssembly());
             });
 
@@ -50,12 +50,18 @@ public class Tests
         Assert.That(result.Value, Is.EqualTo("My test request Changed"));
         CollectionAssert.AreEqual(new List<string>
         {
-            "ExampleRequestValidator",
-            "TracingDecorator",
-            "LoggingDecorator",
-            "LoggingDecorator",
-            "TracingDecorator",
-            "ExampleRequestValidator"
+            typeof(LoggingDecorator<,>).Name,
+            typeof(TracingDecorator<,>).Name,
+            nameof(FirstRequestDecorator),
+            nameof(SecondRequestDecorator),
+            nameof(ThirdRequestDecorator),
+            nameof(FourthRequestDecoratorUniqueNameForSearch),
+            nameof(FourthRequestDecoratorUniqueNameForSearch),
+            nameof(ThirdRequestDecorator),
+            nameof(SecondRequestDecorator),
+            nameof(FirstRequestDecorator),
+            typeof(TracingDecorator<,>).Name,
+            typeof(LoggingDecorator<,>).Name,
         }, _state.Status);
     }
 }
