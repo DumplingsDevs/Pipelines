@@ -4,13 +4,13 @@ namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorat
 
 [Decorator]
 public class
-    ThirdRequestDecorator : IRequestHandler<ExampleRequest,
+    ExampleRequestDecoratorThree : IRequestHandler<ExampleRequest,
         ExampleCommandResult>
 {
     private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
     private readonly DecoratorsState _state;
 
-    public ThirdRequestDecorator(
+    public ExampleRequestDecoratorThree(
         IRequestHandler<ExampleRequest, ExampleCommandResult> handler, DecoratorsState state)
     {
         _handler = handler;
@@ -20,11 +20,11 @@ public class
     public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
         CancellationToken token)
     {
-        _state.Status.Add(nameof(ThirdRequestDecorator));
+        _state.Status.Add(nameof(ExampleRequestDecoratorThree));
 
         var result = await _handler.HandleAsync(request, token);
 
-        _state.Status.Add(nameof(ThirdRequestDecorator));
+        _state.Status.Add(nameof(ExampleRequestDecoratorThree));
 
         return result;
     }

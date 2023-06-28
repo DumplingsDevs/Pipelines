@@ -3,13 +3,13 @@ using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
 public class
-    SecondRequestDecorator : BaseDecorator, IRequestHandler<ExampleRequest,
+    ExampleRequestDecoratorTwo : BaseDecorator, IRequestHandler<ExampleRequest,
         ExampleCommandResult>
 {
     private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
     private readonly DecoratorsState _state;
 
-    public SecondRequestDecorator(
+    public ExampleRequestDecoratorTwo(
         IRequestHandler<ExampleRequest, ExampleCommandResult> handler, DecoratorsState state)
     {
         _handler = handler;
@@ -19,11 +19,11 @@ public class
     public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
         CancellationToken token)
     {
-        _state.Status.Add(nameof(SecondRequestDecorator));
+        _state.Status.Add(nameof(ExampleRequestDecoratorTwo));
 
         var result = await _handler.HandleAsync(request, token);
 
-        _state.Status.Add(nameof(SecondRequestDecorator));
+        _state.Status.Add(nameof(ExampleRequestDecoratorTwo));
 
         return result;
     }

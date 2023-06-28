@@ -26,7 +26,7 @@ public class Tests
                         x.WithImplementedInterface<IDecorator>();
                         x.WithInheritedClass<BaseDecorator>();
                         x.WithAttribute<DecoratorAttribute>();
-                        x.WithNameContaining("FourthRequestDecoratorUniqueNameForSearch");
+                        x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
                     }, Assembly.GetExecutingAssembly());
             });
 
@@ -52,14 +52,14 @@ public class Tests
         {
             typeof(LoggingDecorator<,>).Name,
             typeof(TracingDecorator<,>).Name,
-            nameof(FirstRequestDecorator),
-            nameof(SecondRequestDecorator),
-            nameof(ThirdRequestDecorator),
-            nameof(FourthRequestDecoratorUniqueNameForSearch),
-            nameof(FourthRequestDecoratorUniqueNameForSearch),
-            nameof(ThirdRequestDecorator),
-            nameof(SecondRequestDecorator),
-            nameof(FirstRequestDecorator),
+            nameof(ExampleRequestDecoratorOne),
+            nameof(ExampleRequestDecoratorTwo),
+            nameof(ExampleRequestDecoratorThree),
+            nameof(ExampleRequestDecoratorFourUniqueNameForSearch),
+            nameof(ExampleRequestDecoratorFourUniqueNameForSearch),
+            nameof(ExampleRequestDecoratorThree),
+            nameof(ExampleRequestDecoratorTwo),
+            nameof(ExampleRequestDecoratorOne),
             typeof(TracingDecorator<,>).Name,
             typeof(LoggingDecorator<,>).Name,
         }, _state.Status);
