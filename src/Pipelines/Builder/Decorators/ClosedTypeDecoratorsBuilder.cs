@@ -16,9 +16,9 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
         _handlerType = handlerType;
     }
 
-    public void WithNamePattern(string pattern)
+    public void WithNameContaining(string pattern)
     {
-        bool Predicate(Type t) => t.Name.Contains(pattern);
+        bool Predicate(Type t) => t.Name.Contains(pattern, StringComparison.InvariantCultureIgnoreCase);
         _predicates.Add(Predicate);
     }
 
