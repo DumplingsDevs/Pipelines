@@ -47,6 +47,7 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
 
     public IEnumerable<Type> GetDecoratorTypes()
     {
+        // TO DO - check if decorator implementers handler type 
         return _predicates.SelectMany(x => _assemblies.SelectMany(y => y.GetTypes().Where(x)))
             .WhereConstructorHasCompatibleGenericType(_handlerType);
     }
