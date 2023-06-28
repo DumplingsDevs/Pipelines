@@ -62,7 +62,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateHandlerHandleMethod.Validate(_handlerType);
 
-        _serviceCollection.AddDecorators(_decoratorsBuilder.BuildDecorators());
+        _serviceCollection.AddDecorators(_decoratorsBuilder.GetDecorators());
     }
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
@@ -88,7 +88,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        _decoratorsBuilder.AddDecorators(action, _handlerType, assemblies);
+        _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
 
         return this;
     }

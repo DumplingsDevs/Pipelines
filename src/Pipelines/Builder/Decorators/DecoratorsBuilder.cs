@@ -7,7 +7,7 @@ internal class DecoratorsBuilder
 {
     private readonly List<Type> _decorators = new();
 
-    public List<Type> BuildDecorators() => _decorators;
+    public List<Type> GetDecorators() => _decorators;
 
     public void AddDecorator(Type genericDecorator)
     {
@@ -19,7 +19,7 @@ internal class DecoratorsBuilder
         _decorators.AddRange(decorators);
     }
 
-    public void AddDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
+    public void BuildDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
     {
         var builder = new ClosedTypeDecoratorsBuilder(assemblies, handlerType);
 

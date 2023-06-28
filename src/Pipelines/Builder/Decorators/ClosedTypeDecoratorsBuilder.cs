@@ -1,5 +1,6 @@
 using System.Reflection;
 using Pipelines.Builder.Interfaces;
+using Pipelines.Utils;
 
 namespace Pipelines.Builder.Decorators;
 
@@ -46,6 +47,7 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
 
     public IEnumerable<Type> GetDecoratorTypes()
     {
-        return _predicates.SelectMany(x => _assemblies.SelectMany(y => y.GetTypes().Where(x)));
+        return _predicates.SelectMany(x => _assemblies.SelectMany(y => y.GetTypes().Where(x)))
+            .WhereConstructorHasCompatibleGenericType(_handlerType);
     }
 }
