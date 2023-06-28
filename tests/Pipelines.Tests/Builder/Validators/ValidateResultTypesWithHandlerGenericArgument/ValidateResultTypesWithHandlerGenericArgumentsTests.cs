@@ -1,4 +1,5 @@
 using Pipelines.Builder.Validators;
+using Pipelines.Builder.Validators.Handler.ResultTypes;
 using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.ValidateResultTypesWithHandlerGenericArgument.Types.Handlers.Invalid;
 using Pipelines.Tests.Builder.Validators.ValidateResultTypesWithHandlerGenericArgument.Types.Handlers.Valid;

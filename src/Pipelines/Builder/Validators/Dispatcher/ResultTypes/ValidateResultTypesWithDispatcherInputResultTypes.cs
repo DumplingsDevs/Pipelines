@@ -1,6 +1,6 @@
 using Pipelines.Utils;
 
-namespace Pipelines.Builder.Validators;
+namespace Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 
 internal static class ValidateResultTypesWithDispatcherInputResultTypes
 {
