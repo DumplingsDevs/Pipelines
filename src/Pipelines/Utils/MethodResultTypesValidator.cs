@@ -10,14 +10,15 @@ internal static class MethodResultTypesValidator
         var isVoidMethod = methodToValidate.IsVoidOrTaskReturnType();
         var methodReturnTypes = methodToValidate.GetReturnTypes();
 
-        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
-        
-        if (!isVoidMethod)
+        if (isVoidMethod)
+        {
+            ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
+        }
+        else
         {
             ValidateResultTypeCount(expectedResultTypes.Length, methodReturnTypes.Count);
+            ValidateResultTypeMatch(expectedResultTypes, methodReturnTypes);
         }
-        
-        ValidateResultTypeMatch(expectedResultTypes, methodReturnTypes);
     }
     
     private static void ValidateResultTypeMatch(Type[] expectedResultTypes, List<Type> methodReturnTypes)
