@@ -1,4 +1,4 @@
-namespace Pipelines.Exceptions;
+namespace Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions;
 
 internal class MultipleHandlerMethodsException : Exception
 {

@@ -1,3 +1,4 @@
+using Pipelines.Builder.Validators.Shared.InterfaceConstraint.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Utils;
 
@@ -13,7 +14,7 @@ internal static class AllProvidedTypesShouldBeInterface
         {
             if (!type.IsInterface)
             {
-                throw new InvalidTypeException(type.Name);
+                throw new ProvidedTypeIsNotInterfaceException(type.Name);
             }
         }
     }

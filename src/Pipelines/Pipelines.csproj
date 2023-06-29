@@ -16,9 +16,7 @@
     <Folder Include="Builder\Validators\Dispatcher\InputType\Exceptions" />
     <Folder Include="Builder\Validators\Dispatcher\ResultTypes\Exceptions" />
     <Folder Include="Builder\Validators\Handler\ResultTypes\Exceptions" />
-    <Folder Include="Builder\Validators\Shared\InterfaceConstraint\Exceptions" />
     <Folder Include="Builder\Validators\Shared\MethodWithOneParameter\Exceptions" />
-    <Folder Include="Builder\Validators\Shared\OnlyOneHandleMethod\Exceptions" />
   </ItemGroup>
 
 </Project>

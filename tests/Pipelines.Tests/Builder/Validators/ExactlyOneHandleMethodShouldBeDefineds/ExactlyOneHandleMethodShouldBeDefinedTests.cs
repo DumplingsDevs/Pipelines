@@ -1,5 +1,6 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
+using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.ExactlyOneHandleMethodShouldBeDefineds.Types;
 
@@ -40,7 +41,7 @@ public class ExactlyOneHandleMethodShouldBeDefinedTests
         var typeToValidate = typeof(INoMethod<,>);
 
         // Act & Assert
-        Assert.Throws<HandlerMethodNotImplementedException>(() =>
+        Assert.Throws<HandlerMethodNotFoundException>(() =>
             ExactlyOneHandleMethodShouldBeDefined.Validate(InputType, typeToValidate));
     }
 }

@@ -1,4 +1,4 @@
-namespace Pipelines.Exceptions;
+namespace Pipelines.Builder.Validators.Handler.InputType.Exceptions;
 
 public class GenericArgumentsNotFoundException : Exception
 {

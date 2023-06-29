@@ -1,4 +1,4 @@
-namespace Pipelines.Exceptions;
+namespace Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 
 public class ReturnTypeMismatchException : Exception
 {

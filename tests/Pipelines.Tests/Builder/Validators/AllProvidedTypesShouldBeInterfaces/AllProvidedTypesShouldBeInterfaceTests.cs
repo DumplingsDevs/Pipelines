@@ -1,5 +1,6 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
+using Pipelines.Builder.Validators.Shared.InterfaceConstraint.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.AllProvidedTypesShouldBeInterfaces.Types;
 
@@ -25,7 +26,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(ExampleClass);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
 
@@ -36,7 +37,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(ExampleRecord);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
 
@@ -47,7 +48,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(ExampleStruct);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
 
@@ -58,7 +59,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(ExampleEnum);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
     
@@ -69,7 +70,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(string);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
     
@@ -80,7 +81,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(String);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
     
@@ -91,7 +92,7 @@ public class AllProvidedTypeShouldInterfaceTests
         var inputType = typeof(int);
 
         // Act & Assert
-        Assert.Throws<InvalidTypeException>(() =>
+        Assert.Throws<ProvidedTypeIsNotInterfaceException>(() =>
             AllProvidedTypesShouldBeInterface.Validate(inputType));
     }
 }

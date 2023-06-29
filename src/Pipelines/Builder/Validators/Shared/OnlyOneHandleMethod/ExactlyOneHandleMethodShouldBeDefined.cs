@@ -1,3 +1,4 @@
+using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Utils;
 
@@ -19,7 +20,7 @@ internal static class ExactlyOneHandleMethodShouldBeDefined
             switch (methods.Count)
             {
                 case 0:
-                    throw new HandlerMethodNotImplementedException(type.Name, inputType.Name);
+                    throw new HandlerMethodNotFoundException(type.Name, inputType.Name);
                 case > 1:
                     throw new MultipleHandlerMethodsException(inputType.Name);
             }
