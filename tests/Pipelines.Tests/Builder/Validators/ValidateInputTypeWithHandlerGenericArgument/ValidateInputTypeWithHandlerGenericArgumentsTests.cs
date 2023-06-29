@@ -1,5 +1,6 @@
 using Pipelines.Builder.Validators;
 using Pipelines.Builder.Validators.Handler.InputType;
+using Pipelines.Builder.Validators.Handler.InputType.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.ValidateInputTypeWithHandlerGenericArgument.Types;
 using DiffNamespaceICommand =

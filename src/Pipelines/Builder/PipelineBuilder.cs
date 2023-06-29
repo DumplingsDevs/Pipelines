@@ -8,6 +8,9 @@ using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
 using Pipelines.Builder.Validators.Handler.ResultTypes;
+using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
+using Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
+using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder;

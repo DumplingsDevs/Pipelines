@@ -1,4 +1,5 @@
 using Pipelines.Builder.Validators;
+using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
 using Pipelines.Exceptions;
 using Pipelines.Tests.Builder.Validators.AllProvidedTypesShouldBeInterfaces.Types;
 

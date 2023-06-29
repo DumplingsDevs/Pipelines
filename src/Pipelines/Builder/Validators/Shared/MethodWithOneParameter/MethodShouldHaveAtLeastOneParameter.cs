@@ -1,4 +1,4 @@
-namespace Pipelines.Builder.Validators;
+namespace Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 
 internal static class MethodShouldHaveAtLeastOneParameter
 {

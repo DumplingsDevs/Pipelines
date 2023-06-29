@@ -15,7 +15,6 @@
     <Folder Include="Builder\Validators\CrossValidation" />
     <Folder Include="Builder\Validators\Dispatcher\InputType\Exceptions" />
     <Folder Include="Builder\Validators\Dispatcher\ResultTypes\Exceptions" />
-    <Folder Include="Builder\Validators\Handler\InputType\Exceptions" />
     <Folder Include="Builder\Validators\Handler\ResultTypes\Exceptions" />
     <Folder Include="Builder\Validators\Shared\InterfaceConstraint\Exceptions" />
     <Folder Include="Builder\Validators\Shared\MethodWithOneParameter\Exceptions" />

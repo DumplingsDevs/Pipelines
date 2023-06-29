@@ -12,6 +12,10 @@ internal static class ValidateInputTypeWithDispatcherMethodParameters
         var handleMethod = dispatcherType.GetMethods().First();
         var dispatcherInputType = handleMethod.GetParameters().First().ParameterType;
 
-        TypeNamespaceValidator.Validate(inputType, dispatcherInputType);
+        var areEqual = TypeNamespaceComparer.Compare(inputType, dispatcherInputType);
+        if (!areEqual)
+        {
+            throw new Exception();
+        }
     }
 }

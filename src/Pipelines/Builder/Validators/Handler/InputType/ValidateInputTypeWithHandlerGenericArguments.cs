@@ -1,3 +1,4 @@
+using Pipelines.Builder.Validators.Handler.InputType.Exceptions;
 using Pipelines.Exceptions;
 using Pipelines.Utils;
 
@@ -9,21 +10,20 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
     {
         ParamValidator.NotNull(inputType, nameof(inputType));
         ParamValidator.NotNull(handlerType, nameof(handlerType));
-        
-        var genericArguments = handlerType.GetGenericArguments();
 
-        switch (genericArguments.Length)
+        var genericArguments = handlerType.GetGenericArguments();
+        if (!genericArguments.Any())
         {
-            case 0:
-                throw new GenericArgumentsNotFoundException(handlerType);
+            throw new GenericArgumentsNotFoundException(handlerType);
         }
 
         if (InputTypeNotMatchGenericArgumentConstraint(inputType, genericArguments.First()))
         {
-            throw new InputTypeMismatchException(inputType, genericArguments.First());
+            throw new HandlerInputTypeMismatchException(inputType, genericArguments.First());
         }
     }
 
+    //to do refactor this method
     private static bool InputTypeNotMatchGenericArgumentConstraint(Type inputType, Type handlerGenericParameter)
     {
         //Only one constraint is expected for 
@@ -40,9 +40,9 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
         // 1. Within the same namespace, a type with the same generic argument length cannot exist as it would result in a build error.
         // 2. The handler uses the expected input type as defined by matching namespaces.
         ValidateGenericTypeArgumentsLenght(inputType, handleInputType);
-        TypeNamespaceValidator.Validate(handleInputType,inputType);
+        var areEqual = TypeNamespaceComparer.Compare(handleInputType, inputType);
 
-        return false;
+        return !areEqual;
     }
 
     private static void ValidateGenericTypeArgumentsLenght(Type inputType, Type handleInputType)
@@ -52,7 +52,8 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
 
         if (inputGenericArguments.Length != handleGenericArguments.Length)
         {
-            throw new GenericArgumentsLengthMismatchException(inputGenericArguments.Length, handleGenericArguments.Length);
+            throw new GenericArgumentsLengthMismatchException(inputGenericArguments.Length,
+                handleGenericArguments.Length);
         }
     }
 }

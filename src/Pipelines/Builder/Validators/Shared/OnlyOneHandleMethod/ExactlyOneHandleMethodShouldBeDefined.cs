@@ -1,7 +1,7 @@
 using Pipelines.Exceptions;
 using Pipelines.Utils;
 
-namespace Pipelines.Builder.Validators;
+namespace Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
 
 internal static class ExactlyOneHandleMethodShouldBeDefined
 {
