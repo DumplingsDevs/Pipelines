@@ -10,12 +10,7 @@ internal static class ValidateResultTypesWithHandlerGenericArguments
         ParamValidator.NotNull(handlerType, nameof(handlerType));
         
         var genericArguments = handlerType.GetGenericArguments();
-        var handleMethod = handlerType.GetMethods().FirstOrDefault();
-
-        if (handleMethod == null)
-        {
-            throw new HandleMethodNotFoundException(handlerType);
-        }
+        var handleMethod = handlerType.GetMethods().First();
 
         var expectedResultTypes = GetResultTypes(genericArguments);
         MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType);
