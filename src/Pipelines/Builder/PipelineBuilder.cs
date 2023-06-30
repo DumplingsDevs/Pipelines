@@ -30,12 +30,16 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IHandlerBuilder AddInput(Type type)
     {
+        ProvidedTypeShouldBeInterface.Validate(type);
+
         _inputType = type;
         return this;
     }
 
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
+        ProvidedTypeShouldBeInterface.Validate(handlerType);
+
         _handlerType = handlerType;
 
         var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
@@ -48,6 +52,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
+        ProvidedTypeShouldBeInterface.Validate(typeof(TDispatcher));
+        
         _dispatcherType = typeof(TDispatcher);
 
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
@@ -71,7 +77,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        AllProvidedTypesShouldBeInterface.Validate(_inputType, _handlerType, _dispatcherType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerType, _dispatcherType);
         
