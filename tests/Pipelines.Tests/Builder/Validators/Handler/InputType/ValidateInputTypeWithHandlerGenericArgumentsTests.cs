@@ -131,7 +131,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(ICommandHandler<>);
 
         // Act & Assert
-        Assert.Throws<NamespaceMismatchException>(() =>
+        Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 }

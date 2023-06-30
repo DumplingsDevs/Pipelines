@@ -38,13 +38,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
+        _handlerType = handlerType;
+
         ProvidedTypeShouldBeInterface.Validate(handlerType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerType);
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
-
-        _handlerType = handlerType;
 
         var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
             .WhereConstructorDoesNotHaveParameter(handlerType);

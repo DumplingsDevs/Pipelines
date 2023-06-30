@@ -2,7 +2,7 @@ using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.InputTypes;
 
 namespace Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Invalid;
 
-public interface IVoidWithExpectedResult<in TCommand> where TCommand : ICommand
+public interface IVoidWithExpectedResult<in TCommand> where TCommand : ICommandWithResult<int>
 {
-    public Task<int> HandleAsync(TCommand command, CancellationToken token);
+    public Task HandleAsync(TCommand command, CancellationToken token);
 }
