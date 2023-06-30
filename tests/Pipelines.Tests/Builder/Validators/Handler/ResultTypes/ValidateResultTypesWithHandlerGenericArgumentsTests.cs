@@ -47,10 +47,10 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsExpectedVoidException()
     {
         // Arrange
-        Type handlerType = typeof(IVoidWithExpectedResult<>);
+        Type handlerType = typeof(IVoidWithExpectedResult<,>);
 
         // Act & Assert
-        Assert.Throws<ExpectedVoidMethodException>(() =>
+        Assert.Throws<ExpectedMethodWithResultException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
