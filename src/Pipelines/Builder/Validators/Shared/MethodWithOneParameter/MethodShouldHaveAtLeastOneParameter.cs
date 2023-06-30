@@ -2,18 +2,15 @@ namespace Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 
 internal static class MethodShouldHaveAtLeastOneParameter
 {
-    internal static void Validate(params Type[] typesToValidate)
+    internal static void Validate(Type typeToValidate)
     {
-        foreach (var type in typesToValidate)
-        {
-            var handleMethod = type
-                .GetMethods().First();
+        var handleMethod = typeToValidate
+            .GetMethods().First();
 
-            var parametersCount = handleMethod.GetParameters().Length;
-            if (parametersCount == 0)
-            {
-                throw new Exception();
-            }
+        var parametersCount = handleMethod.GetParameters().Length;
+        if (parametersCount == 0)
+        {
+            throw new Exception();
         }
     }
 }
