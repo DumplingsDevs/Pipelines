@@ -39,7 +39,10 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
         ProvidedTypeShouldBeInterface.Validate(handlerType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerType);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
+        ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
 
         _handlerType = handlerType;
 
@@ -54,9 +57,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
         _dispatcherType = typeof(TDispatcher);
-        
+
         ProvidedTypeShouldBeInterface.Validate(_dispatcherType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherType);
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _handlerType);
 
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));
@@ -79,14 +85,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
-        
-        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
-        ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
-        
-        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
-        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _handlerType);
-
         _serviceCollection.AddDecorators(_decorators);
     }
 }

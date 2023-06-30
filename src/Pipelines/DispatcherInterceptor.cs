@@ -57,9 +57,9 @@ public class DispatcherInterceptor : IInterceptor
         switch (methods.Count)
         {
             case 0:
-                throw new HandlerMethodNotFoundException(handler.GetType().Name, inputType.Name);
+                throw new HandlerMethodNotFoundException(handler.GetType(), inputType);
             case > 1:
-                throw new MultipleHandlerMethodsException(inputType.Name);
+                throw new MultipleHandlerMethodsException(inputType);
         }
 
         var method = methods.First();
