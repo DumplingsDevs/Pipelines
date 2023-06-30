@@ -26,7 +26,7 @@ internal static class MethodResultTypesValidator
             var expectedResultType = expectedResultTypes[i];
             var methodReturnType = methodReturnTypes[i];
 
-            if (expectedResultType != methodReturnType)
+            if (!TypeNamespaceComparer.Compare(expectedResultType, methodReturnType))
             {
                 throw new ReturnTypeMismatchException(expectedResultType, methodReturnType);
             }
