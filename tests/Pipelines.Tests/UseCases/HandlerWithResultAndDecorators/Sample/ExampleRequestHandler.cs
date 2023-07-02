@@ -6,7 +6,6 @@ public class ExampleRequestHandler : IRequestHandler<ExampleRequest, ExampleComm
 {
     public Task<ExampleCommandResult> HandleAsync(ExampleRequest request, CancellationToken token)
     {
-        Console.WriteLine($"Handling {nameof(ExampleRequestHandler)} in {nameof(ExampleRequestHandler)}");
         return Task.FromResult(new ExampleCommandResult(request.Value + " Changed"));
     }
 }
