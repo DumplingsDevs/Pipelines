@@ -3,7 +3,13 @@ using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
-using Pipelines.Builder.Validators;
+using Pipelines.Builder.Validators.Dispatcher.InputType;
+using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
+using Pipelines.Builder.Validators.Handler.InputType;
+using Pipelines.Builder.Validators.Handler.ResultTypes;
+using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
+using Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
+using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder;
@@ -12,6 +18,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
+    private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
     private DecoratorsBuilder _decoratorsBuilder = new();
@@ -23,6 +30,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IHandlerBuilder AddInput(Type type)
     {
+        ProvidedTypeShouldBeInterface.Validate(type);
+
         _inputType = type;
         return this;
     }
@@ -30,11 +39,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
         _handlerType = handlerType;
-
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
-            .WhereConstructorDoesNotHaveParameter(handlerType);
-
-        _serviceCollection.RegisterGenericTypesAsScoped(types);
+        _handlerAssembly = assembly;
+        ProvidedTypeShouldBeInterface.Validate(_handlerType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType);
+        MethodShouldHaveAtLeastOneParameter.Validate(_handlerType);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
+        ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
 
         return this;
     }
@@ -43,30 +53,18 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         _dispatcherType = typeof(TDispatcher);
 
-        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
-            new DispatcherInterceptor(x, _inputType, _handlerType));
-        _serviceCollection.AddScoped<TDispatcher>(x =>
-        {
-            var interceptor = x.GetService<DispatcherInterceptor>();
-            var proxyGenerator = new ProxyGenerator();
-            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
-        });
+        ProvidedTypeShouldBeInterface.Validate(_dispatcherType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherType);
+        MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
+
+        //TO DO - Move to Build Method
+        RegisterDispatcher<TDispatcher>();
 
         return this;
     }
-
-    public void Build()
-    {
-        AllProvidedTypesShouldBeInterface.Validate(_inputType, _handlerType, _dispatcherType);
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType, _dispatcherType);
-        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
-        ValidateHandlerHandleMethod.Validate(_handlerType);
-
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
-        _serviceCollection.AddDecorators(decorators);
-    }
-
+    
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         // Validate if contains proper generic implementation
@@ -93,5 +91,38 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
 
         return this;
+    }
+
+    public void Build()
+    {
+        RegisterHandlers();
+        RegisterDecorators();
+    }
+
+    private void RegisterDecorators()
+    {
+        var decorators = _decoratorsBuilder.GetDecorators();
+        decorators.Reverse();
+        _serviceCollection.AddDecorators(decorators);
+    }
+
+    private void RegisterHandlers()
+    {
+        var types = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
+            .WhereConstructorDoesNotHaveParameter(_handlerType);
+
+        _serviceCollection.RegisterGenericTypesAsScoped(types);
+    }
+    
+    private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
+    {
+        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
+            new DispatcherInterceptor(x, _inputType, _handlerType));
+        _serviceCollection.AddScoped<TDispatcher>(x =>
+        {
+            var interceptor = x.GetService<DispatcherInterceptor>();
+            var proxyGenerator = new ProxyGenerator();
+            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
+        });
     }
 }
