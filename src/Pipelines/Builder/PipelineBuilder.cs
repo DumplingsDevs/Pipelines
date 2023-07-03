@@ -62,7 +62,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherType);
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
-        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _handlerType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
 
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));

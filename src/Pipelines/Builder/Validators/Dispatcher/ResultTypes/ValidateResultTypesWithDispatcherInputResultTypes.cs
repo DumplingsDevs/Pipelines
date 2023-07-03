@@ -9,10 +9,12 @@ internal static class ValidateResultTypesWithDispatcherInputResultTypes
         var expectedResultTypes = inputType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().First();
         
+        //compare types found in inputType generic arguments (IICommand<TResult>) with method return types (Task<TResult>)
         MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType);
         
-        // var genericMethodTypes = handleMethod.GetGenericArguments();
-        // //compare types found in method generic arguments (Handler<TResult>) with method return types 
-        // MethodResultTypesValidator.Validate(handleMethod, genericMethodTypes, handlerType);
+        var genericMethodTypes = handleMethod.GetGenericArguments();
+        
+        //compare types found in method generic arguments (Handler<TResult>) with method return types (Task<TResult>)
+        MethodResultTypesValidator.Validate(handleMethod, genericMethodTypes, handlerType);
     }
 }
