@@ -18,6 +18,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
+    private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
     private DecoratorsBuilder _decoratorsBuilder = new();
@@ -38,17 +39,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
         _handlerType = handlerType;
-
-        ProvidedTypeShouldBeInterface.Validate(handlerType);
+        _handlerAssembly = assembly;
+        ProvidedTypeShouldBeInterface.Validate(_handlerType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerType);
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
-
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(assembly, handlerType)
-            .WhereConstructorDoesNotHaveParameter(handlerType);
-
-        _serviceCollection.RegisterGenericTypesAsScoped(types);
 
         return this;
     }
@@ -63,25 +59,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
 
-        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
-            new DispatcherInterceptor(x, _inputType, _handlerType));
-        _serviceCollection.AddScoped<TDispatcher>(x =>
-        {
-            var interceptor = x.GetService<DispatcherInterceptor>();
-            var proxyGenerator = new ProxyGenerator();
-            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
-        });
+        //TO DO - Move to Build Method
+        RegisterDispatcher<TDispatcher>();
 
         return this;
     }
-
-    public void Build()
-    {
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
-        _serviceCollection.AddDecorators(decorators);
-    }
-
+    
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         // Validate if contains proper generic implementation
@@ -108,5 +91,38 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
 
         return this;
+    }
+
+    public void Build()
+    {
+        RegisterHandlers();
+        RegisterDecorators();
+    }
+
+    private void RegisterDecorators()
+    {
+        var decorators = _decoratorsBuilder.GetDecorators();
+        decorators.Reverse();
+        _serviceCollection.AddDecorators(decorators);
+    }
+
+    private void RegisterHandlers()
+    {
+        var types = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
+            .WhereConstructorDoesNotHaveParameter(_handlerType);
+
+        _serviceCollection.RegisterGenericTypesAsScoped(types);
+    }
+    
+    private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
+    {
+        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
+            new DispatcherInterceptor(x, _inputType, _handlerType));
+        _serviceCollection.AddScoped<TDispatcher>(x =>
+        {
+            var interceptor = x.GetService<DispatcherInterceptor>();
+            var proxyGenerator = new ProxyGenerator();
+            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
+        });
     }
 }
