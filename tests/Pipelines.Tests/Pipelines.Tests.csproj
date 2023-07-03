@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <Folder Include="Builder\Validators\Dispatcher\InputType" />
-    <Folder Include="Builder\Validators\Dispatcher\ResultTypes" />
     <Folder Include="Builder\Validators\Shared\MethodWithOneParameter" />
   </ItemGroup>
 
