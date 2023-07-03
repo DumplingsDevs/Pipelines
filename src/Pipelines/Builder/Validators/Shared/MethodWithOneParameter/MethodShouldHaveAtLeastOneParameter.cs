@@ -1,3 +1,5 @@
+using Pipelines.Builder.Validators.Shared.MethodWithOneParameter.Exceptions;
+
 namespace Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 
 internal static class MethodShouldHaveAtLeastOneParameter
@@ -10,7 +12,7 @@ internal static class MethodShouldHaveAtLeastOneParameter
         var parametersCount = handleMethod.GetParameters().Length;
         if (parametersCount == 0)
         {
-            throw new Exception();
+            throw new MethodShouldHaveAtLeastOneParameterException(handleMethod.Name, typeToValidate);
         }
     }
 }
