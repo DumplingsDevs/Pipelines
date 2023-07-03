@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Pipelines.Builder.Interfaces;
 
 namespace Pipelines.Tests;
 
@@ -14,15 +15,17 @@ public class DependencyContainer
     }
 
     public void RegisterPipeline<TDispatcher>(Assembly handlersAssembly,
-        Type inputType, Type handlerType, Type[]? decorators = null) where TDispatcher : class
+        Type inputType, Type handlerType, Action<IPipelineDecoratorBuilder>? decoratorBuilder = null) where TDispatcher : class
     {
-        _services
+        var builder = _services
             .AddPipeline()
             .AddInput(inputType)
             .AddHandler(handlerType, handlersAssembly)
-            .AddDispatcher<TDispatcher>()
-            .AddDecorators(decorators ?? Array.Empty<Type>())
-            .Build();
+            .AddDispatcher<TDispatcher>();
+
+        decoratorBuilder?.Invoke(builder);
+
+        builder.Build();
     }
 
     public void BuildContainer()

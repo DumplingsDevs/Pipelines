@@ -14,14 +14,13 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder;
 
-public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder,
-    IPipelineBuildBuilder
+public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
-    private Type[] _decorators = null!;
+    private DecoratorsBuilder _decoratorsBuilder = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -76,15 +75,38 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineBuildBuilder AddDecorators(params Type[] decorators)
+    public void Build()
     {
-        _decorators = decorators;
+        var decorators = _decoratorsBuilder.GetDecorators();
+        decorators.Reverse();
+        _serviceCollection.AddDecorators(decorators);
+    }
+
+    public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
+    {
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        _decoratorsBuilder.AddDecorator(genericDecorator);
 
         return this;
     }
 
-    public void Build()
+    public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
-        _serviceCollection.AddDecorators(_decorators);
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        _decoratorsBuilder.AddDecorator(typeof(T));
+
+        return this;
+    }
+
+    public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
+        params Assembly[] assemblies)
+    {
+        _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+
+        return this;
     }
 }
