@@ -26,7 +26,6 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     {
         // Act
         ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType);
-
         
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
