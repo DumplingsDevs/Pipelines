@@ -13,6 +13,10 @@ public static class CrossValidateMethodParameters
         {
             throw new Exception();
         }
+        
+        //TO DO ADD dedicated validation for first parameter
+        // or maybe even we shouldn't validate first parameters as there are dedicated validators that check InputTypes
+        //for both Dispatcher and Handler
 
         for (var i = 0; i < handlerMethodParameters.Count; i++)
         {
