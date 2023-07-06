@@ -20,7 +20,7 @@ public static class CrossValidateMethodParameters
             var handlerParam = handlerMethodParameters[i];
             var dispatcherParam = dispatcherMethodParameters[i];
             
-            if (TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
+            if (!TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
             {
                 throw new ParameterTypeMismatchException(handlerParam, dispatcherParam, i);
             }
