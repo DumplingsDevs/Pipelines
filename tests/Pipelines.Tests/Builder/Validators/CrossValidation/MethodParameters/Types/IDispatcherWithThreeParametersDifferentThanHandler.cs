@@ -3,5 +3,4 @@ namespace Pipelines.Tests.Builder.Validators.CrossValidation.MethodParameters.Ty
 public interface IDispatcherWithThreeParametersDifferentThanHandler
 {
     public Task<string> SendAsync(IInputType inputType, string text, CancellationToken token);
-
 }
