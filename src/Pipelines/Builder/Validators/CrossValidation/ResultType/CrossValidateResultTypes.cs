@@ -1,17 +1,18 @@
+using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType;
 
 public class CrossValidateResultTypes
 {
-    public static void Validate(Type handlerType, Type dispatcher)
+    public static void Validate(Type handlerType, Type dispatcherType)
     {
         var handlerResultTypes = GetResultTypes(handlerType);
-        var dispatcherResultTypes = GetResultTypes(dispatcher);
+        var dispatcherResultTypes = GetResultTypes(dispatcherType);
 
         if (handlerResultTypes.Count != dispatcherResultTypes.Count)
         {
-            throw new Exception();
+            throw new ResultTypeCountMismatchException(handlerType, dispatcherType);
         }
 
         //To check if result types are equate, we need to check generic constraints in case when it is generic type and compare namespaces, if it is not generic
@@ -22,7 +23,7 @@ public class CrossValidateResultTypes
 
             if (handlerParam.IsGenericType != dispatcherParam.IsGenericType)
             {
-                throw new Exception();
+                throw new ResultTypeMismatchException(handlerParam, dispatcherParam);
             }
 
             if (IsGenericTypes(handlerParam, dispatcherParam))
@@ -38,10 +39,9 @@ public class CrossValidateResultTypes
 
     private static void ValidateNonGenericType(Type handlerParam, Type dispatcherParam)
     {
-        if (TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
+        if (!TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
         {
-            //Method Parameters Mismatch exception
-            throw new Exception();
+            throw new ResultTypeMismatchException(handlerParam, dispatcherParam);
         }
     }
 
@@ -52,7 +52,7 @@ public class CrossValidateResultTypes
 
         if (handlerParamGenericConstraints.Length != dispatcherParamGenericConstraints.Length)
         {
-            throw new Exception();
+            throw new GenericTypeCountMismatchException(handlerParam, dispatcherParam);
         }
 
         for (int i = 0; i < handlerParamGenericConstraints.Length; i++)
@@ -60,10 +60,9 @@ public class CrossValidateResultTypes
             var handlerGenericType = handlerParamGenericConstraints[i];
             var dispatcherGenericType = dispatcherParamGenericConstraints[i];
             
-            if (TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
+            if (!TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
             {
-                //Method Parameters Mismatch exception
-                throw new Exception();
+                throw new GenericTypeMismatchException(handlerParam, dispatcherParam);
             }
         }
     }
