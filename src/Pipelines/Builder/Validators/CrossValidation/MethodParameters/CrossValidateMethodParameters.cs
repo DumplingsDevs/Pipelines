@@ -1,20 +1,20 @@
+using Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 
 public static class CrossValidateMethodParameters
 {
-    public static void Validate(Type handlerType, Type dispatcher)
+    public static void Validate(Type handlerType, Type dispatcherType)
     {
         var handlerMethodParameters = GetMethodParameters(handlerType);
-        var dispatcherMethodParameters = GetMethodParameters(dispatcher);
+        var dispatcherMethodParameters = GetMethodParameters(dispatcherType);
 
         if (handlerMethodParameters.Count != dispatcherMethodParameters.Count)
         {
-            throw new Exception();
+            throw new ParameterCountMismatchException(handlerMethodParameters.Count, dispatcherMethodParameters.Count);
         }
         
-        //Validation starts from second parameter. First parameter is InputType and it will be validated in other validators
         for (var i = 1; i < handlerMethodParameters.Count; i++)
         {
             var handlerParam = handlerMethodParameters[i];
@@ -22,8 +22,7 @@ public static class CrossValidateMethodParameters
             
             if (TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
             {
-                //Method Parameters Mismatch exception
-                throw new Exception();
+                throw new ParameterTypeMismatchException(handlerParam, dispatcherParam, i);
             }
         }
     }
