@@ -88,6 +88,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
+        // TO DO change method name
         _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
 
         return this;
