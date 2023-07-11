@@ -109,7 +109,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private void RegisterHandlers()
     {
         var types = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
-            .WhereConstructorDoesNotHaveParameter(_handlerType);
+            .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
 
         _serviceCollection.RegisterGenericTypesAsScoped(types);
     }

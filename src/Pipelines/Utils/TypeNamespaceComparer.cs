@@ -14,4 +14,17 @@ internal static class TypeNamespaceComparer
             return type.FullName ?? type.Namespace + "." + type.Name;
         }
     }
+    
+    internal static bool CompareWithoutFullName(Type type1, Type type2)
+    {
+        var handleInputNamespace = GetNamespace(type1);
+        var inputTypeFullname = GetNamespace(type2);
+
+        var result = handleInputNamespace.Equals(inputTypeFullname);
+        return result;
+        string GetNamespace(Type type)
+        {
+            return type.Namespace + "." + type.Name;
+        }
+    }
 }
