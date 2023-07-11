@@ -1,3 +1,4 @@
+using System.Reflection;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Utils;
 
@@ -7,15 +8,33 @@ public static class CrossValidateResultTypes
 {
     public static void Validate(Type handlerType, Type dispatcherType)
     {
-        var handlerResultTypes = GetResultTypes(handlerType);
-        var dispatcherResultTypes = GetResultTypes(dispatcherType);
+        var handlerMethod = GetMethodInfo(handlerType);
+        var dispatcherMethod = GetMethodInfo(dispatcherType);
+
+        if (handlerMethod.IsVoidOrTaskReturnType() != dispatcherMethod.IsVoidOrTaskReturnType())
+        {
+            throw new ReturnTypeMismatchException(handlerType, dispatcherType);
+        }
+
+        if (handlerMethod.IsGenericTaskReturnType() != dispatcherMethod.IsGenericTaskReturnType())
+        {
+            throw new TaskReturnTypeMismatchException(handlerType, dispatcherType);
+        }
+        
+        var handlerResultTypes = GetResultTypes(handlerMethod);
+        var dispatcherResultTypes = GetResultTypes(dispatcherMethod);
 
         if (handlerResultTypes.Count != dispatcherResultTypes.Count)
         {
             throw new ResultTypeCountMismatchException(handlerType, dispatcherType);
         }
 
-        //To check if result types are equate, we need to check generic constraints in case when it is generic type and compare namespaces, if it is not generic
+        ValidateResultTypes(handlerResultTypes, dispatcherResultTypes);
+    }
+
+    //To check if result types are equate, we need to check generic constraints in case when it is generic type and compare namespaces, if it is not generic
+    private static void ValidateResultTypes(List<Type> handlerResultTypes, List<Type> dispatcherResultTypes)
+    {
         for (var i = 0; i < handlerResultTypes.Count; i++)
         {
             var handlerParam = handlerResultTypes[i];
@@ -73,8 +92,13 @@ public static class CrossValidateResultTypes
         return handlerParam.IsGenericTypeParameter && dispatcherParam.IsGenericMethodParameter;
     }
 
-    private static List<Type> GetResultTypes(Type type)
+    private static List<Type> GetResultTypes(MethodInfo methodInfo)
     {
-        return type.GetMethods().First().GetReturnTypes();
+        return methodInfo.GetReturnTypes();
+    }
+    
+    private static MethodInfo GetMethodInfo(Type type)
+    {
+        return type.GetMethods().First();
     }
 }

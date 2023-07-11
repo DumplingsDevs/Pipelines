@@ -65,7 +65,7 @@ public class CrossValidateResultTypesTests
     public void Validate_WithMismatchingResultTypeCount_ThrowsResultTypeCountMismatchException()
     {
         // Arrange
-        var handlerType = typeof(IHandlerStringResult<>);
+        var handlerType = typeof(IHandlerTaskStringResult<>);
         var dispatcherType = typeof(IDispatcherTaskWithTwoConstraintedResults);
 
         // Act & Assert
@@ -73,14 +73,25 @@ public class CrossValidateResultTypesTests
     }
 
     [Test]
-    public void Validate_WithMismatchingResultType_ThrowsResultTypeMismatchException()
+    public void Validate_WithMismatchingResultType_ThrowsTaskReturnTypeMismatchException()
     {
         // Arrange
         var handlerType = typeof(IHandlerStringResult<>);
         var dispatcherType = typeof(IDispatcherTaskStringResult);
 
         // Act & Assert
-        Assert.Throws<ResultTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<TaskReturnTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+    }
+    
+    [Test]
+    public void Validate_WithVoidDispatcherAndHandlerWithResult_ThrowsReturnTypeMismatchException()
+    {
+        // Arrange
+        var handlerType = typeof(IHandlerStringResult<>);
+        var dispatcherType = typeof(IDispatcherVoid);
+
+        // Act & Assert
+        Assert.Throws<ReturnTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
     }
 
     [Test]
