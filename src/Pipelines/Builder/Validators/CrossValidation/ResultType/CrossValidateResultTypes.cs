@@ -69,7 +69,7 @@ public class CrossValidateResultTypes
 
     private static bool IsGenericTypes(Type handlerParam, Type dispatcherParam)
     {
-        return handlerParam.IsGenericType && dispatcherParam.IsGenericType;
+        return handlerParam.IsGenericTypeParameter && dispatcherParam.IsGenericMethodParameter;
     }
 
     private static List<Type> GetResultTypes(Type type)
