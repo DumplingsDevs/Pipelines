@@ -60,7 +60,7 @@ public class CrossValidateResultTypes
             var handlerGenericType = handlerParamGenericConstraints[i];
             var dispatcherGenericType = dispatcherParamGenericConstraints[i];
             
-            if (!TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
+            if (!TypeNamespaceComparer.Compare(handlerGenericType, dispatcherGenericType))
             {
                 throw new GenericTypeMismatchException(handlerParam, dispatcherParam);
             }
