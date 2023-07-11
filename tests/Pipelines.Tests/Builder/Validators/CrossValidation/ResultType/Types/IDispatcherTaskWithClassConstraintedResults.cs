@@ -1,7 +1,7 @@
 namespace Pipelines.Tests.Builder.Validators.CrossValidation.ResultType.Types;
 
-public interface IDispatcherTaskWithDifferentTwoConstraintedResults
+public interface IDispatcherTaskWithClassConstraintedResults
 {
     public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType)
-        where TResult : IResultOne where TResultTwo : struct;
+        where TResult : IResultOne where TResultTwo : class;
 }

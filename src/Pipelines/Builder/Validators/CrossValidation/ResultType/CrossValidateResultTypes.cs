@@ -3,7 +3,7 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType;
 
-public class CrossValidateResultTypes
+public static class CrossValidateResultTypes
 {
     public static void Validate(Type handlerType, Type dispatcherType)
     {
@@ -47,6 +47,7 @@ public class CrossValidateResultTypes
 
     private static void ValidateGenericType(Type handlerParam, Type dispatcherParam)
     {
+        //Important! "class" constraint is not exist in GenericParameterConstraints. For e.g. "struct" will be exists and will be with type "System.ValueType"
         var handlerParamGenericConstraints = handlerParam.GetGenericParameterConstraints();
         var dispatcherParamGenericConstraints = dispatcherParam.GetGenericParameterConstraints();
 

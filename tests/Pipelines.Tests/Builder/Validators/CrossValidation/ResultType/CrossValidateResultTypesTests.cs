@@ -84,6 +84,17 @@ public class CrossValidateResultTypesTests
     }
 
     [Test]
+    public void Validate_WithGenericTypeCountMismatch_ThrowsGenericTypeMismatchException()
+    {
+        // Arrange
+        var handlerType = typeof(IHandlerTaskWithTwoConstraintedResults<,,>);
+        var dispatcherType = typeof(IDispatcherTaskWithClassConstraintedResults);
+
+        // Act & Assert
+        Assert.Throws<GenericTypeCountMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+    }
+    
+    [Test]
     public void Validate_WithMismatchingGenericType_ThrowsGenericTypeMismatchException()
     {
         // Arrange
