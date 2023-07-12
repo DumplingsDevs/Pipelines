@@ -23,8 +23,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
-    private DecoratorsBuilder _decoratorsBuilder = new();
-
+    private readonly List<Type> _decoratorTypes = new();
+    
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
         _serviceCollection = serviceCollection;
@@ -74,8 +74,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(genericDecorator);
-
+        _decoratorTypes.Add(genericDecorator); 
         return this;
     }
 
@@ -84,17 +83,19 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(typeof(T));
-
+        _decoratorTypes.Add(typeof(T));
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        // TO DO change method name
-        _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
-
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+        
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        _decoratorTypes.AddRange(decorators);
+        
         return this;
     }
 
@@ -106,9 +107,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDecorators()
     {
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
-        _serviceCollection.AddDecorators(decorators);
+        _decoratorTypes.Reverse();
+        _serviceCollection.AddDecorators(_decoratorTypes);
     }
 
     private void RegisterHandlers()

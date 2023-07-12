@@ -3,28 +3,14 @@ using Pipelines.Builder.Interfaces;
 
 namespace Pipelines.Builder.Decorators;
 
-internal class DecoratorsBuilder
+internal static class DecoratorsBuilder
 {
-    private readonly List<Type> _decorators = new();
-
-    public List<Type> GetDecorators() => _decorators;
-
-    public void AddDecorator(Type genericDecorator)
-    {
-        _decorators.Add(genericDecorator);
-    }
-
-    public void AddDecorators(List<Type> decorators)
-    {
-        _decorators.AddRange(decorators);
-    }
-
-    public void BuildDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
+    public static List<Type> BuildDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
     {
         var builder = new ClosedTypeDecoratorsBuilder(assemblies, handlerType);
 
         action(builder);
         
-        _decorators.AddRange(builder.GetDecoratorTypes());
+        return builder.GetDecoratorTypes().ToList();
     }
 }

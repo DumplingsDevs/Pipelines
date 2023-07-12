@@ -14,15 +14,11 @@ public class WithTests
     [Test]
     public void HappyPath()
     {
-        var builder = new DecoratorsBuilder();
-
-        builder.BuildDecorators(
+        var types = DecoratorsBuilder.BuildDecorators(
             x => x.With(y =>
                 y.Namespace?.Contains("Pipelines.Tests.Builder.Decorators.Samples") ?? false),
             _handlerType, _assembly);
-
-        var types = builder.GetDecorators();
-
+        
         Assert.That(types, Has.Count.EqualTo(4));
         Assert.That(types[0].FullName, Is.EqualTo(typeof(FirstDecorator).FullName));
         Assert.That(types[1].FullName, Is.EqualTo(typeof(FourthDecorator).FullName));

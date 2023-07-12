@@ -14,12 +14,8 @@ public class WithInheritedClassTests
     [Test]
     public void HappyPath()
     {
-        var builder = new DecoratorsBuilder();
-
-        builder.BuildDecorators(x => x.WithInheritedClass<DecoratorBaseClass>(), _handlerType, _assembly);
-
-        var types = builder.GetDecorators();
-
+        var types = DecoratorsBuilder.BuildDecorators(x => x.WithInheritedClass<DecoratorBaseClass>(), _handlerType, _assembly);
+        
         Assert.That(types, Has.Count.EqualTo(1));
         Assert.That(types.First().FullName, Is.EqualTo(typeof(ThirdDecorator).FullName));
     }
