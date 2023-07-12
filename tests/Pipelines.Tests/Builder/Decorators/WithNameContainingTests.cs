@@ -14,11 +14,7 @@ public class WithNameContainingTests
     [Test]
     public void HappyPath()
     {
-        var builder = new DecoratorsBuilder();
-
-        builder.BuildDecorators(x => x.WithNameContaining("02E6B297_F635_48D4_ABD9_D280AF6C3DB8"), _handlerType, _assembly);
-
-        var types = builder.GetDecorators();
+        var types = DecoratorsBuilder.BuildDecorators(x => x.WithNameContaining("02E6B297_F635_48D4_ABD9_D280AF6C3DB8"), _handlerType, _assembly);
 
         Assert.That(types, Has.Count.EqualTo(1));
         Assert.That(types.First().FullName, Is.EqualTo(typeof(SecondDecorator02E6B297_F635_48D4_ABD9_D280AF6C3DB8).FullName));

@@ -2,6 +2,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
+using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
+using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
@@ -20,8 +22,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
+    private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
-    private DecoratorsBuilder _decoratorsBuilder = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -58,9 +60,9 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
+        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
+        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
 
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
-        
         return this;
     }
 
@@ -69,8 +71,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(genericDecorator);
-
+        _decoratorTypes.Add(genericDecorator);
         return this;
     }
 
@@ -79,15 +80,18 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(typeof(T));
-
+        _decoratorTypes.Add(typeof(T));
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        _decoratorTypes.AddRange(decorators);
 
         return this;
     }
@@ -103,10 +107,9 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
             .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
 
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
+        _decoratorTypes.Reverse();
 
-        _serviceCollection.AddDecorators(decorators, handlers);
+        _serviceCollection.AddDecorators(_decoratorTypes, handlers);
     }
 
     private void RegisterDispatcher()

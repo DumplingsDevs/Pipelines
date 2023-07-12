@@ -4,6 +4,7 @@ namespace Pipelines.Utils;
 
 public static class MethodInfoExtensions
 {
+    //If return type is generic Task<>, only generic arguments will be listed. E.g. Task<string,int> == string, int result types
     public static List<Type> GetReturnTypes(this MethodInfo methodInfo)
     {
         var returnTypes = new List<Type>();
@@ -47,5 +48,11 @@ public static class MethodInfoExtensions
     {
         var returnType = methodInfo.ReturnType;
         return returnType == typeof(void) || returnType == typeof(Task);
+    }
+    
+    public static bool IsGenericTaskReturnType(this MethodInfo methodInfo)
+    {
+        var returnType = methodInfo.ReturnType;
+        return returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>);
     }
 }
