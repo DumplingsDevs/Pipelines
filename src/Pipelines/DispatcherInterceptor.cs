@@ -1,32 +1,28 @@
 using System.Reflection;
-using Castle.DynamicProxy;
 using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions;
 using Pipelines.Exceptions;
 
 namespace Pipelines;
 
-public class DispatcherInterceptor : IInterceptor
+public class DispatcherInterceptor : DispatchProxy
 {
-    private readonly Type _handlerType;
-    private readonly Type _inputType;
-    private readonly IServiceProvider _serviceProvider;
+    private Type _handlerType;
+    private IServiceProvider _serviceProvider;
 
-    public DispatcherInterceptor(IServiceProvider serviceProvider, Type inputType, Type handlerType)
+    public static T Create<T>(IServiceProvider serviceProvider, Type handlerType)
     {
-        _serviceProvider = serviceProvider;
-        _inputType = inputType;
-        _handlerType = handlerType;
+        object proxy = Create<T, DispatcherInterceptor>();
+        ((DispatcherInterceptor)proxy)._serviceProvider = serviceProvider;
+        ((DispatcherInterceptor)proxy)._handlerType = handlerType;
+
+        return (T)proxy;
     }
 
-    public void Intercept(IInvocation invocation)
+    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
-        var arguments = invocation.Arguments;
-
-        var result = HandleExecutedMethod(arguments);
-        if (result is not null)
-        {
-            invocation.ReturnValue = result;
-        }
+        ValidateArgs(args);
+        
+        return HandleExecutedMethod(args);
     }
 
     private object? HandleExecutedMethod(object[] args)

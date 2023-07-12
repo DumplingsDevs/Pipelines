@@ -1,5 +1,4 @@
 using System.Reflection;
-using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
@@ -111,13 +110,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
     {
-        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
-            new DispatcherInterceptor(x, _inputType, _handlerType));
-        _serviceCollection.AddScoped<TDispatcher>(x =>
-        {
-            var interceptor = x.GetService<DispatcherInterceptor>();
-            var proxyGenerator = new ProxyGenerator();
-            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
-        });
+        _serviceCollection.AddScoped<TDispatcher>(x => DispatcherInterceptor.Create<TDispatcher>(x, _handlerType));
     }
 }
