@@ -21,13 +21,13 @@ public class Tests
                 builder
                     .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
                     .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
-                    .WithClosedTypeDecorators(x =>
-                    {
-                        x.WithImplementedInterface<IDecorator>();
-                        x.WithInheritedClass<BaseDecorator>();
-                        x.WithAttribute<DecoratorAttribute>();
-                        x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
-                    }, Assembly.GetExecutingAssembly());
+                .WithClosedTypeDecorators(x =>
+                {
+                    x.WithImplementedInterface<IDecorator>();
+                    x.WithInheritedClass<BaseDecorator>();
+                    x.WithAttribute<DecoratorAttribute>();
+                    x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+                }, Assembly.GetExecutingAssembly());
             });
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();

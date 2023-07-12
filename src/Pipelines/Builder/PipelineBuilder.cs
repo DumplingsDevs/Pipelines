@@ -64,7 +64,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
         return this;
     }
-    
+
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         // Validate if contains proper generic implementation
@@ -95,25 +95,20 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        RegisterHandlers();
-        RegisterDecorators();
+        RegisterHandlerAndDecorators();
     }
 
-    private void RegisterDecorators()
+    private void RegisterHandlerAndDecorators()
     {
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
-        _serviceCollection.AddDecorators(decorators);
-    }
-
-    private void RegisterHandlers()
-    {
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
+        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
             .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
 
-        _serviceCollection.RegisterGenericTypesAsScoped(types);
+        var decorators = _decoratorsBuilder.GetDecorators();
+        decorators.Reverse();
+
+        _serviceCollection.AddDecorators(decorators, handlers);
     }
-    
+
     private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
     {
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>

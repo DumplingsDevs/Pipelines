@@ -18,6 +18,7 @@ public static class EnumerableExtension
     public static IEnumerable<Type> WhereConstructorHasCompatibleGenericType(this IEnumerable<Type> source,
         Type parameterType)
     {
+        //TO DO check if implements handler type
         return source.Where(x => ConstructorHasCompatibleGenericType(x.GetConstructors(), parameterType));
     }
 
