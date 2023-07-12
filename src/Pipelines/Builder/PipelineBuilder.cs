@@ -20,6 +20,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
+    private Func<IServiceProvider, object> _dispatcherProxy = null!;
     private DecoratorsBuilder _decoratorsBuilder = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
@@ -58,9 +59,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
 
-        //TO DO - Move to Build Method
-        RegisterDispatcher<TDispatcher>();
-
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
+        
         return this;
     }
 
@@ -94,6 +94,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
+        RegisterDispatcher();
         RegisterHandlerAndDecorators();
     }
 
@@ -108,8 +109,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _serviceCollection.AddDecorators(decorators, handlers);
     }
 
-    private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
+    private void RegisterDispatcher()
     {
-        _serviceCollection.AddScoped<TDispatcher>(x => DispatcherInterceptor.Create<TDispatcher>(x, _handlerType));
+        _serviceCollection.AddScoped(_dispatcherType, _dispatcherProxy);
     }
 }
