@@ -3,6 +3,8 @@ using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
+using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
+using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
@@ -58,6 +60,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
+        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
+        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
 
         //TO DO - Move to Build Method
         RegisterDispatcher<TDispatcher>();
@@ -88,6 +92,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
+        // TO DO change method name
         _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
 
         return this;
