@@ -23,7 +23,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
-    private DecoratorsBuilder _decoratorsBuilder = new();
+    private readonly List<Type> _decoratorTypes = new();
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -63,19 +63,15 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
         CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
 
-        //TO DO - Move to Build Method
-        RegisterDispatcher<TDispatcher>();
-
         return this;
     }
-    
+
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(genericDecorator);
-
+        _decoratorTypes.Add(genericDecorator);
         return this;
     }
 
@@ -84,16 +80,18 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         // Validate if contains proper generic implementation
         // Validate if decorator's constructor has parameter with generic handler type 
 
-        _decoratorsBuilder.AddDecorator(typeof(T));
-
+        _decoratorTypes.Add(typeof(T));
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        // TO DO change method name
-        _decoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        // Validate if contains proper generic implementation
+        // Validate if decorator's constructor has parameter with generic handler type 
+
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        _decoratorTypes.AddRange(decorators);
 
         return this;
     }
@@ -101,14 +99,14 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public void Build()
     {
         RegisterHandlers();
+        RegisterDispatcher();
         RegisterDecorators();
     }
 
     private void RegisterDecorators()
     {
-        var decorators = _decoratorsBuilder.GetDecorators();
-        decorators.Reverse();
-        _serviceCollection.AddDecorators(decorators);
+        _decoratorTypes.Reverse();
+        _serviceCollection.AddDecorators(_decoratorTypes);
     }
 
     private void RegisterHandlers()
@@ -118,16 +116,16 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
         _serviceCollection.RegisterGenericTypesAsScoped(types);
     }
-    
-    private void RegisterDispatcher<TDispatcher>() where TDispatcher : class
+
+    private void RegisterDispatcher()
     {
         _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
             new DispatcherInterceptor(x, _inputType, _handlerType));
-        _serviceCollection.AddScoped<TDispatcher>(x =>
+        _serviceCollection.AddScoped(_dispatcherType, x =>
         {
             var interceptor = x.GetService<DispatcherInterceptor>();
             var proxyGenerator = new ProxyGenerator();
-            return proxyGenerator.CreateInterfaceProxyWithoutTarget<TDispatcher>(interceptor);
+            return proxyGenerator.CreateInterfaceProxyWithoutTarget(_dispatcherType, interceptor);
         });
     }
 }
