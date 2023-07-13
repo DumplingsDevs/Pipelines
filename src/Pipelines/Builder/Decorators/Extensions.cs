@@ -1,3 +1,4 @@
+using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Utils;
 
@@ -5,38 +6,75 @@ namespace Pipelines.Builder.Decorators;
 
 internal static class Extensions
 {
-    internal static IServiceCollection AddDecorators(this IServiceCollection serviceCollection, IEnumerable<Type> decorators)
+    internal static IServiceCollection AddDecorators(this IServiceCollection serviceCollection,
+        IEnumerable<Type> decorators, IEnumerable<Type> handlers)
     {
-        foreach (var decoratorType in decorators)
+        foreach (var handlerType in handlers)
         {
-            AddDecorator(serviceCollection, decoratorType);
+            var interfaces = handlerType.GetInterfaces();
+            foreach (var @interface in interfaces)
+            {
+                if (@interface.IsGenericType)
+                {
+                    var compatibleDecorators =
+                        decorators.Where(decoratorType => CanDecorate(@interface, decoratorType)).ToList();
+
+                    if (compatibleDecorators.Count == 0)
+                    {
+                        serviceCollection.AddScoped(@interface, handlerType);
+                        continue;
+                    }
+
+                    serviceCollection.AddScoped(handlerType);
+                    var lastDecorator = Decorate(serviceCollection, handlerType, new Queue<Type>(compatibleDecorators));
+
+                    if (lastDecorator != null)
+                    {
+                        serviceCollection.AddScoped(@interface, lastDecorator);
+                    }
+                }
+            }
         }
 
         return serviceCollection;
     }
 
-    private static void AddDecorator(IServiceCollection serviceCollection, Type decoratorType)
+    private static Func<IServiceProvider, object>? Decorate(IServiceCollection serviceCollection, Type decoratedType,
+        Queue<Type> compatibleDecorators)
     {
-        for (var i = serviceCollection.Count - 1; i >= 0; i--)
+        if (compatibleDecorators.Count == 0)
         {
-            var serviceDescriptor = serviceCollection[i];
-
-            if (serviceDescriptor.ServiceType is DecoratedType)
-            {
-                continue; // Service has already been decorated.
-            }
-
-            if (!CanDecorate(serviceDescriptor.ServiceType, decoratorType))
-            {
-                continue; // decorator is not compatible with ServiceType
-            }
-
-            var decoratedType = new DecoratedType(serviceDescriptor.ServiceType);
-            serviceCollection.Add(serviceDescriptor.WithServiceType(decoratedType));
-
-            var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
-            serviceCollection[i] = serviceDescriptor.WithImplementationFactory(implementationFactory);
+            return null;
         }
+
+        var decoratorType = compatibleDecorators.Dequeue();
+
+
+        if (decoratorType.IsGenericType)
+        {
+            //TO DO: Find interface of handler type
+            var genericArguments = decoratedType.GetInterfaces().First().GetGenericArguments();
+            var closedDecorator = decoratorType.MakeGenericType(genericArguments);
+
+            var closedImplementationFactory = DecoratorFactory.CreateDecorator(decoratedType, closedDecorator);
+
+            serviceCollection.AddScoped(closedDecorator, closedImplementationFactory);
+            if (compatibleDecorators.Count == 0)
+            {
+                return closedImplementationFactory;
+            }
+
+            return Decorate(serviceCollection, closedDecorator, compatibleDecorators);
+        }
+
+        var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
+        serviceCollection.AddScoped(decoratorType, implementationFactory);
+        if (compatibleDecorators.Count == 0)
+        {
+            return implementationFactory;
+        }
+
+        return Decorate(serviceCollection, decoratorType, compatibleDecorators);
     }
 
     private static bool CanDecorate(Type serviceType, Type decoratorType) =>

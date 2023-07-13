@@ -1,5 +1,4 @@
 using System.Reflection;
-using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
@@ -24,6 +23,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
     private readonly List<Type> _decoratorTypes = new();
+    private Func<IServiceProvider, object> _dispatcherProxy = null!;
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -62,6 +62,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
         CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
         CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
+        
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
 
         return this;
     }
@@ -98,34 +100,22 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        RegisterHandlers();
         RegisterDispatcher();
-        RegisterDecorators();
+        RegisterHandlerAndDecorators();
     }
 
-    private void RegisterDecorators()
+    private void RegisterHandlerAndDecorators()
     {
+        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
+            .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
+
         _decoratorTypes.Reverse();
-        _serviceCollection.AddDecorators(_decoratorTypes);
-    }
 
-    private void RegisterHandlers()
-    {
-        var types = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
-            .WhereConstructorDoesNotHaveParameter(_handlerType);
-
-        _serviceCollection.RegisterGenericTypesAsScoped(types);
+        _serviceCollection.AddDecorators(_decoratorTypes, handlers);
     }
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddScoped<DispatcherInterceptor>(x =>
-            new DispatcherInterceptor(x, _inputType, _handlerType));
-        _serviceCollection.AddScoped(_dispatcherType, x =>
-        {
-            var interceptor = x.GetService<DispatcherInterceptor>();
-            var proxyGenerator = new ProxyGenerator();
-            return proxyGenerator.CreateInterfaceProxyWithoutTarget(_dispatcherType, interceptor);
-        });
+        _serviceCollection.AddScoped(_dispatcherType, _dispatcherProxy);
     }
 }
