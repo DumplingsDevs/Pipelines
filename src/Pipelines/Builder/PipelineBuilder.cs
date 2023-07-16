@@ -21,9 +21,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
+    private MethodInfo _handlerHandleMethod = null!;
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
+    private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
 
@@ -50,6 +52,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
 
+        _handlerHandleMethod = handlerType.GetFirstMethodInfo();
+
         return this;
     }
 
@@ -62,8 +66,10 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
-        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
-        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
+        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
+
+        _dispatcherHandleMethod = _dispatcherType.GetFirstMethodInfo();
         
         _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
 

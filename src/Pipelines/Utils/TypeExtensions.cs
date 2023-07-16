@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Pipelines.Utils;
 
 internal static class TypeExtensions
@@ -18,4 +20,10 @@ internal static class TypeExtensions
                 .Any(x => x.ParameterType.HasCompatibleGenericArguments(parameterType)))
             .Any(hasType => hasType);
     }
+
+    internal static MethodInfo GetFirstMethodInfo(this Type type)
+    {
+        return type.GetMethods().First();
+    }
+
 }
