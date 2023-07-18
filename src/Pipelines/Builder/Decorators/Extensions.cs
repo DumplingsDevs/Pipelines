@@ -6,65 +6,78 @@ namespace Pipelines.Builder.Decorators;
 
 internal static class Extensions
 {
-    internal static IServiceCollection AddDecorators(this IServiceCollection serviceCollection,
-        IEnumerable<Type> decorators, IEnumerable<Type> handlers)
+    internal static IServiceCollection AddHandlersWithDecorators(this IServiceCollection serviceCollection,
+        List<Type> decorators, IEnumerable<Type> handlers)
     {
         foreach (var handlerType in handlers)
         {
-            var interfaces = handlerType.GetInterfaces();
-            foreach (var @interface in interfaces)
-            {
-                if (@interface.IsGenericType)
-                {
-                    var compatibleDecorators =
-                        decorators.Where(decoratorType => CanDecorate(@interface, decoratorType)).ToList();
-
-                    if (compatibleDecorators.Count == 0)
-                    {
-                        serviceCollection.AddScoped(@interface, handlerType);
-                        continue;
-                    }
-
-                    serviceCollection.AddScoped(handlerType);
-                    var lastDecorator = Decorate(serviceCollection, handlerType, new Queue<Type>(compatibleDecorators));
-
-                    if (lastDecorator != null)
-                    {
-                        serviceCollection.AddScoped(@interface, lastDecorator);
-                    }
-                }
-            }
+            TryAddHandlerWithDecorators(serviceCollection, decorators, handlerType);
         }
 
         return serviceCollection;
     }
 
-    private static Func<IServiceProvider, object>? Decorate(IServiceCollection serviceCollection, Type decoratedType,
-        Queue<Type> compatibleDecorators)
+    private static void TryAddHandlerWithDecorators(IServiceCollection serviceCollection, List<Type> decorators,
+        Type handlerType)
     {
-        if (compatibleDecorators.Count == 0)
+        var genericTypeInterfaces = GetGenericTypeInterfaces(handlerType);
+
+        foreach (var genericTypeInterface in genericTypeInterfaces)
         {
-            return null;
+            var compatibleDecorators = GetCompatibleDecorators(decorators, genericTypeInterface);
+
+            if (compatibleDecorators.Count == 0)
+            {
+                serviceCollection.AddScoped(genericTypeInterface, handlerType);
+                continue;
+            }
+
+            AddHandlerWithCompatibleDecorators(serviceCollection, handlerType, compatibleDecorators,
+                genericTypeInterface);
         }
+    }
 
+    private static void AddHandlerWithCompatibleDecorators(IServiceCollection serviceCollection, Type handlerType,
+        IEnumerable<Type> compatibleDecorators, Type genericTypeInterface)
+    {
+        serviceCollection.AddScoped(handlerType);
+
+        var lastDecorator = Decorate(serviceCollection, handlerType, genericTypeInterface, new Queue<Type>(compatibleDecorators));
+
+        serviceCollection.AddScoped(genericTypeInterface, lastDecorator);
+    }
+
+    private static List<Type> GetCompatibleDecorators(List<Type> decorators, Type @interface)
+    {
+        return decorators.Where(decoratorType => CanDecorate(@interface, decoratorType)).ToList();
+    }
+
+    private static IEnumerable<Type> GetGenericTypeInterfaces(Type handlerType)
+    {
+        return handlerType.GetInterfaces().Where(x => x.IsGenericType);
+    }
+
+    private static Func<IServiceProvider, object> Decorate(IServiceCollection serviceCollection, Type decoratedType,
+        Type genericTypeInterface, Queue<Type> compatibleDecorators)
+    {
         var decoratorType = compatibleDecorators.Dequeue();
-
 
         if (decoratorType.IsGenericType)
         {
             //TO DO: Find interface of handler type
-            var genericArguments = decoratedType.GetInterfaces().First().GetGenericArguments();
+            var genericArguments = decoratedType.GetInterfaces().First(type => TypeNamespaceComparer.CompareWithoutFullName(type, genericTypeInterface)).GetGenericArguments();
             var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
             var closedImplementationFactory = DecoratorFactory.CreateDecorator(decoratedType, closedDecorator);
 
             serviceCollection.AddScoped(closedDecorator, closedImplementationFactory);
+
             if (compatibleDecorators.Count == 0)
             {
                 return closedImplementationFactory;
             }
 
-            return Decorate(serviceCollection, closedDecorator, compatibleDecorators);
+            return Decorate(serviceCollection, closedDecorator, genericTypeInterface, compatibleDecorators);
         }
 
         var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
@@ -74,7 +87,7 @@ internal static class Extensions
             return implementationFactory;
         }
 
-        return Decorate(serviceCollection, decoratorType, compatibleDecorators);
+        return Decorate(serviceCollection, decoratorType, genericTypeInterface, compatibleDecorators);
     }
 
     private static bool CanDecorate(Type serviceType, Type decoratorType) =>

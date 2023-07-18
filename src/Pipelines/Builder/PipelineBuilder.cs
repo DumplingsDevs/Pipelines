@@ -101,17 +101,17 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public void Build()
     {
         RegisterDispatcher();
-        RegisterHandlerAndDecorators();
+        RegisterHandlersWithDecorators();
     }
 
-    private void RegisterHandlerAndDecorators()
+    private void RegisterHandlersWithDecorators()
     {
         var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
             .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
 
         _decoratorTypes.Reverse();
 
-        _serviceCollection.AddDecorators(_decoratorTypes, handlers);
+        _serviceCollection.AddHandlersWithDecorators(_decoratorTypes, handlers);
     }
 
     private void RegisterDispatcher()

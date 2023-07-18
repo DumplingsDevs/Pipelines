@@ -19,8 +19,7 @@ internal static class ReflectionExtensions
             }
         }
 
-        // TO DO: Change First() find interface by handler type
-        var firstInterface = secondType.GetInterfaces().First();
+        var firstInterface = secondType.GetInterfaces().First(x => TypeNamespaceComparer.CompareWithoutFullName(x, type));
         var interfaceGenericArguments = firstInterface.GetGenericArguments();
 
         if (!AreTheSameTypes(genericArguments, interfaceGenericArguments))
