@@ -64,7 +64,6 @@ internal static class Extensions
 
         if (decoratorType.IsGenericType)
         {
-            //TO DO: Find interface of handler type
             var genericArguments = decoratedType.GetInterfaces().First(type => TypeNamespaceComparer.CompareWithoutFullName(type, genericTypeInterface)).GetGenericArguments();
             var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
