@@ -5,7 +5,6 @@ using Pipelines.Builder.Interfaces;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.Decorator;
-using Pipelines.Builder.Validators.Decorator.Constructor;
 using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
