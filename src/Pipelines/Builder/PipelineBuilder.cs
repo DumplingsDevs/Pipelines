@@ -66,10 +66,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
-        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
-        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
 
         _dispatcherHandleMethod = _dispatcherType.GetFirstMethodInfo();
+        
+        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
         
         _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
 
