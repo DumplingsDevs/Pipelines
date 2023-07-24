@@ -1,3 +1,4 @@
+using Pipelines.Builder.Validators.Decorator.Constructor.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.Decorator.Constructor;
@@ -9,7 +10,7 @@ internal static class DecoratorConstructorValidator
         var hasExpectedParameter = decoratorType.ConstructorHasCompatibleGenericType(expectedParameterType);
         if (!hasExpectedParameter)
         {
-            throw new Exception();
+            throw new ConstructorValidationException(decoratorType, expectedParameterType);
         }
     }
 }
