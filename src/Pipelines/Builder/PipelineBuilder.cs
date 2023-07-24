@@ -79,7 +79,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
-        DecoratorConstructorValidator.Validate(genericDecorator, _handlerType);
+        DecoratorValidator.Validate(genericDecorator, _handlerType);
         
         _decoratorTypes.Add(genericDecorator);
         return this;

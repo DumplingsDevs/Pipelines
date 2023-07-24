@@ -1,12 +1,13 @@
 using Pipelines.Builder.Validators.Decorator.Constructor;
+using Pipelines.Builder.Validators.Decorator.ImplementsInterface;
 
 namespace Pipelines.Builder.Validators.Decorator;
 
 internal static class DecoratorValidator
 {
-    internal static void Validate(Type decoratorType, Type expectedParameterType)
+    internal static void Validate(Type decoratorType, Type handlerType)
     {
-        // Validate if contains proper generic implementation
-        DecoratorConstructorValidator.Validate(decoratorType, expectedParameterType);
+        DecoratorConstructorValidator.Validate(decoratorType, handlerType);
+        ImplementsInterfaceValidator.Validate(decoratorType, handlerType);
     }
 }
