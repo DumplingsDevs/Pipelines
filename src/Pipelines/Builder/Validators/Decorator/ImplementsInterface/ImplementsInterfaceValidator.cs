@@ -1,3 +1,5 @@
+using Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions;
+
 namespace Pipelines.Builder.Validators.Decorator.ImplementsInterface;
 
 internal static class ImplementsInterfaceValidator
@@ -18,7 +20,7 @@ internal static class ImplementsInterfaceValidator
 
         if (!isImplementsInterface)
         {
-            throw new Exception();
+            throw new InterfaceImplementationException(decoratorType, handlerInterfaceType);
         }
     }
 }
