@@ -6,12 +6,12 @@ namespace Pipelines;
 
 public class DispatcherInterceptor : DispatchProxy
 {
-    private Type _handlerType;
-    private IServiceProvider _serviceProvider;
+    private Type _handlerType = null!;
+    private IServiceProvider _serviceProvider = null!;
 
     public static T Create<T>(IServiceProvider serviceProvider, Type handlerType)
     {
-        object proxy = Create<T, DispatcherInterceptor>();
+        object proxy = Create<T, DispatcherInterceptor>()!;
         ((DispatcherInterceptor)proxy)._serviceProvider = serviceProvider;
         ((DispatcherInterceptor)proxy)._handlerType = handlerType;
 
@@ -22,7 +22,7 @@ public class DispatcherInterceptor : DispatchProxy
     {
         ValidateArgs(args);
         
-        return HandleExecutedMethod(args);
+        return HandleExecutedMethod(args!);
     }
 
     private object? HandleExecutedMethod(object[] args)
@@ -83,9 +83,9 @@ public class DispatcherInterceptor : DispatchProxy
         return handler;
     }
 
-    private void ValidateArgs(object[] args)
+    private void ValidateArgs(object?[]? args)
     {
-        var input = args.FirstOrDefault();
+        var input = args?.FirstOrDefault();
 
         if (input is null)
         {
