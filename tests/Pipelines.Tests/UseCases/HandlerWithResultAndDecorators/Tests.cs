@@ -52,6 +52,7 @@ public class Tests
         {
             typeof(LoggingDecorator<,>).Name,
             typeof(TracingDecorator<,>).Name,
+            nameof(ExampleRequestDecoratorFive),
             nameof(ExampleRequestDecoratorOne),
             nameof(ExampleRequestDecoratorTwo),
             nameof(ExampleRequestDecoratorThree),
@@ -60,6 +61,7 @@ public class Tests
             nameof(ExampleRequestDecoratorThree),
             nameof(ExampleRequestDecoratorTwo),
             nameof(ExampleRequestDecoratorOne),
+            nameof(ExampleRequestDecoratorFive),
             typeof(TracingDecorator<,>).Name,
             typeof(LoggingDecorator<,>).Name,
         }, _state.Status);
