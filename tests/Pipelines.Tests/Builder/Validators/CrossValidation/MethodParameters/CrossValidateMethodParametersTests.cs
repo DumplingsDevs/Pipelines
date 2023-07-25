@@ -1,6 +1,7 @@
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions;
 using Pipelines.Tests.Builder.Validators.CrossValidation.MethodParameters.Types;
+using Pipelines.Utils;
 
 namespace Pipelines.Tests.Builder.Validators.CrossValidation.MethodParameters;
 
@@ -13,9 +14,13 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithCancellationToken<IInputType>);
         var dispatcherType = typeof(IDispatcherWithCancellationToken);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -24,9 +29,13 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithCancellationToken<IInputType>);
         var dispatcherType = typeof(IDispatcherWithThreeParameters);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ParameterCountMismatchException>(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.Throws<ParameterCountMismatchException>(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -35,9 +44,13 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithThreeParameters<IInputType>);
         var dispatcherType = typeof(IDispatcherWithThreeParametersDifferentThanHandler);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ParameterTypeMismatchException>(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.Throws<ParameterTypeMismatchException>(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -46,20 +59,28 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithInputTypeOnly<IInputType>);
         var dispatcherType = typeof(IDispatcherWithInputTypeOnly);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
-    
+
     [Test]
     public void Validate_WithMatchingHandlerAndDispatcherWithTwoParams_DoesNotThrowException()
     {
         // Arrange
         var handlerType = typeof(IHandlerWithCancellationToken<IInputType>);
         var dispatcherType = typeof(IDispatcherWithCancellationToken);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -68,9 +89,13 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithThreeParameters<IInputType>);
         var dispatcherType = typeof(IDispatcherWithThreeParameters);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -79,9 +104,13 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithThreeParameters<IInputType>);
         var dispatcherType = typeof(IDispatcherWithCancellationToken);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ParameterCountMismatchException>(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.Throws<ParameterCountMismatchException>(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 
     [Test]
@@ -90,8 +119,12 @@ public class CrossValidateMethodParametersTests
         // Arrange
         var handlerType = typeof(IHandlerWithCancellationToken<IInputType>);
         var dispatcherType = typeof(IDispatcherWithThreeParameters);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ParameterCountMismatchException>(() => CrossValidateMethodParameters.Validate(handlerType, dispatcherType));
+        Assert.Throws<ParameterCountMismatchException>(() =>
+            CrossValidateMethodParameters.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 }

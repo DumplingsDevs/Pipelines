@@ -4,6 +4,7 @@ using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Interfaces;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
+using Pipelines.Builder.Validators.Decorator;
 using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
@@ -19,9 +20,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 {
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerType = null!;
+    private MethodInfo _handlerHandleMethod = null!;
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
     private Type _dispatcherType = null!;
+    private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
 
@@ -48,6 +51,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
 
+        _handlerHandleMethod = handlerType.GetFirstMethodInfo();
+
         return this;
     }
 
@@ -60,8 +65,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
         ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
-        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType);
-        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType);
+
+        _dispatcherHandleMethod = _dispatcherType.GetFirstMethodInfo();
+        
+        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
         
         _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
 
@@ -70,29 +78,32 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
-        // Validate if contains proper generic implementation
-        // Validate if decorator's constructor has parameter with generic handler type 
-
+        DecoratorValidator.Validate(genericDecorator, _handlerType);
+        
         _decoratorTypes.Add(genericDecorator);
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
-        // Validate if contains proper generic implementation
-        // Validate if decorator's constructor has parameter with generic handler type 
+        var decoratorType = typeof(T);  
+        DecoratorValidator.Validate(decoratorType, _handlerType);
+        
+        _decoratorTypes.Add(decoratorType);
 
-        _decoratorTypes.Add(typeof(T));
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        // Validate if contains proper generic implementation
-        // Validate if decorator's constructor has parameter with generic handler type 
-
         var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+
+        foreach (var decoratorType in decorators)
+        {
+            DecoratorValidator.Validate(decoratorType, _handlerType);
+        }
+        
         _decoratorTypes.AddRange(decorators);
 
         return this;
