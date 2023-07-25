@@ -6,6 +6,24 @@ namespace Pipelines.Builder.Decorators;
 
 internal static class Extensions
 {
+    
+//              ▲   ┌─────────────────────┐   │
+//              │   │ Decorator1:IHandler │   │
+//              │   └─────────────────────┘   │
+//              │                             │
+//              │   ┌─────────────────────┐   │
+//              │   │ Decorator2:IHandler │   │
+//              │   └─────────────────────┘   │
+// Registration │                             │  Invoke
+//  direction   │   ┌─────────────────────┐   │ direction
+//              │   │ Decorator3:IHandler │   │
+//              │   └─────────────────────┘   │
+//              │                             │
+//              │    ┌──────────────────┐     │
+//              │    │ Handler:IHandler │     │
+//              │    └──────────────────┘     ▼
+// Decorators are registers and combined like matryoshka - all implements the same interface, and invokes the next one,
+// until handler(the last in chain) will return result.
     internal static IServiceCollection AddHandlersWithDecorators(this IServiceCollection serviceCollection,
         List<Type> decorators, IEnumerable<Type> handlers)
     {
@@ -20,6 +38,8 @@ internal static class Extensions
     private static void TryAddHandlerWithDecorators(IServiceCollection serviceCollection, List<Type> decorators,
         Type handlerType)
     {
+        
+        // handlerType implements generic interfaces - we are sure because we validated it in pipeline builder
         var genericTypeInterfaces = GetGenericTypeInterfaces(handlerType);
 
         foreach (var genericTypeInterface in genericTypeInterfaces)
@@ -28,6 +48,8 @@ internal static class Extensions
 
             if (compatibleDecorators.Count == 0)
             {
+                // there is no decorator for handler - register is as implementer handler's interface.
+                // TO DO - what if user wants to register handler with different lifetime e.g. Transient?
                 serviceCollection.AddScoped(genericTypeInterface, handlerType);
                 continue;
             }
@@ -42,7 +64,7 @@ internal static class Extensions
     {
         serviceCollection.AddScoped(handlerType);
 
-        var lastDecorator = Decorate(serviceCollection, handlerType, genericTypeInterface, new Queue<Type>(compatibleDecorators));
+        var lastDecorator = DecorateRecursively(serviceCollection, handlerType, genericTypeInterface, new Queue<Type>(compatibleDecorators));
 
         serviceCollection.AddScoped(genericTypeInterface, lastDecorator);
     }
@@ -57,7 +79,7 @@ internal static class Extensions
         return handlerType.GetInterfaces().Where(x => x.IsGenericType);
     }
 
-    private static Func<IServiceProvider, object> Decorate(IServiceCollection serviceCollection, Type decoratedType,
+    private static Func<IServiceProvider, object> DecorateRecursively(IServiceCollection serviceCollection, Type decoratedType,
         Type genericTypeInterface, Queue<Type> compatibleDecorators)
     {
         var decoratorType = compatibleDecorators.Dequeue();
@@ -68,7 +90,6 @@ internal static class Extensions
             var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
             var closedImplementationFactory = DecoratorFactory.CreateDecorator(decoratedType, closedDecorator);
-
             serviceCollection.AddScoped(closedDecorator, closedImplementationFactory);
 
             if (compatibleDecorators.Count == 0)
@@ -76,17 +97,18 @@ internal static class Extensions
                 return closedImplementationFactory;
             }
 
-            return Decorate(serviceCollection, closedDecorator, genericTypeInterface, compatibleDecorators);
+            return DecorateRecursively(serviceCollection, closedDecorator, genericTypeInterface, compatibleDecorators);
         }
 
         var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
         serviceCollection.AddScoped(decoratorType, implementationFactory);
+        
         if (compatibleDecorators.Count == 0)
         {
             return implementationFactory;
         }
 
-        return Decorate(serviceCollection, decoratorType, genericTypeInterface, compatibleDecorators);
+        return DecorateRecursively(serviceCollection, decoratorType, genericTypeInterface, compatibleDecorators);
     }
 
     private static bool CanDecorate(Type serviceType, Type decoratorType) =>
