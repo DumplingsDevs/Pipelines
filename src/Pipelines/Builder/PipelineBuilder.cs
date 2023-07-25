@@ -19,11 +19,11 @@ namespace Pipelines.Builder;
 public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilder, IPipelineDecoratorBuilder
 {
     private readonly IServiceCollection _serviceCollection;
-    private Type _handlerType = null!;
+    private Type _handlerInterfaceType = null!;
     private MethodInfo _handlerHandleMethod = null!;
     private Assembly _handlerAssembly = null!;
     private Type _inputType = null!;
-    private Type _dispatcherType = null!;
+    private Type _dispatcherInterfaceType = null!;
     private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
@@ -43,13 +43,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
     {
-        _handlerType = handlerType;
+        _handlerInterfaceType = handlerType;
         _handlerAssembly = assembly;
-        ProvidedTypeShouldBeInterface.Validate(_handlerType);
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerType);
-        MethodShouldHaveAtLeastOneParameter.Validate(_handlerType);
-        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerType);
-        ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerType);
+        ProvidedTypeShouldBeInterface.Validate(_handlerInterfaceType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerInterfaceType);
+        MethodShouldHaveAtLeastOneParameter.Validate(_handlerInterfaceType);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerInterfaceType);
+        ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerInterfaceType);
 
         _handlerHandleMethod = handlerType.GetFirstMethodInfo();
 
@@ -58,27 +58,27 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
-        _dispatcherType = typeof(TDispatcher);
+        _dispatcherInterfaceType = typeof(TDispatcher);
 
-        ProvidedTypeShouldBeInterface.Validate(_dispatcherType);
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherType);
-        MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherType);
-        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherType);
-        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherType);
+        ProvidedTypeShouldBeInterface.Validate(_dispatcherInterfaceType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherInterfaceType);
+        MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherInterfaceType);
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherInterfaceType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherInterfaceType);
 
-        _dispatcherHandleMethod = _dispatcherType.GetFirstMethodInfo();
+        _dispatcherHandleMethod = _dispatcherInterfaceType.GetFirstMethodInfo();
         
-        CrossValidateMethodParameters.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
-        CrossValidateResultTypes.Validate(_handlerType, _dispatcherType, _handlerHandleMethod, _dispatcherHandleMethod);
+        CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
         
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerType);
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
 
         return this;
     }
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
-        DecoratorValidator.Validate(genericDecorator, _handlerType);
+        DecoratorValidator.Validate(genericDecorator, _handlerInterfaceType);
         
         _decoratorTypes.Add(genericDecorator);
         return this;
@@ -87,7 +87,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
         var decoratorType = typeof(T);  
-        DecoratorValidator.Validate(decoratorType, _handlerType);
+        DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
         
         _decoratorTypes.Add(decoratorType);
 
@@ -97,11 +97,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerType, assemblies);
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
 
         foreach (var decoratorType in decorators)
         {
-            DecoratorValidator.Validate(decoratorType, _handlerType);
+            DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
         }
         
         _decoratorTypes.AddRange(decorators);
@@ -117,8 +117,8 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterHandlersWithDecorators()
     {
-        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerType)
-            .WhereConstructorDoesNotHaveGenericParameter(_handlerType);
+        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerInterfaceType)
+            .WhereConstructorDoesNotHaveGenericParameter(_handlerInterfaceType);
 
         _decoratorTypes.Reverse();
 
@@ -127,6 +127,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddScoped(_dispatcherType, _dispatcherProxy);
+        _serviceCollection.AddScoped(_dispatcherInterfaceType, _dispatcherProxy);
     }
 }
