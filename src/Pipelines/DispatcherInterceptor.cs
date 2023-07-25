@@ -44,7 +44,7 @@ internal class DispatcherInterceptor : DispatchProxy
 
         // get the interface implemented by handler which matches handlerInterfaceType
         var implementedInterface = handlerType.GetInterfaces()
-            .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterfaceType);
+            .First(i => i.GetGenericTypeDefinition() == handlerInterfaceType);
         
         // get the map of methods implemented by the interface (there will be always one method, because validators will check it)
         var interfaceMap = handlerType.GetInterfaceMap(implementedInterface);
