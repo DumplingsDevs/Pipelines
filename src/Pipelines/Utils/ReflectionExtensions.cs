@@ -2,7 +2,7 @@
 
 internal static class ReflectionExtensions
 {
-    public static bool HasCompatibleGenericArguments(this Type type, Type secondType)
+    internal static bool HasCompatibleGenericArguments(this Type type, Type secondType)
     {
         var genericArguments = type.GetGenericArguments();
 

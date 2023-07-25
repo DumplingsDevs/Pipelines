@@ -1,20 +1,24 @@
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Tests.Builder.Validators.CrossValidation.ResultType.Types;
+using Pipelines.Utils;
 
 namespace Pipelines.Tests.Builder.Validators.CrossValidation.ResultType;
 
 public class CrossValidateResultTypesTests
 {
-     [Test]
+    [Test]
     public void Validate_WithMatchingHandlerAndDispatcherStringResult_DoesNotThrowException()
     {
         // Arrange
         var handlerType = typeof(IHandlerStringResult<>);
         var dispatcherType = typeof(IDispatcherStringResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -23,9 +27,12 @@ public class CrossValidateResultTypesTests
         // Arrange
         var handlerType = typeof(IHandlerTaskStringResult<>);
         var dispatcherType = typeof(IDispatcherTaskStringResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -34,9 +41,12 @@ public class CrossValidateResultTypesTests
         // Arrange
         var handlerType = typeof(IHandlerTaskGenericResult<,>);
         var dispatcherType = typeof(IDispatcherTaskGenericResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -45,20 +55,26 @@ public class CrossValidateResultTypesTests
         // Arrange
         var handlerType = typeof(IHandlerTaskWithConstrainedResult<,>);
         var dispatcherType = typeof(IDispatcherTaskWithConstrainedResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstraintedResults_DoesNotThrowException()
+    public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstrainedResults_DoesNotThrowException()
     {
         // Arrange
         var handlerType = typeof(IHandlerTaskWithTwoConstraintedResults<,,>);
-        var dispatcherType = typeof(IDispatcherTaskWithTwoConstraintedResults);
+        var dispatcherType = typeof(IDispatcherTaskWithTwoConstrainedResults);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.DoesNotThrow(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.DoesNotThrow(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -66,10 +82,13 @@ public class CrossValidateResultTypesTests
     {
         // Arrange
         var handlerType = typeof(IHandlerTaskStringResult<>);
-        var dispatcherType = typeof(IDispatcherTaskWithTwoConstraintedResults);
+        var dispatcherType = typeof(IDispatcherTaskWithTwoConstrainedResults);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ResultTypeCountMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -78,20 +97,26 @@ public class CrossValidateResultTypesTests
         // Arrange
         var handlerType = typeof(IHandlerStringResult<>);
         var dispatcherType = typeof(IDispatcherTaskStringResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<TaskReturnTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<TaskReturnTypeMismatchException>(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
-    
+
     [Test]
     public void Validate_WithVoidDispatcherAndHandlerWithResult_ThrowsReturnTypeMismatchException()
     {
         // Arrange
         var handlerType = typeof(IHandlerStringResult<>);
         var dispatcherType = typeof(IDispatcherVoid);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ReturnTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<ReturnTypeMismatchException>(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
     [Test]
@@ -100,19 +125,26 @@ public class CrossValidateResultTypesTests
         // Arrange
         var handlerType = typeof(IHandlerTaskWithTwoConstraintedResults<,,>);
         var dispatcherType = typeof(IDispatcherTaskWithClassConstraintedResults);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<GenericTypeCountMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<GenericTypeCountMismatchException>(() =>
+            CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
-    
+
     [Test]
     public void Validate_WithMismatchingGenericType_ThrowsGenericTypeMismatchException()
     {
         // Arrange
         var handlerType = typeof(IHandlerTaskWithTwoConstraintedResults<,,>);
         var dispatcherType = typeof(IDispatcherTaskWithDifferentTwoConstraintedResults);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<GenericTypeMismatchException>(() => CrossValidateResultTypes.Validate(handlerType, dispatcherType));
+        Assert.Throws<GenericTypeMismatchException>(
+            () => CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
     }
 }
