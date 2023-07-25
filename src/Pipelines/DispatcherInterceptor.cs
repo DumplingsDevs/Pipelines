@@ -1,19 +1,19 @@
 using System.Reflection;
-using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions;
 using Pipelines.Exceptions;
 
 namespace Pipelines;
 
-public class DispatcherInterceptor : DispatchProxy
+internal class DispatcherInterceptor : DispatchProxy
 {
-    private Type _handlerType = null!;
+    private Type _handlerInterfaceType = null!;
+
     private IServiceProvider _serviceProvider = null!;
 
-    public static T Create<T>(IServiceProvider serviceProvider, Type handlerType)
+    public static T Create<T>(IServiceProvider serviceProvider, Type handlerInterfaceType)
     {
         object proxy = Create<T, DispatcherInterceptor>()!;
         ((DispatcherInterceptor)proxy)._serviceProvider = serviceProvider;
-        ((DispatcherInterceptor)proxy)._handlerType = handlerType;
+        ((DispatcherInterceptor)proxy)._handlerInterfaceType = handlerInterfaceType;
 
         return (T)proxy;
     }
@@ -21,7 +21,7 @@ public class DispatcherInterceptor : DispatchProxy
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
         ValidateArgs(args);
-        
+
         return HandleExecutedMethod(args!);
     }
 
@@ -33,36 +33,22 @@ public class DispatcherInterceptor : DispatchProxy
 
         var handler = GetHandlerService(inputType);
 
-        var method = GetHandlerMethod(handler, inputType);
+        var method = GetHandlerMethod(handler, _handlerInterfaceType);
 
         return method.Invoke(handler, args);
     }
 
-    private static MethodInfo GetHandlerMethod(object handler, Type inputType)
+    private static MethodInfo GetHandlerMethod(object handler, Type handlerInterfaceType)
     {
-        //TO DO - we need to think about it twice - there could be situation, when you have private methods or public by mistake which takes same input parameter!
-        // To solve that, maybe we can use Attributes? Even attribute could be provided in builde
-        // Handler with Result Tests proves that state
+        var handlerType = handler.GetType();
+
+        // get the interface implemented by handler which matches handlerInterfaceType
+        var implementedInterface = handlerType.GetInterfaces()
+            .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterfaceType);
         
-        var methods = handler.GetType()
-            .GetMethods()
-            .Where(x => x.GetParameters()
-                .Any(y => y.ParameterType == inputType))
-            .ToList();
-
-        switch (methods.Count)
-        {
-            case 0:
-                throw new HandlerMethodNotFoundException(handler.GetType(), inputType);
-            case > 1:
-                throw new MultipleHandlerMethodsException(inputType);
-        }
-
-        var method = methods.First();
-
-        // TO DO think how to validate method - do we need to validate method? Maybe it's enough to validate HandlerType interface in builder
-
-        return method;
+        // get the map of methods implemented by the interface (there will be always one method, because validators will check it)
+        var interfaceMap = handlerType.GetInterfaceMap(implementedInterface);
+        return interfaceMap.InterfaceMethods.First();
     }
 
     private object GetHandlerService(Type inputType)
@@ -70,8 +56,8 @@ public class DispatcherInterceptor : DispatchProxy
         var resultType = GetResultType(inputType);
 
         var handlerTypeWithInput = resultType is null
-            ? _handlerType.MakeGenericType(inputType)
-            : _handlerType.MakeGenericType(inputType, resultType);
+            ? _handlerInterfaceType.MakeGenericType(inputType)
+            : _handlerInterfaceType.MakeGenericType(inputType, resultType);
 
         var handler = _serviceProvider.GetService(handlerTypeWithInput);
 
@@ -96,7 +82,7 @@ public class DispatcherInterceptor : DispatchProxy
         // Remember that we can pass CancellationToken.
         // Also in args there will be object that implements e.g. ICommand so we need to check if that object implements required input type
     }
-    
+
     private static Type GetInputType(object[] args)
     {
         return args.First().GetType();
