@@ -31,6 +31,11 @@ public static class MethodInfoExtensions
             {
                 returnTypes.AddRange(returnType.GetGenericArguments());
             }
+            else if(genericTypeDefinition == typeof(ValueTuple<,>))
+            {
+                var typeInfo = genericTypeDefinition.GetTypeInfo();
+                returnTypes.AddRange(typeInfo.GetGenericArguments());
+            }
             else
             {
                 returnTypes.Add(returnType);

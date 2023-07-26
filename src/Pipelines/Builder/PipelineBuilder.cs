@@ -22,7 +22,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Type _handlerInterfaceType = null!;
     private MethodInfo _handlerHandleMethod = null!;
     private Assembly _handlerAssembly = null!;
-    private Type _inputType = null!;
+    private Type _inputInterfaceType = null!;
     private Type _dispatcherInterfaceType = null!;
     private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
@@ -37,7 +37,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         ProvidedTypeShouldBeInterface.Validate(type);
 
-        _inputType = type;
+        _inputInterfaceType = type;
         return this;
     }
 
@@ -46,9 +46,9 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _handlerInterfaceType = handlerType;
         _handlerAssembly = assembly;
         ProvidedTypeShouldBeInterface.Validate(_handlerInterfaceType);
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _handlerInterfaceType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputInterfaceType, _handlerInterfaceType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerInterfaceType);
-        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputType, _handlerInterfaceType);
+        ValidateInputTypeWithHandlerGenericArguments.Validate(_inputInterfaceType, _handlerInterfaceType);
         ValidateResultTypesWithHandlerGenericArguments.Validate(_handlerInterfaceType);
 
         _handlerHandleMethod = handlerType.GetFirstMethodInfo();
@@ -61,17 +61,20 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _dispatcherInterfaceType = typeof(TDispatcher);
 
         ProvidedTypeShouldBeInterface.Validate(_dispatcherInterfaceType);
-        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputType, _dispatcherInterfaceType);
+        ExactlyOneHandleMethodShouldBeDefined.Validate(_inputInterfaceType, _dispatcherInterfaceType);
         MethodShouldHaveAtLeastOneParameter.Validate(_dispatcherInterfaceType);
-        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputType, _dispatcherInterfaceType);
-        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherInterfaceType);
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(_inputInterfaceType, _dispatcherInterfaceType);
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputInterfaceType, _dispatcherInterfaceType);
 
         _dispatcherHandleMethod = _dispatcherInterfaceType.GetFirstMethodInfo();
-        
-        CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
-        CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
-        
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
+
+        CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
+            _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
+            _dispatcherHandleMethod);
+
+        _dispatcherProxy = provider =>
+            DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
 
         return this;
     }
@@ -79,16 +82,16 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         DecoratorValidator.Validate(genericDecorator, _handlerInterfaceType);
-        
+
         _decoratorTypes.Add(genericDecorator);
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
-        var decoratorType = typeof(T);  
+        var decoratorType = typeof(T);
         DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
-        
+
         _decoratorTypes.Add(decoratorType);
 
         return this;
@@ -103,7 +106,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         {
             DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
         }
-        
+
         _decoratorTypes.AddRange(decorators);
 
         return this;
