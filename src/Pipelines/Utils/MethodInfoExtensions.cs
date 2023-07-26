@@ -27,10 +27,12 @@ public static class MethodInfoExtensions
                     returnTypes.Add(taskType);
                 }
             }
+            //kbytner 26.07.2023 - this line should detect all Tuples, not only Tuple<>
             else if (genericTypeDefinition == typeof(Tuple<>))
             {
                 returnTypes.AddRange(returnType.GetGenericArguments());
             }
+            //kbytner 26.07.2023 - this line should detect all ValueTuple, not only ValueTuple<,>
             else if(genericTypeDefinition == typeof(ValueTuple<,>))
             {
                 var typeInfo = genericTypeDefinition.GetTypeInfo();
