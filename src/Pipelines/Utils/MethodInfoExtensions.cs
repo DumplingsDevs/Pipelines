@@ -27,14 +27,9 @@ public static class MethodInfoExtensions
                     returnTypes.Add(taskType);
                 }
             }
-            else if (genericTypeDefinition.IsTuple())
+            else if (genericTypeDefinition.IsTuple() || genericTypeDefinition.IsValueTuple())
             {
                 returnTypes.AddRange(returnType.GetGenericArguments());
-            }
-            else if(genericTypeDefinition.IsValueTuple())
-            {
-                var typeInfo = genericTypeDefinition.GetTypeInfo();
-                returnTypes.AddRange(typeInfo.GetGenericArguments());
             }
             else
             {
