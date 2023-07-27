@@ -7,7 +7,7 @@ internal static class TypeExtensions
     internal static bool HasConstructorWithType(this Type type, Type parameterType)
     {
         var constructorInfos = type.GetConstructors();
-        
+
         return constructorInfos
             .Select(constructorInfo => constructorInfo.ConstructorHasType(parameterType))
             .Any(hasType => hasType);
@@ -26,4 +26,27 @@ internal static class TypeExtensions
         return type.GetMethods().First();
     }
 
+    internal static bool IsTuple(this Type type)
+    {
+        return type.IsGenericType
+               && (type.GetGenericTypeDefinition() == typeof(Tuple<>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,,>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,>));
+    }
+
+    internal static bool IsValueTuple(this Type type)
+    {
+        return type.IsGenericType
+               && (type.GetGenericTypeDefinition() == typeof(ValueTuple<>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,,>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>)
+                   || type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>));
+    }
 }
