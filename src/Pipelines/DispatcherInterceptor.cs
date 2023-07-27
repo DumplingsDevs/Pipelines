@@ -55,12 +55,15 @@ internal class DispatcherInterceptor : DispatchProxy
 
     private object GetHandlerService(Type inputType, Type inputInterfaceType)
     {
+        var typesForGenericType = new List<Type> { inputType };
+       
         var resultType = GetResultType(inputType, inputInterfaceType);
+        if (resultType is not null)
+        {
+            typesForGenericType.AddRange(resultType);
+        }
 
-        var handlerTypeWithInput = resultType is null
-            ? _handlerInterfaceType.MakeGenericType(inputType)
-            : _handlerInterfaceType.MakeGenericType(inputType, resultType);
-
+        var handlerTypeWithInput = _handlerInterfaceType.MakeGenericType(typesForGenericType.ToArray());
         var handler = _serviceProvider.GetService(handlerTypeWithInput);
 
         if (handler is null)
@@ -86,11 +89,11 @@ internal class DispatcherInterceptor : DispatchProxy
         return args.First().GetType();
     }
 
-    private static Type? GetResultType(Type queryType, Type inputTypeInterface)
+    private static Type[]? GetResultType(Type queryType, Type inputTypeInterface)
     {
         var queryInterfaceType =
             queryType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == inputTypeInterface);
         
-        return queryInterfaceType?.GetGenericArguments().FirstOrDefault();
+        return queryInterfaceType?.GetGenericArguments();
     }
 }
