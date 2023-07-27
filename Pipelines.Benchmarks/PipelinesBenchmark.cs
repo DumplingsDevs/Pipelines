@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Decorators;
 using Pipelines.Benchmarks.Sample.Mediator;
+using Pipelines.Benchmarks.Sample.Mediator.Behaviours;
 using Pipelines.Benchmarks.Types;
 
 namespace Pipelines.Benchmarks;
@@ -20,10 +21,10 @@ public class PipelinesBenchmark
     private IServiceProvider _pipelinesProvider = null!;
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
-    private IServiceProvider _mediatorWithDecoratorsProvider;
+    private IServiceProvider _mediatorWithBehavioursProvider;
 
     [GlobalSetup(Target = nameof(Pipelines))]
-    public void GlobalSetup()
+    public void SetupPipelines()
     {
         var services = new ServiceCollection();
 
@@ -69,10 +70,29 @@ public class PipelinesBenchmark
         var assembly = Assembly.GetExecutingAssembly();
 
         var services = new ServiceCollection();
-        
         services.AddMediatR(x => x.RegisterServicesFromAssembly(assembly));
         
         _mediatorProvider = services.BuildServiceProvider();
+    }
+    
+    [GlobalSetup(Target = nameof(MediatRWithBehaviours))]
+    public void SetupMediatorWithBehaviours()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<DecoratorsState>();
+        services.AddMediatR(x => x.RegisterServicesFromAssembly(assembly))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourOne<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourTwo<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourThree<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourFour<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourFive<,>));
+        
+
+        _mediatorWithBehavioursProvider = services.BuildServiceProvider();
     }
 
     [Benchmark]
@@ -103,6 +123,18 @@ public class PipelinesBenchmark
     public async Task<ExampleCommandResult> MediatR()
     {
         var mediator = _mediatorProvider.GetRequiredService<IMediator>();
+        
+        var request = new MediatorExampleRequest("My test request");
+    
+        var result = await mediator.Send(request, new CancellationToken());
+    
+        return result;
+    }
+    
+    [Benchmark()]
+    public async Task<ExampleCommandResult> MediatRWithBehaviours()
+    {
+        var mediator = _mediatorWithBehavioursProvider.GetRequiredService<IMediator>();
         
         var request = new MediatorExampleRequest("My test request");
     

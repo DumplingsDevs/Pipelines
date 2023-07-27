@@ -12,7 +12,9 @@ using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
 
 BenchmarkRunner.Run(typeof(Program).Assembly);
-
+// var benchmark = new PipelinesBenchmark();
+// benchmark.SetupMediatorWithBehaviours();
+// await benchmark.MediatRWithBehaviours();
 // await ManualBenchmark();
 
 async Task ManualBenchmark()
