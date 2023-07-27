@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder;
 using Pipelines.Builder.Interfaces;
 
-namespace Pipelines;
+namespace Pipelines.Public;
 
 public static class Extension
 {

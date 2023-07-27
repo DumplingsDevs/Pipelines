@@ -10,6 +10,7 @@ using Pipelines.Benchmarks.Sample.Decorators;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Sample.Mediator.Behaviours;
 using Pipelines.Benchmarks.Types;
+using Pipelines.Public;
 
 namespace Pipelines.Benchmarks;
 
