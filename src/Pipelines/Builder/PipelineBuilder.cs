@@ -73,42 +73,65 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
             _dispatcherHandleMethod);
 
-        _dispatcherProxy = provider =>
-            DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
 
         return this;
     }
 
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
-        DecoratorValidator.Validate(genericDecorator, _handlerInterfaceType);
-
-        _decoratorTypes.Add(genericDecorator);
-        return this;
+        return WithOpenTypeDecorator(new DecoratorOptions(), genericDecorator);
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
-        var decoratorType = typeof(T);
-        DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
-
-        _decoratorTypes.Add(decoratorType);
-
-        return this;
+        return WithClosedTypeDecorator<T>(new DecoratorOptions());
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
+        return WithClosedTypeDecorators(new DecoratorOptions(), action, assemblies);
+    }
 
-        foreach (var decoratorType in decorators)
+    public IPipelineDecoratorBuilder WithOpenTypeDecorator(DecoratorOptions decoratorOptions, Type genericDecorator)
+    {
+        if (decoratorOptions.StrictMode)
+        {
+            DecoratorValidator.Validate(genericDecorator, _handlerInterfaceType);
+        }
+
+        _decoratorTypes.Add(genericDecorator);
+        return this;
+    }
+
+    public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>(DecoratorOptions decoratorOptions)
+    {
+        var decoratorType = typeof(T);
+        if (decoratorOptions.StrictMode)
         {
             DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
         }
 
-        _decoratorTypes.AddRange(decorators);
+        _decoratorTypes.Add(decoratorType);
+        return this;
+    }
 
+    public IPipelineDecoratorBuilder WithClosedTypeDecorators(DecoratorOptions decoratorOptions,
+        Action<IPipelineClosedTypeDecoratorBuilder> action,
+        params Assembly[] assemblies)
+    {
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
+
+        if (decoratorOptions.StrictMode)
+        {
+            foreach (var decoratorType in decorators)
+            {
+                DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
+            }
+        }
+
+        _decoratorTypes.AddRange(decorators);
         return this;
     }
 
