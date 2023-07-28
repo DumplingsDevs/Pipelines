@@ -73,7 +73,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
             _dispatcherHandleMethod);
 
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
 
         return this;
     }
