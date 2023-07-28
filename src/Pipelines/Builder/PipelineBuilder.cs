@@ -12,7 +12,6 @@ using Pipelines.Builder.Validators.Handler.ResultTypes;
 using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
 using Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
-using Pipelines.Public;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder;

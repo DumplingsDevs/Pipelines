@@ -1,7 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Interfaces;
-using Pipelines.Public;
 
 namespace Pipelines.Tests;
 

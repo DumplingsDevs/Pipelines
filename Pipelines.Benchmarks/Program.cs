@@ -10,7 +10,6 @@ using Pipelines.Benchmarks;
 using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
-using Pipelines.Public;
 
 BenchmarkRunner.Run(typeof(Program).Assembly);
 // var benchmark = new PipelinesBenchmark();

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Pipelines.Public;
 using Pipelines.Tests.TestData;
 
 namespace Pipelines.Tests;

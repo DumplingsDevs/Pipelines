@@ -1,6 +1,5 @@
 using System.Reflection;
 using Pipelines.Builder.Decorators;
-using Pipelines.Public;
 
 namespace Pipelines.Builder.Interfaces;
 
