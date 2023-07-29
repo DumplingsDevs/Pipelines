@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,10 +10,16 @@ using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
 
-BenchmarkRunner.Run(typeof(Program).Assembly);
-// var benchmark = new PipelinesBenchmark();
-// benchmark.SetupMediatorWithBehaviours();
-// await benchmark.MediatRWithBehaviours();
+// BenchmarkRunner.Run(typeof(Program).Assembly);
+
+var benchmark = new PipelinesBenchmark();
+benchmark.SetupPipelines();
+
+for (int i = 0; i < 10000; i++)
+{
+    await benchmark.Pipelines();
+}
+// await ManualBenchmark();
 // await ManualBenchmark();
 
 async Task ManualBenchmark()

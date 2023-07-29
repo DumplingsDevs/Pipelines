@@ -71,7 +71,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
         CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
         
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
+        // _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
 
         return this;
     }
@@ -111,7 +111,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        RegisterDispatcher();
+        // RegisterDispatcher();
         RegisterHandlersWithDecorators();
     }
 
@@ -127,6 +127,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddScoped(_dispatcherInterfaceType, _dispatcherProxy);
+        _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
     }
 }

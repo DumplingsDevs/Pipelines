@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Exceptions;
 
 namespace Pipelines;
@@ -25,6 +26,8 @@ internal class DispatcherInterceptor : DispatchProxy
         return HandleExecutedMethod(args!);
     }
 
+    private MethodInfo? _method;
+
     private object? HandleExecutedMethod(object[] args)
     {
         ValidateArgs(args);
@@ -33,9 +36,9 @@ internal class DispatcherInterceptor : DispatchProxy
 
         var handler = GetHandlerService(inputType);
 
-        var method = GetHandlerMethod(handler, _handlerInterfaceType);
+        _method ??= GetHandlerMethod(handler, _handlerInterfaceType);
 
-        return method.Invoke(handler, args);
+        return _method.Invoke(handler, args);
     }
 
     private static MethodInfo GetHandlerMethod(object handler, Type handlerInterfaceType)
@@ -45,21 +48,24 @@ internal class DispatcherInterceptor : DispatchProxy
         // get the interface implemented by handler which matches handlerInterfaceType
         var implementedInterface = handlerType.GetInterfaces()
             .First(i => i.GetGenericTypeDefinition() == handlerInterfaceType);
-        
+
         // get the map of methods implemented by the interface (there will be always one method, because validators will check it)
         var interfaceMap = handlerType.GetInterfaceMap(implementedInterface);
         return interfaceMap.InterfaceMethods.First();
     }
 
+    private Type? _handlerTypeWithInput;
+    private Type? _resultType;
+
     private object GetHandlerService(Type inputType)
     {
-        var resultType = GetResultType(inputType);
+        _resultType ??= GetResultType(inputType);
 
-        var handlerTypeWithInput = resultType is null
+        _handlerTypeWithInput ??= _resultType is null
             ? _handlerInterfaceType.MakeGenericType(inputType)
-            : _handlerInterfaceType.MakeGenericType(inputType, resultType);
+            : _handlerInterfaceType.MakeGenericType(inputType, _resultType);
 
-        var handler = _serviceProvider.GetService(handlerTypeWithInput);
+        var handler = _serviceProvider.GetService(_handlerTypeWithInput);
 
         if (handler is null)
         {
