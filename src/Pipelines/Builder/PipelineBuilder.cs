@@ -139,7 +139,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        RegisterDispatcher();
+        // RegisterDispatcher();
         RegisterHandlersWithDecorators();
     }
 
@@ -155,6 +155,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddScoped(_dispatcherInterfaceType, _dispatcherProxy);
+        _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
     }
 }

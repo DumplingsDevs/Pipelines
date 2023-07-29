@@ -13,6 +13,7 @@ public class Tests
         var assembly = typeof(DependencyContainer).Assembly;
         
         _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly,typeof(ICommand<>), typeof(ICommandHandler<,>));
+        _dependencyContainer.RegisterType<ICommandDispatcher, DispatcherTestImplementation>();
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
     }
