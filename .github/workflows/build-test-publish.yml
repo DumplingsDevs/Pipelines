@@ -58,4 +58,6 @@ jobs:
         with:
           PROJECT_FILE_PATH: 'src/Pipelines/Pipelines.csproj'
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          VERSION_REGEX: '' # empty because we will use git tags for versioning
+          VERSION_STATIC: ${{ github.ref }} # use git tag for version
           PACKAGE_NAME: 'Pipelines'
