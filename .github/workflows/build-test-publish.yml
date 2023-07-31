@@ -56,6 +56,6 @@ jobs:
       - name: Push
         uses: rohith/publish-nuget@v2
         with:
-          PROJECT_FILE_PATH: 'Pipelines/Pipelines.csproj'
+          PROJECT_FILE_PATH: 'src/Pipelines/Pipelines.csproj'
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           PACKAGE_NAME: 'Pipelines'
