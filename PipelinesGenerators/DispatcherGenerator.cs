@@ -13,41 +13,15 @@ namespace PipelinesGenerators;
 public class DispatcherGenerator : ISourceGenerator
 {
     private const string DispatcherAttribute = "PipelinesDispatcher";
+    private const string ConfigInterfaceName = "IPipelineGeneratorConfig";
+    
+    private const string DispatcherTypeProperty = "GetDispatcherType";
+    private const string InputTypeProperty = "GetInputType";
+    private const string HandlerTypeProperty = "GetHandlerType";
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var syntaxTrees = context.Compilation.SyntaxTrees;
-
-        foreach (var syntaxTree in syntaxTrees)
-        {
-            var root = syntaxTree.GetRoot() as CompilationUnitSyntax;
-            if (root == null) continue;
-
-            var pipelinesConfigClass = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                .FirstOrDefault(c => c.Identifier.ValueText == "PipelinesConfig");
-            
-            if (pipelinesConfigClass != null)
-            {
-                var getDispatcherProperty = pipelinesConfigClass.DescendantNodes().OfType<PropertyDeclarationSyntax>()
-                    .FirstOrDefault(p => p.Identifier.ValueText == "GetDispatcher");
-
-                if ( getDispatcherProperty != null )
-                {
-                    var typeOfSyntax = getDispatcherProperty.DescendantNodes().OfType<TypeOfExpressionSyntax>().FirstOrDefault();
-                    if ( typeOfSyntax != null )
-                    {
-                        var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-                        if ( identifierSyntax != null )
-                        {
-                            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-                            var typeInfo = semanticModel.GetTypeInfo( identifierSyntax );
-                            var symbolInfoSymbol = typeInfo.Type;
-                            
-                        }
-                    }
-                }
-            }
-        }
+        var configs = GetPipelineConfigs(context);
 
         // Pobierz wszystkie interfejsy z atrybutem GenerateImplementation
         var interfacesToImplement = GetInterfacesWithAttribute(context, DispatcherAttribute);
@@ -94,7 +68,23 @@ public class {interfaceName}Implementation : {interfaceName}
         }
     }
 
-    private static List<InterfaceDeclarationSyntax> GetInterfacesWithAttribute(GeneratorExecutionContext context, string disptacherAttribute)
+    private static IEnumerable<(ITypeSymbol, ITypeSymbol, ITypeSymbol)> GetPipelineConfigs(GeneratorExecutionContext context)
+    {
+        var classes = context.GetClassNodeByInterface(ConfigInterfaceName).ToList();
+        
+        foreach (var (classDeclarationSyntax, syntaxTree) in classes)
+        {
+            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
+            var dispatcherType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, DispatcherTypeProperty);
+            var inputType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, InputTypeProperty);
+            var handlerType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, HandlerTypeProperty);
+
+            yield return (dispatcherType, inputType, handlerType);
+        }
+    }
+
+    private static List<InterfaceDeclarationSyntax> GetInterfacesWithAttribute(GeneratorExecutionContext context,
+        string disptacherAttribute)
     {
         return context.Compilation.SyntaxTrees
             .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>())
