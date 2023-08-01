@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Authors>DumplingsDevs (Mateusz Wróblewski,Kamil Bytner)</Authors>
     <Description>The fastest and most extensible pipeline in the .NET ecosystem</Description>
+    <PackageId>DumplingsDevs.Pipelines</PackageId>
     <PackageTags>pipelines</PackageTags>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
