@@ -23,10 +23,7 @@ public interface IRequestDispatcher
 //     {
 //         switch (request)
 //         {
-//             case ExampleRequest r:
-//                 var handler =
-//                     _serviceProvider.GetRequiredService<IRequestHandler<ExampleRequest, ExampleCommandResult>>();
-//                 return (await handler.HandleAsync(r, token)) as TResult;
+//             case ExampleRequest r: return (await _serviceProvider.GetRequiredService<IRequestHandler<ExampleRequest, ExampleCommandResult>>().HandleAsync(r, token)) as TResult;
 //         }
 //
 //         throw new Exception();

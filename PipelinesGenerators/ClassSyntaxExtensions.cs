@@ -17,7 +17,6 @@ public static class ClassSyntaxExtensions
         }
 
         IEnumerable<BaseTypeSyntax> baseTypes = source.BaseList.Types.Select(baseType => baseType);
-
         // To Do - cleaner interface finding.
         return baseTypes.Any(baseType => baseType.ToString() == interfaceName);
     }
@@ -48,8 +47,8 @@ public static class ClassSyntaxExtensions
 
                 if (generic != null)
                 {
-                    var typeInfo = semanticModel.GetTypeInfo(generic);
-                    return typeInfo.Type!;
+                    var typeInfo = semanticModel.GetSymbolInfo(generic);
+                    return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
                 }
             }
         }
