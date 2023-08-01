@@ -19,10 +19,14 @@ public class DispatcherGenerator : ISourceGenerator
     private const string InputTypeProperty = "GetInputType";
     private const string HandlerTypeProperty = "GetHandlerType";
 
+    private const string CasePattern =
+        "            case {0} r: return (await _serviceProvider.GetRequiredService<IRequestHandler<{0}, {1}>>().HandleAsync(r, token)) as TResult;";
+
     public void Execute(GeneratorExecutionContext context)
     {
+        var caseBuilder = new StringBuilder();
         var configs = GetPipelineConfigs(context);
-        
+
         foreach (var config in configs)
         {
             // Pobierz nazwę interfejsu
@@ -33,11 +37,14 @@ public class DispatcherGenerator : ISourceGenerator
                 var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
                 var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
                 var interfaces = ((ITypeSymbol)classSymbol).AllInterfaces.ToList();
-                var constructedFrom = interfaces.FirstOrDefault()?.ConstructedFrom;
+                var implementedInputInterface = interfaces.FirstOrDefault(x =>
+                    SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, config.inputType));
 
-                if (SymbolEqualityComparer.Default.Equals(constructedFrom, config.inputType))
+                if (implementedInputInterface != null)
                 {
-                    
+                    var response = implementedInputInterface.TypeArguments.First();
+                    caseBuilder.Append(string.Format(CasePattern, classSymbol.Name, response.Name));
+                    caseBuilder.Append("\n");
                 }
             }
 
@@ -61,8 +68,7 @@ public class {interfaceName}Implementation : {interfaceName}
     {{
         switch (request)
         {{
-            case ExampleRequest r: return (await _serviceProvider.GetRequiredService<IRequestHandler<ExampleRequest, ExampleCommandResult>>().HandleAsync(r, token)) as TResult;
-
+{caseBuilder}
         }}
 
         throw new Exception();
