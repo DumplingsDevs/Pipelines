@@ -51,7 +51,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
       
       - name: Pack
-        run: dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts
+        run: dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts ./src/Pipelines/Pipelines.csproj
 
       - name: Push NuGet Package
         run: |
