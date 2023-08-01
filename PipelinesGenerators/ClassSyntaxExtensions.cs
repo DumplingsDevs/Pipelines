@@ -36,9 +36,19 @@ public static class ClassSyntaxExtensions
             {
                 var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
                     .FirstOrDefault();
+
                 if (identifierSyntax != null)
                 {
                     var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
+                    return typeInfo.Type!;
+                }
+
+                var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
+                    .FirstOrDefault();
+
+                if (generic != null)
+                {
+                    var typeInfo = semanticModel.GetTypeInfo(generic);
                     return typeInfo.Type!;
                 }
             }

@@ -26,10 +26,10 @@ public class DispatcherGenerator : ISourceGenerator
         // Pobierz wszystkie interfejsy z atrybutem GenerateImplementation
         var interfacesToImplement = GetInterfacesWithAttribute(context, DispatcherAttribute);
 
-        foreach (var interfaceSyntax in interfacesToImplement)
+        foreach (var config in configs)
         {
             // Pobierz nazwę interfejsu
-            var interfaceName = interfaceSyntax.Identifier.ValueText;
+            var interfaceName = config.dispatcherType.Name;
 
             // Wygeneruj kod klasy implementującej interfejs
             var classSourceCode = $@"
@@ -66,20 +66,21 @@ public class {interfaceName}Implementation : {interfaceName}
             var sourceFileName = $"{interfaceName}Implementation.cs";
             context.AddSource(sourceFileName, sourceText);
         }
-    }
-
-    private static IEnumerable<(ITypeSymbol, ITypeSymbol, ITypeSymbol)> GetPipelineConfigs(GeneratorExecutionContext context)
-    {
-        var classes = context.GetClassNodeByInterface(ConfigInterfaceName).ToList();
         
-        foreach (var (classDeclarationSyntax, syntaxTree) in classes)
+        static IEnumerable<(ITypeSymbol? dispatcherType, ITypeSymbol? inputType, ITypeSymbol? handlerType)> GetPipelineConfigs(GeneratorExecutionContext context)
         {
-            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-            var dispatcherType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, DispatcherTypeProperty);
-            var inputType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, InputTypeProperty);
-            var handlerType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, HandlerTypeProperty);
-
-            yield return (dispatcherType, inputType, handlerType);
+            var classes = context.GetClassNodeByInterface(ConfigInterfaceName).ToList();
+        
+            foreach (var (classDeclarationSyntax, syntaxTree) in classes)
+            {
+                var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
+                var dispatcherType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, DispatcherTypeProperty);
+                var inputType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, InputTypeProperty);
+                var handlerType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, HandlerTypeProperty);
+                
+                // TO DO - throw exception when null/empty?
+                yield return (dispatcherType, inputType, handlerType);
+            }
         }
     }
 
