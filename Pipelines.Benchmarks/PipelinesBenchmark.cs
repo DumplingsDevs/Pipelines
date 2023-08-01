@@ -1,7 +1,5 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +19,7 @@ public class PipelinesBenchmark
     private IServiceProvider _pipelinesProvider = null!;
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
-    private IServiceProvider _mediatorWithBehavioursProvider;
+    private IServiceProvider _mediatorWithBehavioursProvider = null!;
 
     [GlobalSetup(Target = nameof(Pipelines))]
     public void SetupPipelines()

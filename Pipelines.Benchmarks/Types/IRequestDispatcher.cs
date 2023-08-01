@@ -1,31 +1,34 @@
 using Microsoft.Extensions.DependencyInjection;
+using Pipelines.Benchmarks.Sample;
 
 namespace Pipelines.Benchmarks.Types;
 
-[GenerateImplementation]
 public interface IRequestDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token) where TResult : class;
 }
 
-class Example : IRequestDispatcher
-{
-    private readonly IServiceProvider _serviceProvider;
-
-    public Example(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
-    public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token)
-    {
-        var type = request.GetType();
-        var handlerGeneric = typeof(IRequestHandler<,>);
-        var requestAndResult = new[] { type, typeof(TResult) };
-        var handlerType = handlerGeneric.MakeGenericType(requestAndResult);
-
-        dynamic handler = _serviceProvider.GetRequiredService(handlerType);
-
-        return (TResult)await handler.HandleAsync((dynamic)request, token);
-    }
-}
+// class Example : IRequestDispatcher
+// {
+//     private readonly IServiceProvider _serviceProvider;
+//
+//     public Example(IServiceProvider serviceProvider)
+//     {
+//         _serviceProvider = serviceProvider;
+//     }
+//
+//     public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token)
+//         where TResult : class
+//
+//     {
+//         switch (request)
+//         {
+//             case ExampleRequest r:
+//                 var handler =
+//                     _serviceProvider.GetRequiredService<IRequestHandler<ExampleRequest, ExampleCommandResult>>();
+//                 return (await handler.HandleAsync(r, token)) as TResult;
+//         }
+//
+//         throw new Exception();
+//     }
+// }

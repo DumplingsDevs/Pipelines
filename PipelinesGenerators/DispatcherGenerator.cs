@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -11,17 +12,45 @@ namespace PipelinesGenerators;
 [Generator]
 public class DispatcherGenerator : ISourceGenerator
 {
-    private const string AttributeName = "GenerateImplementation"; // Atrybut oznaczający interfejsy do wygenerowania
+    private const string DispatcherAttribute = "PipelinesDispatcher";
 
     public void Execute(GeneratorExecutionContext context)
     {
+        var syntaxTrees = context.Compilation.SyntaxTrees;
+
+        foreach (var syntaxTree in syntaxTrees)
+        {
+            var root = syntaxTree.GetRoot() as CompilationUnitSyntax;
+            if (root == null) continue;
+
+            var pipelinesConfigClass = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                .FirstOrDefault(c => c.Identifier.ValueText == "PipelinesConfig");
+            
+            if (pipelinesConfigClass != null)
+            {
+                var getDispatcherProperty = pipelinesConfigClass.DescendantNodes().OfType<PropertyDeclarationSyntax>()
+                    .FirstOrDefault(p => p.Identifier.ValueText == "GetDispatcher");
+
+                if ( getDispatcherProperty != null )
+                {
+                    var typeOfSyntax = getDispatcherProperty.DescendantNodes().OfType<TypeOfExpressionSyntax>().FirstOrDefault();
+                    if ( typeOfSyntax != null )
+                    {
+                        var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                        if ( identifierSyntax != null )
+                        {
+                            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
+                            var typeInfo = semanticModel.GetTypeInfo( identifierSyntax );
+                            var symbolInfoSymbol = typeInfo.Type;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
         // Pobierz wszystkie interfejsy z atrybutem GenerateImplementation
-        var interfacesToImplement = context.Compilation.SyntaxTrees
-            .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>())
-            .Where(interfaceSyntax => interfaceSyntax.AttributeLists
-                .SelectMany(list => list.Attributes)
-                .Any(attribute => attribute.Name.ToString() == AttributeName))
-            .ToList();
+        var interfacesToImplement = GetInterfacesWithAttribute(context, DispatcherAttribute);
 
         foreach (var interfaceSyntax in interfacesToImplement)
         {
@@ -32,6 +61,7 @@ public class DispatcherGenerator : ISourceGenerator
             var classSourceCode = $@"
 using System;
 using Pipelines.Benchmarks.Types;
+using Pipelines.Benchmarks.Sample;
 using Microsoft.Extensions.DependencyInjection;
 
 public class {interfaceName}Implementation : {interfaceName}
@@ -43,16 +73,17 @@ public class {interfaceName}Implementation : {interfaceName}
         _serviceProvider = serviceProvider;
     }}
 
-    public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token)
+    public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token) where TResult : class
     {{
-            var type = request.GetType();
-            var handlerGeneric = typeof(IRequestHandler<,>);
-            var requestAndResult = new[] {{ type, typeof(TResult) }};
-            var handlerType = handlerGeneric.MakeGenericType(requestAndResult);
+        switch (request)
+        {{
+            case ExampleRequest r:
+                var handler = _serviceProvider.GetRequiredService<IRequestHandler<ExampleRequest, ExampleCommandResult>>();
+                return (await handler.HandleAsync(r, token)) as TResult;
 
-            dynamic handler = _serviceProvider.GetRequiredService(handlerType);
+        }}
 
-            return (TResult)await handler.HandleAsync((dynamic)request, token);
+        throw new Exception();
     }}
 }}";
 
@@ -61,6 +92,16 @@ public class {interfaceName}Implementation : {interfaceName}
             var sourceFileName = $"{interfaceName}Implementation.cs";
             context.AddSource(sourceFileName, sourceText);
         }
+    }
+
+    private static List<InterfaceDeclarationSyntax> GetInterfacesWithAttribute(GeneratorExecutionContext context, string disptacherAttribute)
+    {
+        return context.Compilation.SyntaxTrees
+            .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>())
+            .Where(interfaceSyntax => interfaceSyntax.AttributeLists
+                .SelectMany(list => list.Attributes)
+                .Any(attribute => attribute.Name.ToString() == disptacherAttribute))
+            .ToList();
     }
 
     public void Initialize(GeneratorInitializationContext context)
