@@ -51,13 +51,8 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
       
       - name: Pack
-        run: dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output out
-      
-      - name: Push
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: 'src/Pipelines/Pipelines.csproj'
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_REGEX: '' # empty because we will use git tags for versioning
-          VERSION_STATIC: ${{ github.ref }} # use git tag for version
-          PACKAGE_NAME: 'Pipelines'
+        run: dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts
+
+      - name: Push NuGet Package
+        run: |
+          dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
