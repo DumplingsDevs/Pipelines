@@ -7,7 +7,7 @@ namespace PipelinesGenerators;
 
 internal static class GeneratorExecutionContextExtensions
 {
-    public static IEnumerable<(ClassDeclarationSyntax, SyntaxTree)> GetClassNodeByInterface(this GeneratorExecutionContext context, string interfaceName)
+    public static IEnumerable<ClassDeclarationSyntax> GetClassNodeByInterface(this GeneratorExecutionContext context, string interfaceName)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
 
@@ -21,8 +21,24 @@ internal static class GeneratorExecutionContextExtensions
                 // TO DO: Check also namespace
                 if (classNode.HasInterface(interfaceName))
                 {
-                    yield return (classNode, syntaxTree);
+                    yield return classNode;
                 }
+            }
+        }
+    }
+    
+    public static IEnumerable<TypeDeclarationSyntax> GetTypeNodes(this GeneratorExecutionContext context)
+    {
+        var syntaxTrees = context.Compilation.SyntaxTrees;
+
+        foreach (var syntaxTree in syntaxTrees)
+        {
+            var root = syntaxTree.GetRoot() as CompilationUnitSyntax;
+            if (root == null) continue;
+
+            foreach (var classNode in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
+            {
+                yield return classNode;
             }
         }
     }
