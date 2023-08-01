@@ -1,0 +1,58 @@
+name: Build, Test, and Publish NuGet package
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v1
+
+      - name: Determine required .NET SDK version
+        id: dotnet-version
+        run: |
+          export DOTNET_VERSION=$(dotnet --list-sdks | awk '/7\.0\./ {print $1; exit}')
+          echo "::set-output name=dotnet-version::$DOTNET_VERSION"
+
+      - name: Download and install .NET SDK
+        run: |
+          export DOTNET_INSTALL_DIR="$HOME/.dotnet"
+          export DOTNET_VERSION="${{ steps.dotnet-version.outputs.dotnet-version }}"
+          export DOTNET_INSTALL_SCRIPT_URL="https://dot.net/v1/dotnet-install.sh"
+          export DOTNET_INSTALL_ARGS="--install-dir $DOTNET_INSTALL_DIR --version $DOTNET_VERSION --no-path"
+
+          mkdir -p "$DOTNET_INSTALL_DIR"
+          curl -Lsfo dotnet-install.sh $DOTNET_INSTALL_SCRIPT_URL
+          bash dotnet-install.sh $DOTNET_INSTALL_ARGS
+
+          export PATH="$DOTNET_INSTALL_DIR:$PATH"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore --verbosity normal
+      
+      - name: Set version from git tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+      
+      - name: Pack
+        run: dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts ./src/Pipelines/Pipelines.csproj
+
+      - name: Push NuGet Package
+        run: |
+          dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
