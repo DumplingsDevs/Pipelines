@@ -21,7 +21,7 @@ public static class ClassSyntaxExtensions
         return baseTypes.Any(baseType => baseType.ToString() == interfaceName);
     }
 
-    public static ITypeSymbol? GetPropertyTypeSymbol(this ClassDeclarationSyntax classDeclarationSyntax,
+    public static INamedTypeSymbol? GetPropertyTypeSymbol(this ClassDeclarationSyntax classDeclarationSyntax,
         SemanticModel semanticModel, string propertyName)
     {
         var property = classDeclarationSyntax.DescendantNodes().OfType<PropertyDeclarationSyntax>()
@@ -39,7 +39,7 @@ public static class ClassSyntaxExtensions
                 if (identifierSyntax != null)
                 {
                     var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
-                    return typeInfo.Type!;
+                    return (INamedTypeSymbol)typeInfo.Type!;
                 }
 
                 var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
