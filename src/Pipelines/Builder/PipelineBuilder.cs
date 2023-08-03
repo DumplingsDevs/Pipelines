@@ -67,11 +67,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(_inputType, _dispatcherInterfaceType);
 
         _dispatcherHandleMethod = _dispatcherInterfaceType.GetFirstMethodInfo();
-        
-        CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
-        CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod, _dispatcherHandleMethod);
-        
-        // _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
+
+        CrossValidateMethodParameters.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
+            _dispatcherHandleMethod);
+        CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
+            _dispatcherHandleMethod);
+
+        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType);
 
         return this;
     }
@@ -79,16 +81,16 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
     {
         DecoratorValidator.Validate(genericDecorator, _handlerInterfaceType);
-        
+
         _decoratorTypes.Add(genericDecorator);
         return this;
     }
 
     public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
     {
-        var decoratorType = typeof(T);  
+        var decoratorType = typeof(T);
         DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
-        
+
         _decoratorTypes.Add(decoratorType);
 
         return this;
@@ -103,7 +105,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         {
             DecoratorValidator.Validate(decoratorType, _handlerInterfaceType);
         }
-        
+
         _decoratorTypes.AddRange(decorators);
 
         return this;
@@ -111,7 +113,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        // RegisterDispatcher();
+        RegisterDispatcher();
         RegisterHandlersWithDecorators();
     }
 
@@ -127,6 +129,21 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
+        var dispatcherImplementations = _handlerAssembly.GetTypes()
+            .Where(t => t.GetInterfaces()
+                .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
+        
+        if (dispatcherImplementations.Count > 0)
+        {
+            foreach (var dispatcherImplementation in dispatcherImplementations)
+            {
+                _serviceCollection.AddScoped(_dispatcherInterfaceType, dispatcherImplementation);
+            }
+        }
+        else
+        {
+            throw new Exception("No dispatcher available");
+            // _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
+        }
     }
 }
