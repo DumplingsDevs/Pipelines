@@ -15,11 +15,11 @@ internal static class MethodResultTypesValidator
 
         if (isVoidMethod) return;
         
-        ValidateResultTypeCount(expectedResultTypes.Length, methodReturnTypes.Count);
-        ValidateResultTypeMatch(expectedResultTypes, methodReturnTypes);
+        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
+        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
     }
 
-    private static void ValidateResultTypeMatch(Type[] expectedResultTypes, List<Type> methodReturnTypes)
+    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes, List<Type> methodReturnTypes)
     {
         for (var i = 0; i < expectedResultTypes.Length; i++)
         {
@@ -45,7 +45,7 @@ internal static class MethodResultTypesValidator
         }
     }
 
-    private static void ValidateResultTypeCount(int expectedResultTypesLength, int methodReturnTypesLength)
+    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength, int methodReturnTypesLength)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
