@@ -1,8 +1,9 @@
 using Pipelines.Builder.Validators.Input.ResultTypes.Exceptions;
+using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 
 namespace Pipelines.Builder.Validators.Input.ResultTypes;
 
-internal static class InputTypeShouldNotContainMoreThanOneResult
+internal static class ValidateInputReturnTypes
 {
     internal static void Validate(Type inputType)
     {
@@ -12,5 +13,7 @@ internal static class InputTypeShouldNotContainMoreThanOneResult
         {
             throw new InputTypeShouldNotContainMoreThanOneResultException(expectedResultTypes.Length, inputType);
         }
+        
+        ReturnTypesShouldHaveClassConstraintValidator.Validate(expectedResultTypes.ToList(), inputType);
     }
 }

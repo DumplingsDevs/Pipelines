@@ -1,5 +1,7 @@
 using System.Reflection;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
+using Pipelines.Builder.Validators.Shared.OnlyOneResultTypeOrVoid;
+using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.Shared.MethodResultTypes;
@@ -15,6 +17,9 @@ internal static class MethodResultTypesValidator
 
         if (isVoidMethod) return;
         
+        ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
+        OnlyOneResultTypeOrVoidValidator.Validate(methodToValidate, handlerType);
+
         CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
     }
