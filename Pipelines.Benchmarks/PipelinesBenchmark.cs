@@ -31,7 +31,6 @@ public class PipelinesBenchmark
             .AddHandler((typeof(Types.IRequestHandler<,>)), Assembly.GetExecutingAssembly())
             .AddDispatcher<IRequestDispatcher>()
             .Build();
-        services.AddScoped<IRequestDispatcher, IRequestDispatcherImplementation>();
         _pipelinesProvider = services.BuildServiceProvider();
     }
 
@@ -57,7 +56,6 @@ public class PipelinesBenchmark
             }, assembly)
             .Build();
         servicesWithDecorators.AddSingleton<DecoratorsState>();
-        servicesWithDecorators.AddScoped<IRequestDispatcher, IRequestDispatcherImplementation>();
         _pipelinesWithDecoratorsProvider = servicesWithDecorators.BuildServiceProvider();
     }
 

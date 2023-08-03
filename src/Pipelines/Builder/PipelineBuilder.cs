@@ -139,7 +139,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public void Build()
     {
-        // RegisterDispatcher();
+        RegisterDispatcher();
         RegisterHandlersWithDecorators();
     }
 
@@ -155,6 +155,21 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
-        _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
+        var dispatcherImplementations = _handlerAssembly.GetTypes()
+            .Where(t => t.GetInterfaces()
+                .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
+        
+        if (dispatcherImplementations.Count > 0)
+        {
+            foreach (var dispatcherImplementation in dispatcherImplementations)
+            {
+                _serviceCollection.AddScoped(_dispatcherInterfaceType, dispatcherImplementation);
+            }
+        }
+        else
+        {
+            throw new Exception("No dispatcher available");
+            // _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
+        }
     }
 }
