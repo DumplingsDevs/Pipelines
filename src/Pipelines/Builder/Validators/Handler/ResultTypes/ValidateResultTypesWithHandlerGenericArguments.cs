@@ -1,5 +1,4 @@
 using Pipelines.Builder.Validators.Shared.MethodResultTypes;
-using Pipelines.Builder.Validators.Shared.OnlyOneResultTypeOrVoid;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.Handler.ResultTypes;
@@ -14,8 +13,6 @@ internal static class ValidateResultTypesWithHandlerGenericArguments
         var genericArguments = handlerType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().First();
         
-        OnlyOneResultTypeOrVoidValidator.Validate(handleMethod, handlerType);
-
         var expectedResultTypes = GetResultTypes(genericArguments);
         //compare types found in Handler Generic Type with method return types 
         MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType);

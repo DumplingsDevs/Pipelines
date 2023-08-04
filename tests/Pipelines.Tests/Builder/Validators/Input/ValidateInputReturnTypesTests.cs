@@ -1,5 +1,4 @@
 using Pipelines.Builder.Validators.Input.ResultTypes;
-using Pipelines.Builder.Validators.Input.ResultTypes.Exceptions;
 using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint.Exceptions;
 
 namespace Pipelines.Tests.Builder.Validators.Input;
@@ -29,7 +28,7 @@ public class ValidateInputReturnTypesTests
     [Test]
     public void Validate_InterfaceWithMultipleGenericArguments_Exception()
     {
-        Assert.Throws<InputTypeShouldNotContainMoreThanOneResultException>(() =>
+        Assert.DoesNotThrow(() =>
             ValidateInputReturnTypes.Validate(_interfaceWithMultipleGenericArguments));
     }
 
@@ -40,11 +39,20 @@ public class ValidateInputReturnTypesTests
             ValidateInputReturnTypes.Validate(_interfaceWithClassConstraint));
     }
 
-    private interface IQuery { }
+    private interface IQuery
+    {
+    }
 
-    private interface IQueryWithSingleGenericArgument<TResult> { }
+    private interface IQueryWithSingleGenericArgument<TResult>
+    {
+    }
 
-    private interface IQueryWithMultipleGenericArguments<TResult1, TResult2> { }
+    private interface IQueryWithMultipleGenericArguments<TResult1, TResult2>
+        where TResult1 : class where TResult2 : class
+    {
+    }
 
-    private interface IQueryWithClassConstraint<TResult> where TResult : class { }
+    private interface IQueryWithClassConstraint<TResult> where TResult : class
+    {
+    }
 }

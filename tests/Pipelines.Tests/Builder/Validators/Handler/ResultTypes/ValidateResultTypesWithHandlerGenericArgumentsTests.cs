@@ -1,6 +1,5 @@
 using Pipelines.Builder.Validators.Handler.ResultTypes;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
-using Pipelines.Builder.Validators.Shared.OnlyOneResultTypeOrVoid.Exceptions;
 using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Invalid;
 using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Valid;
 
@@ -22,8 +21,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     [Test]
     [TestCase(typeof(ICommandHandlerWithResult<,>), TestName = "ICommandHandlerWithResult")]
     [TestCase(typeof(IVoidCommandHandler<>), TestName = "IVoidCommandHandler")]
-    // [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")] //
-    //After we will remove limit to to max one result, this example above should be uncommented
+    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")] //
     public void Validate_GenericArgumentsMatchesHandlerMethod_Passes(Type handlerType)
     {
         // Act
@@ -31,15 +29,6 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
 
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
-    }
-
-    [Test]
-    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")]
-    public void Validate_MoreThanOneResultType_Throws(Type handlerType)
-    {
-        // Assert
-        Assert.Throws<MethodShouldNotReturnMoreThanOneResultException>(() =>
-            ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
     [Test]
@@ -66,12 +55,11 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
 
     [Test]
     [TestCase(typeof(IReturnTwoValuesExpectedOne<,>), TestName = "IReturnTwoValuesExpectedOne")]
-    // [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")] //After we will remove limit to to max one result, ResultTypeCountMismatchException should be validate
+    [TestCase(typeof(IReturnSingleValueExpectedTwo<,,>), TestName = "IReturnSingleValueExpectedTwo")]
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsReturnCountMismatchException(Type handlerType)
     {
         // Act & Assert
-        //After we will remove limit to to max one result, this validator should throw ResultTypeCountMismatchException
-        Assert.Throws<MethodShouldNotReturnMoreThanOneResultException>(() =>
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
@@ -82,8 +70,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
         Type handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
 
         // Act & Assert
-        //After we will remove limit to to max one result, this validator should throw ReturnTypeMismatchException
-        Assert.Throws<MethodShouldNotReturnMoreThanOneResultException>(() =>
+        Assert.Throws<ReturnTypeMismatchException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 }

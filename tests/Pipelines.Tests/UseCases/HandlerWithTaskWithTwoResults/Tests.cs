@@ -16,7 +16,7 @@ public class Tests
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
     }
     
-    //[Test]  //After we will remove limit to max one result, this test should be uncommented
+    [Test]
     public async Task HappyPath()
     {
         //Arrange
