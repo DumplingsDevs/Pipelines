@@ -61,8 +61,9 @@ internal class DispatcherImplementationBuilder
         AddLine("switch", $"({methodSymbol.Parameters.First().Name})");
         AddLine("{");
         BuildSwitchBody();
+        //TO DO: throw dedicated exception
+        AddLine("default: throw new Exception();");
         AddLine("}");
-        AddLine("throw new Exception();"); //TO DO - dedicated exception?
     }
 
     private void BuildSwitchBody()
@@ -77,15 +78,25 @@ internal class DispatcherImplementationBuilder
 
             if (implementedInputInterface != null)
             {
-                var response = implementedInputInterface.TypeArguments.First();
+                var response = implementedInputInterface.TypeArguments.FirstOrDefault();
+                var hasResponse = response is not null;
                 var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
+                var genericStructure = hasResponse ? $"<{classSymbol}, {response}>" : $"<{classSymbol}>";
                 
-                AddLine("case",
-                    classSymbol.ToString(),
-                    "r: return",
-                    "(",
-                    "await",
-                    $"_serviceProvider.GetRequiredService<{_pipelineConfig.HandlerType.ContainingNamespace}.{_pipelineConfig.HandlerType.Name}<{classSymbol}, {response}>>().{handlerMethodName}(r, token)) as TResult;");
+                AddInLine("case");
+                AddInLine(classSymbol.ToString());
+                AddInLine("r: ");
+                AddInLine(hasResponse, "return");
+                AddInLine(hasResponse, "(");
+                AddInLine("await");
+                AddInLine("_serviceProvider.GetRequiredService<");
+                AddInLine(_pipelineConfig.HandlerType.GetNameWithNamespace());
+                AddInLine(genericStructure);
+                AddInLine(">().", handlerMethodName, "(r, token)");
+                AddInLine(hasResponse, ")");
+                AddInLine(hasResponse, "as TResult");
+                AddInLine(";");
+                AddInLine(!hasResponse,"break;");
             }
         }
     }
@@ -180,6 +191,20 @@ internal class DispatcherImplementationBuilder
 
     private void AddLine(params string[] value)
     {
-        _builder.Append(string.Join(" ", value) + "\n");
+        _builder.Append("\n");
+        _builder.Append(string.Join(" ", value));
+    }
+
+    private void AddInLine(params string[] value)
+    {
+        _builder.Append(string.Join("", value) + " ");
+    }
+    
+    private void AddInLine(bool shouldAdd, params string[] value)
+    {
+        if (shouldAdd)
+        {
+            _builder.Append(string.Join("", value));
+        }
     }
 }

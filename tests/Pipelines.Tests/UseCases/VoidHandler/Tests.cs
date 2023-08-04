@@ -13,7 +13,6 @@ public class Tests
         var assembly = typeof(DependencyContainer).Assembly;
         
         _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly,typeof(ICommand), typeof(ICommandHandler<>));
-
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
     }
@@ -26,6 +25,7 @@ public class Tests
 
         //Act
         var result = _commandDispatcher.SendAsync(request, new CancellationToken());
+        await result;
         result.Wait();
         
         //Assert
