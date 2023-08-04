@@ -27,6 +27,6 @@ public class Tests
             
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
-        Assert.That(result.Item2, Is.EqualTo(5));
+        Assert.That(result.Item2.Value, Is.EqualTo("Value"));
     }
 }

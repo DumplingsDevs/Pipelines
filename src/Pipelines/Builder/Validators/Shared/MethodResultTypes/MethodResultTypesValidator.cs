@@ -16,9 +16,10 @@ internal static class MethodResultTypesValidator
 
         if (isVoidMethod) return;
         
+        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
+
         ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
 
-        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
     }
 
