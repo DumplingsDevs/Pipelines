@@ -102,7 +102,7 @@ public class PipelinesBenchmark
         return result;
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public async Task<ExampleCommandResult> Pipelines()
     {
         var dispatcher = _pipelinesProvider.GetRequiredService<IRequestDispatcher>();
@@ -114,7 +114,7 @@ public class PipelinesBenchmark
         return result;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark()]
     public async Task<ExampleCommandResult> MediatR()
     {
         var mediator = _mediatorProvider.GetRequiredService<IMediator>();
