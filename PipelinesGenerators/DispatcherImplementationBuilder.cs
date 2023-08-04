@@ -81,11 +81,11 @@ internal class DispatcherImplementationBuilder
                 var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
                 
                 AddLine("case",
-                    classSymbol.Name,
+                    classSymbol.ToString(),
                     "r: return",
                     "(",
                     "await",
-                    $"_serviceProvider.GetRequiredService<{_pipelineConfig.HandlerType.Name}<{classSymbol.Name}, {response.Name}>>().{handlerMethodName}(r, token)) as TResult;");
+                    $"_serviceProvider.GetRequiredService<{_pipelineConfig.HandlerType.ContainingNamespace}.{_pipelineConfig.HandlerType.Name}<{classSymbol}, {response}>>().{handlerMethodName}(r, token)) as TResult;");
             }
         }
     }
@@ -169,14 +169,12 @@ internal class DispatcherImplementationBuilder
         var dispatcherInterface = _pipelineConfig.DispatcherType.Name;
 
         //TO DO: What if someone will make the same name of dispatcher, but in different namespaces?
-        AddLine($"public class {dispatcherInterface}Implementation : {dispatcherInterface}");
+        AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
     }
 
     private void BuildNamespaces()
     {
         AddLine("using System;");
-        AddLine("using Pipelines.Benchmarks.Types;");
-        AddLine("using Pipelines.Benchmarks.Sample;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
     }
 
