@@ -1,4 +1,4 @@
-namespace Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
+namespace Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 
 public class GenericTypeCountMismatchException : Exception
 {

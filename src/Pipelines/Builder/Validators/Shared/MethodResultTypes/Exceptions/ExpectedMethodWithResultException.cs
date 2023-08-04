@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 
-public class ExpectedMethodWithResultException : Exception
+internal class ExpectedMethodWithResultException : Exception
 {
     private const string ErrorMessage = "Expected method with result, but method was void in type: ";
 

@@ -1,5 +1,7 @@
 using System.Reflection;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
+using Pipelines.Builder.Validators.Shared.CompareTypes;
+using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType;
@@ -14,14 +16,14 @@ public static class CrossValidateResultTypes
 
         if (handlerMethod.IsVoidOrTaskReturnType() != dispatcherMethod.IsVoidOrTaskReturnType())
         {
-            throw new ReturnTypeMismatchException(handlerType, dispatcherType);
+            throw new VoidAndValueMethodMismatchException(handlerType, dispatcherType);
         }
 
         if (handlerMethod.IsGenericTaskReturnType() != dispatcherMethod.IsGenericTaskReturnType())
         {
             throw new TaskReturnTypeMismatchException(handlerType, dispatcherType);
         }
-        
+
         var handlerResultTypes = GetResultTypes(handlerMethod);
         var dispatcherResultTypes = GetResultTypes(dispatcherMethod);
 
@@ -46,14 +48,7 @@ public static class CrossValidateResultTypes
                 throw new ResultTypeMismatchException(handlerParam, dispatcherParam);
             }
 
-            if (IsGenericTypes(handlerParam, dispatcherParam))
-            {
-                ValidateGenericType(handlerParam, dispatcherParam);
-            }
-            else
-            {
-                ValidateNonGenericType(handlerParam, dispatcherParam);
-            }
+            TypeCompatibilityValidator.Validate(handlerParam, dispatcherParam);
         }
     }
 
@@ -80,7 +75,7 @@ public static class CrossValidateResultTypes
         {
             var handlerGenericType = handlerParamGenericConstraints[i];
             var dispatcherGenericType = dispatcherParamGenericConstraints[i];
-            
+
             if (!TypeNamespaceComparer.Compare(handlerGenericType, dispatcherGenericType))
             {
                 throw new GenericTypeMismatchException(handlerParam, dispatcherParam);
@@ -97,7 +92,7 @@ public static class CrossValidateResultTypes
     {
         return methodInfo.GetReturnTypes();
     }
-    
+
     private static MethodInfo GetMethodInfo(Type type, MethodInfo methodInfo)
     {
         return type.GetMethods().First(x => x.Equals(methodInfo));

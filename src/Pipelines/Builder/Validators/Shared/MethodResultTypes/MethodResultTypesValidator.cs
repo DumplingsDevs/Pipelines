@@ -1,4 +1,5 @@
 using System.Reflection;
+using Pipelines.Builder.Validators.Shared.CompareTypes;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 using Pipelines.Utils;
@@ -11,11 +12,11 @@ internal static class MethodResultTypesValidator
     {
         var isVoidMethod = methodToValidate.IsVoidOrTaskReturnType();
         var methodReturnTypes = methodToValidate.GetReturnTypes();
-        
+
         ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
 
         if (isVoidMethod) return;
-        
+
         CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
 
         ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
@@ -23,17 +24,15 @@ internal static class MethodResultTypesValidator
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
     }
 
-    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes, List<Type> methodReturnTypes)
+    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes,
+        List<Type> methodReturnTypes)
     {
         for (var i = 0; i < expectedResultTypes.Length; i++)
         {
             var expectedResultType = expectedResultTypes[i];
             var methodReturnType = methodReturnTypes[i];
 
-            if (!TypeNamespaceComparer.Compare(expectedResultType, methodReturnType))
-            {
-                throw new ReturnTypeMismatchException(expectedResultType, methodReturnType);
-            }
+            TypeCompatibilityValidator.Validate(expectedResultType, methodReturnType);
         }
     }
 
@@ -49,7 +48,8 @@ internal static class MethodResultTypesValidator
         }
     }
 
-    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength, int methodReturnTypesLength)
+    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength,
+        int methodReturnTypesLength)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
