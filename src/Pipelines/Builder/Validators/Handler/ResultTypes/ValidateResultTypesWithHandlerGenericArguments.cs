@@ -12,7 +12,7 @@ internal static class ValidateResultTypesWithHandlerGenericArguments
         // generic arguments defined in Handler type for e.g IHandler<TInput,TResult>
         var genericArguments = handlerType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().First();
-
+        
         var expectedResultTypes = GetResultTypes(genericArguments);
         //compare types found in Handler Generic Type with method return types 
         MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType);

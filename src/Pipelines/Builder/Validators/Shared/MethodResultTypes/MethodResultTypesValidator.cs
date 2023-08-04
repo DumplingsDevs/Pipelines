@@ -1,5 +1,6 @@
 using System.Reflection;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
+using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.Shared.MethodResultTypes;
@@ -15,11 +16,14 @@ internal static class MethodResultTypesValidator
 
         if (isVoidMethod) return;
         
-        ValidateResultTypeCount(expectedResultTypes.Length, methodReturnTypes.Count);
-        ValidateResultTypeMatch(expectedResultTypes, methodReturnTypes);
+        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
+
+        ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
+
+        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
     }
 
-    private static void ValidateResultTypeMatch(Type[] expectedResultTypes, List<Type> methodReturnTypes)
+    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes, List<Type> methodReturnTypes)
     {
         for (var i = 0; i < expectedResultTypes.Length; i++)
         {
@@ -45,7 +49,7 @@ internal static class MethodResultTypesValidator
         }
     }
 
-    private static void ValidateResultTypeCount(int expectedResultTypesLength, int methodReturnTypesLength)
+    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength, int methodReturnTypesLength)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {

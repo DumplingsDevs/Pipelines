@@ -12,7 +12,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     {
         // Arrange
         Type handlerType = null;
-        
+
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
@@ -21,12 +21,12 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     [Test]
     [TestCase(typeof(ICommandHandlerWithResult<,>), TestName = "ICommandHandlerWithResult")]
     [TestCase(typeof(IVoidCommandHandler<>), TestName = "IVoidCommandHandler")]
-    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")]
+    [TestCase(typeof(ICommandHandlerWithTwoResults<,,>), TestName = "ICommandHandlerWithTwoResults")] //
     public void Validate_GenericArgumentsMatchesHandlerMethod_Passes(Type handlerType)
     {
         // Act
         ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType);
-        
+
         // Assert
         Assert.Pass(); // if no exception was thrown, the test passes
     }

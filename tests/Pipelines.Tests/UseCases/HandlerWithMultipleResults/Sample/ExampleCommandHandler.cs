@@ -1,10 +1,10 @@
 namespace Pipelines.Tests.UseCases.HandlerWithMultipleResults.Sample;
 using Types;
 
-public class ExampleCommandHandler : ICommandHandler<ExampleCommand, ExampleCommandResult, int>
+public class ExampleCommandHandler : ICommandHandler<ExampleCommand, ExampleRecordCommandResult, ExampleCommandClassResult>
 {
-    public (ExampleCommandResult, int) HandleAsync(ExampleCommand command, CancellationToken token)
+    public (ExampleRecordCommandResult, ExampleCommandClassResult) HandleAsync(ExampleCommand command, CancellationToken token)
     {
-        return (new ExampleCommandResult(command.Value), 5);
+        return (new ExampleRecordCommandResult(command.Value), new ExampleCommandClassResult("Value"));
     }
 }
