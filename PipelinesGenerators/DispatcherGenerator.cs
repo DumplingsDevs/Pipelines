@@ -25,12 +25,12 @@ public class DispatcherGenerator : ISourceGenerator
 
         foreach (var config in configs)
         {
-            var interfaceName = config.DispatcherType.Name;
+            var interfaceName = config.DispatcherType.GetNameWithNamespace();
 
             var builder = new DispatcherImplementationBuilder(config, context);
             var classSourceCode = builder.Build();
             var sourceText = SourceText.From(classSourceCode, Encoding.UTF8);
-            var sourceFileName = $"{interfaceName}Implementation.cs";
+            var sourceFileName = $"{interfaceName}Implementation.g.cs";
             context.AddSource(sourceFileName, sourceText);
         }
     }

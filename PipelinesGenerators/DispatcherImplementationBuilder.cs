@@ -156,7 +156,7 @@ internal class DispatcherImplementationBuilder
 
     private void BuildConstructor()
     {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.Name;
+        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
 
         AddLine($"public {dispatcherInterface}Implementation(IServiceProvider serviceProvider)");
         AddLine("{");
@@ -166,7 +166,7 @@ internal class DispatcherImplementationBuilder
 
     private void BuildClassDefinition()
     {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.Name;
+        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
 
         //TO DO: What if someone will make the same name of dispatcher, but in different namespaces?
         AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
