@@ -34,6 +34,30 @@ internal class DispatcherImplementationBuilder
         return _builder.ToString();
     }
 
+    private void BuildNamespaces()
+    {
+        AddLine("using System;");
+        AddLine("using Microsoft.Extensions.DependencyInjection;");
+        AddLine("using Pipelines.Exceptions;");
+    }
+
+    private void BuildClassDefinition()
+    {
+        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
+
+        AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
+    }
+
+    private void BuildConstructor()
+    {
+        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
+
+        AddLine($"public {dispatcherInterface}Implementation(IServiceProvider serviceProvider)");
+        AddLine("{");
+        AddLine("_serviceProvider = serviceProvider;");
+        AddLine("}");
+    }
+
     private void BuildMethodImplementations()
     {
         var dispatcherMethods = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>();
@@ -59,15 +83,35 @@ internal class DispatcherImplementationBuilder
         AddLine("}");
     }
 
+    private static string AsyncModified(IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.IsAsync() ? "async" : "";
+    }
+
+    private string GenerateMethodReturnType(IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.ReturnType.ToDisplayString();
+    }
+    
+    private string GetMethodConstraint(IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.TypeParameters.Any() ? $"<{string.Join(", ", methodSymbol.TypeParameters)}>" : "";
+    }
+    
+    private static string GenerateMethodParameters(IMethodSymbol methodSymbol)
+    {
+        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
+    }
+
     private void BuildSwitchCase(IMethodSymbol methodSymbol)
     {
         var parameterName = methodSymbol.Parameters.First().Name;
-        
+
         AddLine("switch", $"({parameterName})");
         AddLine("{");
         BuildSwitchBody();
-        //TO DO: throw dedicated exception
-        AddLine($"default: throw new InputNotSupportedByDispatcherException({parameterName}.GetType(), typeof({_pipelineConfig.DispatcherType}));");
+        AddLine(
+            $"default: throw new InputNotSupportedByDispatcherException({parameterName}.GetType(), typeof({_pipelineConfig.DispatcherType}));");
         AddLine("}");
     }
 
@@ -174,24 +218,9 @@ internal class DispatcherImplementationBuilder
         return builder.ToString();
     }
 
-    private string GenerateMultipleCastExpression()
-    {
-        throw new System.NotImplementedException();
-    }
-
     private string GenerateSingleCastExpression()
     {
         return _pipelineConfig.HandlerType.TypeArguments.Skip(1).First().Name;
-    }
-
-    private string GenerateMethodParameters(IMethodSymbol methodSymbol)
-    {
-        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
-    }
-
-    private string GetMethodConstraint(IMethodSymbol methodSymbol)
-    {
-        return methodSymbol.TypeParameters.Any() ? $"<{string.Join(", ", methodSymbol.TypeParameters)}>" : "";
     }
 
     private string GetConstraints(IMethodSymbol methodSymbol)
@@ -199,7 +228,6 @@ internal class DispatcherImplementationBuilder
         var typeParameterConstraints = methodSymbol.TypeParameters.Select(GetTypeParameterConstraints).ToList();
         if (typeParameterConstraints.Any())
         {
-            //TO DO - I think that many constraints should be in separate lines
             return "where " + string.Join(" where ", typeParameterConstraints);
         }
 
@@ -214,16 +242,10 @@ internal class DispatcherImplementationBuilder
             constraints = constraints.Append("class");
         }
 
-        //TO DO
-        // if (typeParameter.HasValueTypeConstraint && !typeParameter.HasValueTypeConstraintIsNullable)
-        // {
-        //     constraints = constraints.Append("struct");
-        // }
-        //
-        // if (typeParameter.HasValueTypeConstraintIsNullable)
-        // {
-        //     constraints = constraints.Append("struct?");
-        // }
+        if (typeParameter.HasValueTypeConstraint)
+        {
+            constraints = constraints.Append("struct");
+        }
 
         if (typeParameter.HasConstructorConstraint)
         {
@@ -233,47 +255,6 @@ internal class DispatcherImplementationBuilder
         //TO DO - other constraints ? Or maybe different approach
 
         return $"{typeParameter.Name} : {string.Join(", ", constraints)}";
-    }
-
-    private string GenerateMethodReturnType(IMethodSymbol methodSymbol)
-    {
-        return methodSymbol.ReturnType.ToDisplayString();
-    }
-
-    private string AsyncModified(IMethodSymbol methodSymbol)
-    {
-        // check if in body exists await 
-        if (methodSymbol.IsAsync())
-        {
-            return "async";
-        }
-
-        return "";
-    }
-
-    private void BuildConstructor()
-    {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
-
-        AddLine($"public {dispatcherInterface}Implementation(IServiceProvider serviceProvider)");
-        AddLine("{");
-        AddLine("_serviceProvider = serviceProvider;");
-        AddLine("}");
-    }
-
-    private void BuildClassDefinition()
-    {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
-
-        //TO DO: What if someone will make the same name of dispatcher, but in different namespaces?
-        AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
-    }
-
-    private void BuildNamespaces()
-    {
-        AddLine("using System;");
-        AddLine("using Microsoft.Extensions.DependencyInjection;");
-        AddLine("using Pipelines.Exceptions;");
     }
 
     private void AddEmptyLine()
