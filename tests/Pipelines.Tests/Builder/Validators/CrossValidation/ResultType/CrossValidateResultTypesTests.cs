@@ -1,5 +1,6 @@
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
+using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 using Pipelines.Tests.Builder.Validators.CrossValidation.ResultType.Types;
 using Pipelines.Utils;
 
@@ -115,7 +116,7 @@ public class CrossValidateResultTypesTests
         var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
 
         // Act & Assert
-        Assert.Throws<ReturnTypeMismatchException>(() =>
+        Assert.Throws<VoidAndValueMethodMismatchException>(() =>
             CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo, dispatcherMethodInfo));
     }
 
