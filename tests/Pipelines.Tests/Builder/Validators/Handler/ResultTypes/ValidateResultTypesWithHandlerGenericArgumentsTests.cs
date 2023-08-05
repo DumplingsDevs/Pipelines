@@ -73,7 +73,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
         Type handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
 
         // Act & Assert
-        Assert.Throws<ResultTypeMismatchException>(() =>
+        Assert.Throws<GenericTypeCountMismatchException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 }

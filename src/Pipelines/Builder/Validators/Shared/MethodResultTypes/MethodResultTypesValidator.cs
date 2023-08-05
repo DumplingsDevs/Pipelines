@@ -8,7 +8,8 @@ namespace Pipelines.Builder.Validators.Shared.MethodResultTypes;
 
 internal static class MethodResultTypesValidator
 {
-    internal static void Validate(MethodInfo methodToValidate, Type[] expectedResultTypes, Type handlerType)
+    internal static void Validate(MethodInfo methodToValidate, Type[] expectedResultTypes, Type handlerType,
+        Type expectedResultSourceType)
     {
         var isVoidMethod = methodToValidate.IsVoidOrTaskReturnType();
         var methodReturnTypes = methodToValidate.GetReturnTypes();
@@ -21,18 +22,20 @@ internal static class MethodResultTypesValidator
 
         ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
 
-        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
+        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes, handlerType,
+            expectedResultSourceType);
     }
 
     private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes,
-        List<Type> methodReturnTypes)
+        List<Type> methodReturnTypes, Type resultSourceType, Type expectedResultSourceType)
     {
         for (var i = 0; i < expectedResultTypes.Length; i++)
         {
             var expectedResultType = expectedResultTypes[i];
             var methodReturnType = methodReturnTypes[i];
 
-            TypeCompatibilityValidator.Validate(expectedResultType, methodReturnType);
+            TypeCompatibilityValidator.Validate(expectedResultType, methodReturnType, resultSourceType,
+                expectedResultSourceType);
         }
     }
 

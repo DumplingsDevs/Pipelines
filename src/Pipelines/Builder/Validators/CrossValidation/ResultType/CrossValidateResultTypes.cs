@@ -1,7 +1,6 @@
 using System.Reflection;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Builder.Validators.Shared.CompareTypes;
-using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType;
@@ -32,60 +31,20 @@ public static class CrossValidateResultTypes
             throw new ResultTypeCountMismatchException(handlerType, dispatcherType);
         }
 
-        ValidateResultTypes(handlerResultTypes, dispatcherResultTypes);
+        ValidateResultTypes(handlerResultTypes, dispatcherResultTypes, handlerType, dispatcherType);
     }
 
     //To check if result types are equate, we need to check generic constraints in case when it is generic type and compare namespaces, if it is not generic
-    private static void ValidateResultTypes(List<Type> handlerResultTypes, List<Type> dispatcherResultTypes)
+    private static void ValidateResultTypes(List<Type> handlerResultTypes, List<Type> dispatcherResultTypes,
+        Type handlerType, Type dispatcherType)
     {
         for (var i = 0; i < handlerResultTypes.Count; i++)
         {
             var handlerParam = handlerResultTypes[i];
             var dispatcherParam = dispatcherResultTypes[i];
 
-            if (handlerParam.IsGenericType != dispatcherParam.IsGenericType)
-            {
-                throw new ResultTypeMismatchException(handlerParam, dispatcherParam);
-            }
-
-            TypeCompatibilityValidator.Validate(handlerParam, dispatcherParam);
+            TypeCompatibilityValidator.Validate(handlerParam, dispatcherParam, handlerType, dispatcherType);
         }
-    }
-
-    private static void ValidateNonGenericType(Type handlerParam, Type dispatcherParam)
-    {
-        if (!TypeNamespaceComparer.Compare(handlerParam, dispatcherParam))
-        {
-            throw new ResultTypeMismatchException(handlerParam, dispatcherParam);
-        }
-    }
-
-    private static void ValidateGenericType(Type handlerParam, Type dispatcherParam)
-    {
-        //Important! "class" constraint is not exist in GenericParameterConstraints. For e.g. "struct" will be exists and will be with type "System.ValueType"
-        var handlerParamGenericConstraints = handlerParam.GetGenericParameterConstraints();
-        var dispatcherParamGenericConstraints = dispatcherParam.GetGenericParameterConstraints();
-
-        if (handlerParamGenericConstraints.Length != dispatcherParamGenericConstraints.Length)
-        {
-            throw new GenericTypeCountMismatchException(handlerParam, dispatcherParam);
-        }
-
-        for (int i = 0; i < handlerParamGenericConstraints.Length; i++)
-        {
-            var handlerGenericType = handlerParamGenericConstraints[i];
-            var dispatcherGenericType = dispatcherParamGenericConstraints[i];
-
-            if (!TypeNamespaceComparer.Compare(handlerGenericType, dispatcherGenericType))
-            {
-                throw new GenericTypeMismatchException(handlerParam, dispatcherParam);
-            }
-        }
-    }
-
-    private static bool IsGenericTypes(Type handlerParam, Type dispatcherParam)
-    {
-        return handlerParam.IsGenericTypeParameter && dispatcherParam.IsGenericMethodParameter;
     }
 
     private static List<Type> GetResultTypes(MethodInfo methodInfo)

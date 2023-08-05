@@ -1,10 +1,11 @@
 namespace Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 
-public class GenericTypeCountMismatchException : Exception
+internal class GenericTypeCountMismatchException : Exception
 {
-    private const string ErrorMessage = "Generic type count mismatch in result type. Handler: {0}, Dispatcher: {1}";
+    private const string ErrorMessage =
+        "Generic type count mismatch in provided type '{0}' from '{1}' and type '{2}' from '{3}'";
 
-    public GenericTypeCountMismatchException(Type handlerType, Type dispatcherType)
-        : base(string.Format(ErrorMessage, handlerType.FullName, dispatcherType.FullName))
+    public GenericTypeCountMismatchException(Type handlerType, Type dispatcherType, Type sourceType1, Type sourceType2)
+        : base(string.Format(ErrorMessage, handlerType, sourceType1, dispatcherType, sourceType2))
     { }
 }

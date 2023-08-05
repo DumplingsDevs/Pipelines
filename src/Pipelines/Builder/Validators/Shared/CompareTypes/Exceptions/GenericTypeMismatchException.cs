@@ -1,10 +1,12 @@
 namespace Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 
-public class GenericTypeMismatchException : Exception
+internal class GenericTypeMismatchException : Exception
 {
-    private const string ErrorMessage = "Generic type mismatch in result type. Handler: {0}, Dispatcher: {1}";
+    private const string ErrorMessage =
+        "Generic type mismatch in provided type '{0}' from '{1}' and type '{2}' from '{3}'";
 
-    public GenericTypeMismatchException(Type handlerType, Type dispatcherType)
-        : base(string.Format(ErrorMessage, handlerType.FullName, dispatcherType.FullName))
-    { }
+    internal GenericTypeMismatchException(Type type1, Type type2, Type sourceType1, Type sourceType2)
+        : base(string.Format(ErrorMessage, type1, sourceType1, type2, sourceType2))
+    {
+    }
 }
