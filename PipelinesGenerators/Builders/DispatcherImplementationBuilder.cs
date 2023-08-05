@@ -159,6 +159,7 @@ internal class DispatcherImplementationBuilder
 
     private string AsyncModified()
     {
+        // check if in body exists await 
         if (true)
         {
             return "async";
