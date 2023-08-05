@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -80,6 +81,7 @@ internal class DispatcherImplementationBuilder
             if (implementedInputInterface != null)
             {
                 //implementedInputInterface.TypeArguments.Count > 1 then Tuple scenario
+                var hasMultipleResults = implementedInputInterface.TypeArguments.Length > 1;
                 var response = implementedInputInterface.TypeArguments.FirstOrDefault();
                 var hasResponse = response is not null;
                 var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
@@ -98,12 +100,39 @@ internal class DispatcherImplementationBuilder
                 AddInLine(genericStructure);
                 AddInLine(">().", handlerMethodName, "(r, token);");
                 AddEmptyLine();
-                AddInLine(hasResponse, $"return {resultName} ");
-                AddInLine(hasResponse, "as TResult;");
+                AddInLine(hasResponse && !hasMultipleResults, () => GenerateSingleArgumentReturn(resultName));
+                AddInLine(hasResponse && hasMultipleResults, () => GenerateMultipleArgumentReturn(resultName));
                 AddEmptyLine();
                 AddInLine(!hasResponse, "break;");
             }
         }
+    }
+
+    private string GenerateMultipleArgumentReturn(string resultName)
+    {
+        return ";asdasd";
+    }
+
+    private string GenerateSingleArgumentReturn(string resultName)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append($"return {resultName} ");
+        builder.Append("as ");
+        builder.Append(GenerateSingleCastExpression());
+        builder.Append(";");
+        
+        return builder.ToString();
+    }
+
+    private string GenerateMultipleCastExpression()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    private string GenerateSingleCastExpression()
+    {
+        return _pipelineConfig.HandlerType.TypeArguments.Skip(1).First().Name;
     }
 
     private string GenerateMethodParameters(IMethodSymbol methodSymbol)
@@ -216,6 +245,14 @@ internal class DispatcherImplementationBuilder
         if (shouldAdd)
         {
             _builder.Append(string.Join("", value));
+        }
+    }
+    
+    private void AddInLine(bool shouldAdd, Func<string> builder)
+    {
+        if (shouldAdd)
+        {
+            _builder.Append(string.Join("", builder.Invoke()));
         }
     }
 }
