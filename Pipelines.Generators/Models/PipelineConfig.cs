@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace PipelinesGenerators.Models;
+namespace Pipelines.Generators.Models;
 
 internal class PipelineConfig
 {

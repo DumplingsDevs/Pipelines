@@ -3,13 +3,13 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using PipelinesGenerators.Builders;
-using PipelinesGenerators.Extensions;
-using PipelinesGenerators.Models;
+using Pipelines.Generators.Builders;
+using Pipelines.Generators.Models;
+using Pipelines.Generators.Extensions;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-namespace PipelinesGenerators;
+namespace Pipelines.Generators;
 
 [Generator]
 public class DispatcherGenerator : ISourceGenerator

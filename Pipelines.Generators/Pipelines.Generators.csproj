@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Authors>DumplingsDevs (Mateusz Wróblewski,Kamil Bytner)</Authors>
+        <Description>Extension for Pipelines package that improves performance by generating source code for dispatcher</Description>
+        <PackageId>DumplingsDevs.Pipelines.Generators</PackageId>
+        <PackageTags>pipelines</PackageTags>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Nullable>enable</Nullable>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
         <IsRoslynComponent>true</IsRoslynComponent>
         <LangVersion>latest</LangVersion>
+        <RootNamespace>Pipelines.Generators</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

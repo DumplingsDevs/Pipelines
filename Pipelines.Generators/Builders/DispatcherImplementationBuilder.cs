@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using PipelinesGenerators.Extensions;
-using PipelinesGenerators.Models;
+using Pipelines.Generators.Models;
+using Pipelines.Generators.Extensions;
 
-namespace PipelinesGenerators.Builders;
+namespace Pipelines.Generators.Builders;
 
 internal class DispatcherImplementationBuilder
 {

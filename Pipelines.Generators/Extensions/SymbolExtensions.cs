@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace PipelinesGenerators.Extensions;
+namespace Pipelines.Generators.Extensions;
 
 internal static class SymbolExtensions
 {

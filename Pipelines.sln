@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Tests", "tests\Pi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Benchmarks", "Pipelines.Benchmarks\Pipelines.Benchmarks.csproj", "{36D7DF6E-7BDB-484E-9530-D578028A5DC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelinesGenerators", "PipelinesGenerators\PipelinesGenerators.csproj", "{2C6197F2-A87A-4CA8-B605-6BD54F0016B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Generators", "Pipelines.Generators\Pipelines.Generators.csproj", "{2C6197F2-A87A-4CA8-B605-6BD54F0016B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

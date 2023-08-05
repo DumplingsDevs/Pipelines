@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace PipelinesGenerators.Extensions;
+namespace Pipelines.Generators.Extensions;
 
 public static class ClassSyntaxExtensions
 {
