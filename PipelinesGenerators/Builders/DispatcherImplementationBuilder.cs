@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -68,6 +69,10 @@ internal class DispatcherImplementationBuilder
         AddLine("}");
     }
 
+    // Example:
+    //     case Sample.ExampleCommand r:
+    //     var result = _serviceProvider.GetRequiredService<ICommandHandler<Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>>().HandleAsync(r, token);
+    //     return ((result.Item1 as TResult), (result.Item2 as TResult2));
     private void BuildSwitchBody()
     {
         foreach (var classDeclaration in _context.GetTypeNodes())
@@ -82,10 +87,10 @@ internal class DispatcherImplementationBuilder
             {
                 //implementedInputInterface.TypeArguments.Count > 1 then Tuple scenario
                 var hasMultipleResults = implementedInputInterface.TypeArguments.Length > 1;
-                var response = implementedInputInterface.TypeArguments.FirstOrDefault();
-                var hasResponse = response is not null;
+                var responses = implementedInputInterface.TypeArguments.ToList();
+                var hasResponse = responses.Count > 0;
                 var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
-                var genericStructure = hasResponse ? $"<{classSymbol}, {response}>" : $"<{classSymbol}>";
+                var genericStructure = GenerateGenericBrackets(hasResponse, classSymbol, responses);
                 var isAsync = true;
                 var resultName = $"result{classSymbol.GetFormattedFullname()}";
 
@@ -108,11 +113,41 @@ internal class DispatcherImplementationBuilder
         }
     }
 
-    private string GenerateMultipleArgumentReturn(string resultName)
+    // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
+    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> responses)
     {
-        return ";asdasd";
+        if (!hasResponse)
+        {
+            return $"<{inputClass}>";
+        }
+        
+        var builder = new StringBuilder();
+
+        builder.Append($"<{inputClass}");
+        foreach (var response in responses)
+        {
+            builder.Append($", {response}");
+        }
+
+        builder.Append(">");
+
+        return builder.ToString();
     }
 
+    // Example: return ((result.Item1 as TResult), (result.Item2 as TResult2));
+    private string GenerateMultipleArgumentReturn(string resultName)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append("return (");
+        builder.Append($"({resultName}");
+        
+        builder.Append(");");
+
+        return builder.ToString();
+    }
+
+    // Example: return resultPipelinesTestsUseCasesHandlerWithResultSampleExampleCommand as TResult;
     private string GenerateSingleArgumentReturn(string resultName)
     {
         var builder = new StringBuilder();
