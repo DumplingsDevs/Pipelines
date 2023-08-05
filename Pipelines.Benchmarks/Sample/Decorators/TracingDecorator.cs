@@ -2,7 +2,7 @@ using Pipelines.Benchmarks.Types;
 
 namespace Pipelines.Benchmarks.Sample.Decorators;
 
-public class TracingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TResult> where TCommand : IRequest<TResult>
+public class TracingDecorator<TCommand, TResult> : IRequestHandler<TCommand, TResult> where TCommand : IRequest<TResult> where TResult : class
 {
     private readonly IRequestHandler<TCommand, TResult> _handler;
     private readonly DecoratorsState _state;

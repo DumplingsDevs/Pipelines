@@ -47,7 +47,7 @@ internal class DispatcherImplementationBuilder
     private void BuildMethod(IMethodSymbol methodSymbol)
     {
         AddLine("public",
-            AsyncModified(),
+            AsyncModified(methodSymbol),
             GenerateMethodReturnType(methodSymbol),
             methodSymbol.Name,
             GetMethodConstraint(methodSymbol),
@@ -78,24 +78,25 @@ internal class DispatcherImplementationBuilder
         foreach (var classDeclaration in _context.GetTypeNodes())
         {
             var semanticModel = _context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-            var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
-            var interfaces = ((ITypeSymbol)classSymbol).AllInterfaces.ToList();
+            var inputClass = semanticModel.GetDeclaredSymbol(classDeclaration);
+            var interfaces = ((ITypeSymbol)inputClass).AllInterfaces.ToList();
             var implementedInputInterface = interfaces.FirstOrDefault(x =>
                 SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType));
 
             if (implementedInputInterface != null)
             {
-                //implementedInputInterface.TypeArguments.Count > 1 then Tuple scenario
                 var hasMultipleResults = implementedInputInterface.TypeArguments.Length > 1;
-                var responses = implementedInputInterface.TypeArguments.ToList();
-                var hasResponse = responses.Count > 0;
-                var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
-                var genericStructure = GenerateGenericBrackets(hasResponse, classSymbol, responses);
-                var isAsync = true;
-                var resultName = $"result{classSymbol.GetFormattedFullname()}";
+                var genericResults = _pipelineConfig.HandlerType.TypeArguments.Skip(1).ToList();
+                var results = implementedInputInterface.TypeArguments.ToList();
+                var hasResponse = results.Count > 0;
+                var handlerMethod = _pipelineConfig.HandlerType.GetMembers().OfType<IMethodSymbol>().First();
+                var handlerMethodName = handlerMethod.Name;
+                var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, results);
+                var isAsync = handlerMethod.IsAsync();
+                var resultName = $"result{inputClass.GetFormattedFullname()}";
 
                 AddInLine("case ");
-                AddInLine(classSymbol.ToString());
+                AddInLine(inputClass.ToString());
                 AddInLine(" r: ");
                 AddEmptyLine();
                 AddInLine(hasResponse, $"var {resultName} = ");
@@ -106,7 +107,8 @@ internal class DispatcherImplementationBuilder
                 AddInLine(">().", handlerMethodName, "(r, token);");
                 AddEmptyLine();
                 AddInLine(hasResponse && !hasMultipleResults, () => GenerateSingleArgumentReturn(resultName));
-                AddInLine(hasResponse && hasMultipleResults, () => GenerateMultipleArgumentReturn(resultName));
+                AddInLine(hasResponse && hasMultipleResults,
+                    () => GenerateMultipleArgumentReturn(resultName, genericResults));
                 AddEmptyLine();
                 AddInLine(!hasResponse, "break;");
             }
@@ -114,17 +116,17 @@ internal class DispatcherImplementationBuilder
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
-    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> responses)
+    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> results)
     {
         if (!hasResponse)
         {
             return $"<{inputClass}>";
         }
-        
+
         var builder = new StringBuilder();
 
         builder.Append($"<{inputClass}");
-        foreach (var response in responses)
+        foreach (var response in results)
         {
             builder.Append($", {response}");
         }
@@ -135,13 +137,22 @@ internal class DispatcherImplementationBuilder
     }
 
     // Example: return ((result.Item1 as TResult), (result.Item2 as TResult2));
-    private string GenerateMultipleArgumentReturn(string resultName)
+    private string GenerateMultipleArgumentReturn(string resultName, List<ITypeSymbol> results)
     {
         var builder = new StringBuilder();
 
         builder.Append("return (");
-        builder.Append($"({resultName}");
-        
+        for (var index = 0; index < results.Count; index++)
+        {
+            var result = results[index];
+            if (index > 0)
+            {
+                builder.Append(", ");
+            }
+
+            builder.Append($"({resultName}.Item{index + 1} as {result})");
+        }
+
         builder.Append(");");
 
         return builder.ToString();
@@ -156,7 +167,7 @@ internal class DispatcherImplementationBuilder
         builder.Append("as ");
         builder.Append(GenerateSingleCastExpression());
         builder.Append(";");
-        
+
         return builder.ToString();
     }
 
@@ -186,7 +197,7 @@ internal class DispatcherImplementationBuilder
         if (typeParameterConstraints.Any())
         {
             //TO DO - I think that many constraints should be in separate lines
-            return " where " + string.Join(" ", typeParameterConstraints);
+            return "where " + string.Join(" where ", typeParameterConstraints);
         }
 
         return "";
@@ -226,13 +237,15 @@ internal class DispatcherImplementationBuilder
         return methodSymbol.ReturnType.ToDisplayString();
     }
 
-    private string AsyncModified()
+    private string AsyncModified(IMethodSymbol methodSymbol)
     {
         // check if in body exists await 
-        if (true)
+        if (methodSymbol.IsAsync())
         {
             return "async";
         }
+
+        return "";
     }
 
     private void BuildConstructor()
@@ -282,7 +295,7 @@ internal class DispatcherImplementationBuilder
             _builder.Append(string.Join("", value));
         }
     }
-    
+
     private void AddInLine(bool shouldAdd, Func<string> builder)
     {
         if (shouldAdd)
