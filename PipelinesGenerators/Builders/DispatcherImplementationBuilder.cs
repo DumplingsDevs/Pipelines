@@ -61,11 +61,13 @@ internal class DispatcherImplementationBuilder
 
     private void BuildSwitchCase(IMethodSymbol methodSymbol)
     {
-        AddLine("switch", $"({methodSymbol.Parameters.First().Name})");
+        var parameterName = methodSymbol.Parameters.First().Name;
+        
+        AddLine("switch", $"({parameterName})");
         AddLine("{");
         BuildSwitchBody();
         //TO DO: throw dedicated exception
-        AddLine("default: throw new Exception();");
+        AddLine($"default: throw new InputNotSupportedByDispatcherException({parameterName}.GetType(), typeof({_pipelineConfig.DispatcherType}));");
         AddLine("}");
     }
 
@@ -95,6 +97,7 @@ internal class DispatcherImplementationBuilder
                 var isAsync = handlerMethod.IsAsync();
                 var resultName = $"result{inputClass.GetFormattedFullname()}";
 
+                // TO DO: Check if GetService returns null and throw dedicated exception
                 AddInLine("case ");
                 AddInLine(inputClass.ToString());
                 AddInLine(" r: ");
@@ -270,6 +273,7 @@ internal class DispatcherImplementationBuilder
     {
         AddLine("using System;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
+        AddLine("using Pipelines.Exceptions;");
     }
 
     private void AddEmptyLine()
