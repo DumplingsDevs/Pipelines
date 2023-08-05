@@ -1,10 +1,11 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using PipelinesGenerators.Builders;
+using PipelinesGenerators.Extensions;
+using PipelinesGenerators.Models;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 

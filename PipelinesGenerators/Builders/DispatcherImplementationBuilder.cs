@@ -1,9 +1,10 @@
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using PipelinesGenerators.Extensions;
+using PipelinesGenerators.Models;
 
-namespace PipelinesGenerators;
+namespace PipelinesGenerators.Builders;
 
 internal class DispatcherImplementationBuilder
 {
@@ -78,25 +79,29 @@ internal class DispatcherImplementationBuilder
 
             if (implementedInputInterface != null)
             {
+                //implementedInputInterface.TypeArguments.Count > 1 then Tuple scenario
                 var response = implementedInputInterface.TypeArguments.FirstOrDefault();
                 var hasResponse = response is not null;
                 var handlerMethodName = _pipelineConfig.HandlerType.GetMembers().First().Name;
                 var genericStructure = hasResponse ? $"<{classSymbol}, {response}>" : $"<{classSymbol}>";
-                
-                AddInLine("case");
+                var isAsync = true;
+                var resultName = $"result{classSymbol.GetFormattedFullname()}";
+
+                AddInLine("case ");
                 AddInLine(classSymbol.ToString());
-                AddInLine("r: ");
-                AddInLine(hasResponse, "return");
-                AddInLine(hasResponse, "(");
-                AddInLine("await");
+                AddInLine(" r: ");
+                AddEmptyLine();
+                AddInLine(hasResponse, $"var {resultName} = ");
+                AddInLine(isAsync, "await ");
                 AddInLine("_serviceProvider.GetRequiredService<");
                 AddInLine(_pipelineConfig.HandlerType.GetNameWithNamespace());
                 AddInLine(genericStructure);
-                AddInLine(">().", handlerMethodName, "(r, token)");
-                AddInLine(hasResponse, ")");
-                AddInLine(hasResponse, "as TResult");
-                AddInLine(";");
-                AddInLine(!hasResponse,"break;");
+                AddInLine(">().", handlerMethodName, "(r, token);");
+                AddEmptyLine();
+                AddInLine(hasResponse, $"return {resultName} ");
+                AddInLine(hasResponse, "as TResult;");
+                AddEmptyLine();
+                AddInLine(!hasResponse, "break;");
             }
         }
     }
@@ -190,6 +195,11 @@ internal class DispatcherImplementationBuilder
         AddLine("using Microsoft.Extensions.DependencyInjection;");
     }
 
+    private void AddEmptyLine()
+    {
+        _builder.Append("\n");
+    }
+
     private void AddLine(params string[] value)
     {
         _builder.Append("\n");
@@ -198,9 +208,9 @@ internal class DispatcherImplementationBuilder
 
     private void AddInLine(params string[] value)
     {
-        _builder.Append(string.Join("", value) + " ");
+        _builder.Append(string.Join("", value));
     }
-    
+
     private void AddInLine(bool shouldAdd, params string[] value)
     {
         if (shouldAdd)
