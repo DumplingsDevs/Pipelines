@@ -14,11 +14,12 @@ internal static class MethodResultTypesValidator
         var isVoidMethod = methodToValidate.IsVoidOrTaskReturnType();
         var methodReturnTypes = methodToValidate.GetReturnTypes();
 
-        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
+        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType, expectedResultSourceType);
 
         if (isVoidMethod) return;
 
-        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
+        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count, handlerType,
+            expectedResultSourceType);
 
         ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
 
@@ -39,24 +40,26 @@ internal static class MethodResultTypesValidator
         }
     }
 
-    private static void ValidateVoidMethod(bool isVoidMethod, Type[] expectedResultTypes, Type handlerType)
+    private static void ValidateVoidMethod(bool isVoidMethod, Type[] expectedResultTypes, Type handlerType,
+        Type expectedResultSourceType)
     {
         switch (isVoidMethod)
         {
             case true when expectedResultTypes.Any():
-                throw new ExpectedMethodWithResultException(handlerType);
+                throw new ExpectedMethodWithResultException(handlerType, expectedResultSourceType);
 
             case false when !expectedResultTypes.Any():
-                throw new ExpectedVoidMethodException(handlerType);
+                throw new ExpectedVoidMethodException(handlerType, expectedResultSourceType);
         }
     }
 
     private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength,
-        int methodReturnTypesLength)
+        int methodReturnTypesLength, Type resultSourceType, Type expectedResultSourceType)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
-            throw new ResultTypeCountMismatchException(expectedResultTypesLength, methodReturnTypesLength);
+            throw new ResultTypeCountMismatchException(expectedResultTypesLength, methodReturnTypesLength,
+                resultSourceType, expectedResultSourceType);
         }
     }
 }
