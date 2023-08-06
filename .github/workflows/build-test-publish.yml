@@ -51,7 +51,7 @@ jobs:
       - name: Pack
         run: |
           dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts ./src/Pipelines/Pipelines.csproj
-          dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts ./src/Pipelines/Pipelines.Generators.csproj
+          dotnet pack /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --no-build --configuration Release --output ./artifacts ./src/Pipelines.Generators/Pipelines.Generators.csproj
 
       - name: Push NuGet Package
         run: |
