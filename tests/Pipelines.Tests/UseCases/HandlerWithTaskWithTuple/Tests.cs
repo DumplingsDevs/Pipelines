@@ -7,16 +7,28 @@ public class Tests
 {
     private readonly ICommandDispatcher _commandDispatcher;
     private readonly DependencyContainer _dependencyContainer;
+    private readonly DecoratorsState _state;
+
     public Tests()
     {
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
+
+        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly, typeof(ICommand<,>),
+            typeof(ICommandHandler<,,>),
+            builder =>
+            {
+                builder
+                    .WithOpenTypeDecorator(typeof(LoggingDecorator<,,>));
+            });
         
-        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly,typeof(ICommand<,>), typeof(ICommandHandler<,,>));
+        _dependencyContainer.RegisterSingleton<DecoratorsState>();
+
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
+        _state = _dependencyContainer.GetService<DecoratorsState>();
     }
-    
+
     [Test]
     public async Task HappyPath()
     {
@@ -25,9 +37,15 @@ public class Tests
 
         //Act
         var result = await _commandDispatcher.SendAsync(request, new CancellationToken());
-            
+
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
         Assert.That(result.Item2.Value, Is.EqualTo("Value"));
+        
+        CollectionAssert.AreEqual(new List<string>
+        {
+            typeof(LoggingDecorator<,,>).Name,
+            typeof(LoggingDecorator<,,>).Name,
+        }, _state.Status);
     }
 }
