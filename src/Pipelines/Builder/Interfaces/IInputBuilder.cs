@@ -3,7 +3,7 @@ namespace Pipelines.Builder.Interfaces;
 public interface IInputBuilder
 {
     /// <summary>
-    /// Adds a specific Input type to the pipeline builder. This interface will be used for Inputs in Handlers.
+    /// Adds a specific Input Interface Type to the pipeline builder. This interface will be implemented by Inputs.
     /// This is key for dynamically stitching different Input types, allowing system extendability and flexibility.
     /// </summary>
     /// <param name="type">This is the Type of the Input interface to be added to the pipeline builder. This method expects a interface Type that will be implemented by Inputs for Handlers</param>
