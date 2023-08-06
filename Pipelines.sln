@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Benchmarks", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Generators", "src\Pipelines.Generators\Pipelines.Generators.csproj", "{2C6197F2-A87A-4CA8-B605-6BD54F0016B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{46767E7B-DA07-4511-85DF-C453E4574153}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,5 +41,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AE67E3C6-8E88-4BB0-BA4C-028DFBC5F7C1}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2C6197F2-A87A-4CA8-B605-6BD54F0016B8} = {46767E7B-DA07-4511-85DF-C453E4574153}
+		{B3BA8F23-A902-4298-ABC1-0F32C6D8EAD6} = {46767E7B-DA07-4511-85DF-C453E4574153}
 	EndGlobalSection
 EndGlobal
