@@ -28,6 +28,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
+    private DispatcherOptions _dispatcherOptions = null!;
 
     public PipelineBuilder(IServiceCollection serviceCollection)
     {
@@ -60,6 +61,11 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
     {
+        return AddDispatcher<TDispatcher>(new DispatcherOptions());
+    }
+
+    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>(DispatcherOptions options) where TDispatcher : class
+    {
         _dispatcherInterfaceType = typeof(TDispatcher);
 
         ProvidedTypeShouldBeInterface.Validate(_dispatcherInterfaceType);
@@ -75,7 +81,10 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         CrossValidateResultTypes.Validate(_handlerInterfaceType, _dispatcherInterfaceType, _handlerHandleMethod,
             _dispatcherHandleMethod);
 
-        _dispatcherProxy = provider => DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
+        _dispatcherProxy = provider =>
+            DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
+
+        _dispatcherOptions = options;
 
         return this;
     }
@@ -155,10 +164,22 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterDispatcher()
     {
+        if (_dispatcherOptions.UseReflectionProxyImplementation)
+        {
+            RegisterProxyDispatcher();
+        }
+        else
+        {
+            RegisterGeneratedDispatcher();
+        }
+    }
+
+    private void RegisterGeneratedDispatcher()
+    {
         var dispatcherImplementations = _handlerAssembly.GetTypes()
             .Where(t => t.GetInterfaces()
                 .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
-        
+
         if (dispatcherImplementations.Count > 0)
         {
             foreach (var dispatcherImplementation in dispatcherImplementations)
@@ -168,8 +189,12 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         }
         else
         {
-            throw new Exception("No dispatcher available");
-            // _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
+            throw new DispatcherNotRegisteredException(_dispatcherInterfaceType);
         }
+    }
+
+    private void RegisterProxyDispatcher()
+    {
+        _serviceCollection.AddSingleton(_dispatcherInterfaceType, _dispatcherProxy);
     }
 }
