@@ -1,7 +1,7 @@
-using Pipelines.Tests.UseCases.VoidHandler.Sample;
-using Pipelines.Tests.UseCases.VoidHandler.Types;
+using Pipelines.Tests.UseCases.TaskVoidHandler.Sample;
+using Pipelines.Tests.UseCases.TaskVoidHandler.Types;
 
-namespace Pipelines.Tests.UseCases.VoidHandler;
+namespace Pipelines.Tests.UseCases.TaskVoidHandler;
 
 public class Tests
 {
@@ -18,12 +18,17 @@ public class Tests
     }
     
     [Test]
-    public void HappyPath()
+    public async Task HappyPath()
     {
         //Arrange
         var request = new ExampleCommand("My test request");
 
-        //Act & Assert
-        Assert.DoesNotThrow(()=> _commandDispatcher.SendAsync(request, new CancellationToken()));
+        //Act
+        var result = _commandDispatcher.SendAsync(request, new CancellationToken());
+        await result;
+        result.Wait();
+        
+        //Assert
+        Assert.That(result.Status, Is.EqualTo(TaskStatus.RanToCompletion));
     }
 }
