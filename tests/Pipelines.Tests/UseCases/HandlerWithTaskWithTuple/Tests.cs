@@ -1,7 +1,7 @@
-using Pipelines.Tests.UseCases.VoidHandler.Sample;
-using Pipelines.Tests.UseCases.VoidHandler.Types;
+using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Sample;
+using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Types;
 
-namespace Pipelines.Tests.UseCases.VoidHandler;
+namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple;
 
 public class Tests
 {
@@ -14,11 +14,12 @@ public class Tests
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
 
-        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly, typeof(ICommand), typeof(ICommandHandler<>),
+        _dependencyContainer.RegisterPipeline<ICommandDispatcher>(assembly, typeof(ICommand<,>),
+            typeof(ICommandHandler<,,>),
             builder =>
             {
                 builder
-                    .WithOpenTypeDecorator(typeof(LoggingDecorator<>));
+                    .WithOpenTypeDecorator(typeof(LoggingDecorator<,,>));
             });
         
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
@@ -29,18 +30,22 @@ public class Tests
     }
 
     [Test]
-    public void HappyPath()
+    public async Task HappyPath()
     {
         //Arrange
         var request = new ExampleCommand("My test request");
 
-        //Act & Assert
-        Assert.DoesNotThrow(() => _commandDispatcher.SendAsync(request, new CancellationToken()));
+        //Act
+        var result = await _commandDispatcher.SendAsync(request, new CancellationToken());
+
+        //Assert
+        Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
+        Assert.That(result.Item2.Value, Is.EqualTo("Value"));
         
         CollectionAssert.AreEqual(new List<string>
         {
-            typeof(LoggingDecorator<>).Name,
-            typeof(LoggingDecorator<>).Name,
+            typeof(LoggingDecorator<,,>).Name,
+            typeof(LoggingDecorator<,,>).Name,
         }, _state.Status);
     }
 }
