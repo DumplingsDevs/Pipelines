@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.HandlerWithMultipleResults.Sample;
+namespace Pipelines.Tests.UseCases.HandlerWithTupleResult.Sample;
 
 public class ExampleCommandClassResult
 {

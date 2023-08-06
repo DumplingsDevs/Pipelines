@@ -1,5 +1,6 @@
-namespace Pipelines.Tests.UseCases.HandlerWithMultipleResults.Sample;
-using Types;
+using Pipelines.Tests.UseCases.HandlerWithTupleResult.Types;
+
+namespace Pipelines.Tests.UseCases.HandlerWithTupleResult.Sample;
 
 public class ExampleCommandHandler : ICommandHandler<ExampleCommand, ExampleRecordCommandResult, ExampleCommandClassResult>
 {

@@ -1,6 +1,6 @@
-using Pipelines.Tests.UseCases.HandlerWithTaskWithTwoResults.Types;
+using Pipelines.Tests.UseCases.HandlerWithTupleResult.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTwoResults;
+namespace Pipelines.Tests.UseCases.HandlerWithTupleResult;
 
 public class PipelinesConfig : IPipelineGeneratorConfig
 {

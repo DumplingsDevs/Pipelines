@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTwoResults.Types;
+namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Types;
 
 public interface ICommandDispatcher
 {

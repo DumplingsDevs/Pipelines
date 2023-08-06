@@ -1,7 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using Pipelines.Tests.UseCases.HandlerWithMultipleResults.Types;
+using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerWithMultipleResults;
+namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple;
 
 public class PipelinesConfig : IPipelineGeneratorConfig
 {

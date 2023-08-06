@@ -1,6 +1,7 @@
-namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTwoResults;
-using Types;
-using Sample;
+using Pipelines.Tests.UseCases.HandlerWithTupleResult.Sample;
+using Pipelines.Tests.UseCases.HandlerWithTupleResult.Types;
+
+namespace Pipelines.Tests.UseCases.HandlerWithTupleResult;
 
 public class Tests
 {
@@ -17,13 +18,13 @@ public class Tests
     }
     
     [Test]
-    public async Task HappyPath()
+    public void HappyPath()
     {
         //Arrange
         var request = new ExampleCommand("My test request");
 
         //Act
-        var result = await _commandDispatcher.SendAsync(request, new CancellationToken());
+        var result = _commandDispatcher.SendAsync(request, new CancellationToken());
             
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
