@@ -20,6 +20,11 @@ public interface IDispatcherBuilder
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.IsGenericMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.TypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions.ParameterCountMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions.ParameterTypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.ResultTypeCountMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.TaskReturnTypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.VoidAndValueMethodMismatchException"></exception>
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class;
     
     /// <summary>
@@ -41,5 +46,10 @@ public interface IDispatcherBuilder
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.IsGenericMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.TypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions.ParameterCountMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions.ParameterTypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.ResultTypeCountMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.TaskReturnTypeMismatchException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions.VoidAndValueMethodMismatchException"></exception>
     public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>(DispatcherOptions options) where TDispatcher : class;
 }
