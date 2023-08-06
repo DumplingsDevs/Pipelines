@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Exceptions;
 
 namespace Pipelines;
@@ -27,6 +28,8 @@ internal class DispatcherInterceptor : DispatchProxy
         return HandleExecutedMethod(args!);
     }
 
+    private MethodInfo? _method;
+
     private object? HandleExecutedMethod(object[] args)
     {
         ValidateArgs(args);
@@ -35,9 +38,9 @@ internal class DispatcherInterceptor : DispatchProxy
 
         var handler = GetHandlerService(inputType, _inputInterfaceType);
 
-        var method = GetHandlerMethod(handler, _handlerInterfaceType);
+        _method ??= GetHandlerMethod(handler, _handlerInterfaceType);
 
-        return method.Invoke(handler, args);
+        return _method.Invoke(handler, args);
     }
 
     private static MethodInfo GetHandlerMethod(object handler, Type handlerInterfaceType)
