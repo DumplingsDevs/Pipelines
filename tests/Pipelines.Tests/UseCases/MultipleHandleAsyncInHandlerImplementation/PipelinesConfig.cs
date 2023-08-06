@@ -1,6 +1,6 @@
-using Pipelines.Tests.UseCases.HandlerTwoHandleAsync.Types;
+using Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Types;
 
-namespace Pipelines.Tests.UseCases.HandlerTwoHandleAsync;
+namespace Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation;
 
 public class PipelinesConfig : IPipelineGeneratorConfig
 {

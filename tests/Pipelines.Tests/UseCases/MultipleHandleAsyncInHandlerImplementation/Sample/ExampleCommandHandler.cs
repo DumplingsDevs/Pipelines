@@ -1,6 +1,6 @@
-namespace Pipelines.Tests.UseCases.HandlerTwoHandleAsync.Sample;
+using Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Types;
 
-using Types;
+namespace Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Sample;
 
 public class ExampleCommandHandler : ICommandHandler<ExampleCommand, ExampleCommandResult>
 {

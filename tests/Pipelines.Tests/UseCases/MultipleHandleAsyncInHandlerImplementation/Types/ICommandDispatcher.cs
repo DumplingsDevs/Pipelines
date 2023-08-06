@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.HandlerTwoHandleAsync.Types;
+namespace Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Types;
 
 public interface ICommandDispatcher
 {
