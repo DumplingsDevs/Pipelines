@@ -1,4 +1,5 @@
 using System.Reflection;
+using Pipelines.Builder.Validators.Shared.CompareTypes;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 using Pipelines.Utils;
@@ -7,53 +8,58 @@ namespace Pipelines.Builder.Validators.Shared.MethodResultTypes;
 
 internal static class MethodResultTypesValidator
 {
-    internal static void Validate(MethodInfo methodToValidate, Type[] expectedResultTypes, Type handlerType)
+    internal static void Validate(MethodInfo methodToValidate, Type[] expectedResultTypes, Type handlerType,
+        Type expectedResultSourceType)
     {
         var isVoidMethod = methodToValidate.IsVoidOrTaskReturnType();
         var methodReturnTypes = methodToValidate.GetReturnTypes();
-        
-        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType);
+
+        ValidateVoidMethod(isVoidMethod, expectedResultTypes, handlerType, expectedResultSourceType);
 
         if (isVoidMethod) return;
-        
-        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count);
+
+        CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count, handlerType,
+            expectedResultSourceType);
 
         ReturnTypesShouldHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
 
-        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes);
+        CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes, handlerType,
+            expectedResultSourceType);
     }
 
-    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes, List<Type> methodReturnTypes)
+    private static void CompareInputResultTypesMatchWithHandler(Type[] expectedResultTypes,
+        List<Type> methodReturnTypes, Type resultSourceType, Type expectedResultSourceType)
     {
         for (var i = 0; i < expectedResultTypes.Length; i++)
         {
             var expectedResultType = expectedResultTypes[i];
             var methodReturnType = methodReturnTypes[i];
 
-            if (!TypeNamespaceComparer.Compare(expectedResultType, methodReturnType))
-            {
-                throw new ReturnTypeMismatchException(expectedResultType, methodReturnType);
-            }
+            TypeCompatibilityValidator.Validate(expectedResultType, methodReturnType, resultSourceType,
+                expectedResultSourceType);
         }
     }
 
-    private static void ValidateVoidMethod(bool isVoidMethod, Type[] expectedResultTypes, Type handlerType)
+    private static void ValidateVoidMethod(bool isVoidMethod, Type[] expectedResultTypes, Type handlerType,
+        Type expectedResultSourceType)
     {
         switch (isVoidMethod)
         {
             case true when expectedResultTypes.Any():
-                throw new ExpectedMethodWithResultException(handlerType);
+                throw new ExpectedMethodWithResultException(handlerType, expectedResultSourceType);
 
             case false when !expectedResultTypes.Any():
-                throw new ExpectedVoidMethodException(handlerType);
+                throw new ExpectedVoidMethodException(handlerType, expectedResultSourceType);
         }
     }
 
-    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength, int methodReturnTypesLength)
+    private static void CompareInputResultTypeCountWithHandler(int expectedResultTypesLength,
+        int methodReturnTypesLength, Type resultSourceType, Type expectedResultSourceType)
     {
         if (expectedResultTypesLength != methodReturnTypesLength)
         {
-            throw new ResultTypeCountMismatchException(expectedResultTypesLength, methodReturnTypesLength);
+            throw new ResultTypeCountMismatchException(expectedResultTypesLength, methodReturnTypesLength,
+                resultSourceType, expectedResultSourceType);
         }
     }
 }

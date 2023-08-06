@@ -1,7 +1,10 @@
+using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Builder.Validators.Handler.ResultTypes;
+using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Invalid;
 using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Valid;
+using ResultTypeCountMismatchException = Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ResultTypeCountMismatchException;
 
 namespace Pipelines.Tests.Builder.Validators.Handler.ResultTypes;
 
@@ -70,7 +73,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
         Type handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
 
         // Act & Assert
-        Assert.Throws<ReturnTypeMismatchException>(() =>
+        Assert.Throws<GenericTypeCountMismatchException>(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 }
