@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
+using Pipelines.Builder.Exceptions;
 using Pipelines.Builder.Interfaces;
-using Pipelines.Builder.Interfaces.Exceptions;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.Decorator;

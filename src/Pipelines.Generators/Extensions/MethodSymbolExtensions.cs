@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Pipelines.Generators.Extensions;
