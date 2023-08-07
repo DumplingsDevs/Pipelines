@@ -132,39 +132,35 @@ internal class DispatcherImplementationBuilder
             if (implementedInputInterface != null)
             {
                 var hasMultipleResults = implementedInputInterface.TypeArguments.Length > 1;
-                var genericResults = _pipelineConfig.HandlerType.TypeArguments.Skip(1).ToList();
                 var results = implementedInputInterface.TypeArguments.ToList();
                 var hasResponse = results.Count > 0;
                 var handlerMethod = _pipelineConfig.HandlerType.GetMembers().OfType<IMethodSymbol>().First();
-                var handlerMethodName = handlerMethod.Name;
                 var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, results);
-                var isAsync = handlerMethod.IsAsync();
+                var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
                 var resultName = $"result{inputClass.GetFormattedFullname()}";
 
                 // TO DO: Check if GetService returns null and throw dedicated exception
                 AddInLine("case ");
                 AddInLine(inputClass.ToString());
-                AddInLine(" r: ");
+                AddInLine(" i: ");
                 AddLine(GetCaseTemplate(hasResponse,
                     hasMultipleResults,
                     resultName,
-                    isAsync
-                        ? "await"
-                        : "",
+                    asyncModifier,
                     $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
-                    handlerMethodName));
+                    handlerMethod));
             }
         }
     }
 
     public string GetCaseTemplate(bool hasResponse, bool hasMultipleResults, string resultName, string @await,
-        string handlerType, string handlerMethodName)
+        string handlerType, IMethodSymbol handlerMethod)
     {
         if (hasResponse && !hasMultipleResults)
         {
             return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
             if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethodName}(r, token);
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
             {GenerateSingleArgumentReturn(resultName)}";
         }
 
@@ -173,7 +169,7 @@ internal class DispatcherImplementationBuilder
             var genericResults = _pipelineConfig.HandlerType.TypeArguments.Skip(1).ToList();
             return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
             if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethodName}(r, token);
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
             {GenerateMultipleArgumentReturn(resultName, genericResults)}";
         }
 
@@ -182,7 +178,7 @@ internal class DispatcherImplementationBuilder
             return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>();
             foreach (var {resultName}Handler in {resultName}Handlers)
                 {{
-                    {@await} {resultName}Handler.{handlerMethodName}(r, token);
+                    {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
                 }}
             break;";
         }
