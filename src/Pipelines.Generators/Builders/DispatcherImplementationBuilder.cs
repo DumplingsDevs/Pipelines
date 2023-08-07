@@ -92,12 +92,12 @@ internal class DispatcherImplementationBuilder
     {
         return methodSymbol.ReturnType.ToDisplayString();
     }
-    
+
     private string GetMethodConstraint(IMethodSymbol methodSymbol)
     {
         return methodSymbol.TypeParameters.Any() ? $"<{string.Join(", ", methodSymbol.TypeParameters)}>" : "";
     }
-    
+
     private static string GenerateMethodParameters(IMethodSymbol methodSymbol)
     {
         return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
@@ -145,21 +145,49 @@ internal class DispatcherImplementationBuilder
                 AddInLine("case ");
                 AddInLine(inputClass.ToString());
                 AddInLine(" r: ");
-                AddEmptyLine();
-                AddInLine(hasResponse, $"var {resultName} = ");
-                AddInLine(isAsync, "await ");
-                AddInLine("_serviceProvider.GetRequiredService<");
-                AddInLine(_pipelineConfig.HandlerType.GetNameWithNamespace());
-                AddInLine(genericStructure);
-                AddInLine(">().", handlerMethodName, "(r, token);");
-                AddEmptyLine();
-                AddInLine(hasResponse && !hasMultipleResults, () => GenerateSingleArgumentReturn(resultName));
-                AddInLine(hasResponse && hasMultipleResults,
-                    () => GenerateMultipleArgumentReturn(resultName, genericResults));
-                AddEmptyLine();
-                AddInLine(!hasResponse, "break;");
+                AddLine(GetCaseTemplate(hasResponse,
+                    hasMultipleResults,
+                    resultName,
+                    isAsync
+                        ? "await"
+                        : "",
+                    $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
+                    handlerMethodName));
             }
         }
+    }
+
+    public string GetCaseTemplate(bool hasResponse, bool hasMultipleResults, string resultName, string @await,
+        string handlerType, string handlerMethodName)
+    {
+        if (hasResponse && !hasMultipleResults)
+        {
+            return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
+            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
+            var {resultName} = {@await} {resultName}Handler.{handlerMethodName}(r, token);
+            {GenerateSingleArgumentReturn(resultName)}";
+        }
+
+        if (hasResponse && hasMultipleResults)
+        {
+            var genericResults = _pipelineConfig.HandlerType.TypeArguments.Skip(1).ToList();
+            return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
+            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
+            var {resultName} = {@await} {resultName}Handler.{handlerMethodName}(r, token);
+            {GenerateMultipleArgumentReturn(resultName, genericResults)}";
+        }
+
+        if (!hasResponse)
+        {
+            return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>();
+            foreach (var {resultName}Handler in {resultName}Handlers)
+                {{
+                    {@await} {resultName}Handler.{handlerMethodName}(r, token);
+                }}
+            break;";
+        }
+
+        return "";
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>

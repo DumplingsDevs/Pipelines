@@ -1,10 +1,11 @@
 namespace Pipelines.Exceptions;
 
-internal class HandlerNotRegisteredException : Exception
+public class HandlerNotRegisteredException : Exception
 {
-    private const string ErrorMessage = "Handler is not registered";
+    private const string ErrorMessage = "Handler {} is not registered";
 
-    public HandlerNotRegisteredException() : base(ErrorMessage)
+    public HandlerNotRegisteredException(Type handlerTypeWithInput) : base(string.Format(ErrorMessage,
+        handlerTypeWithInput.Namespace))
     {
     }
 }
