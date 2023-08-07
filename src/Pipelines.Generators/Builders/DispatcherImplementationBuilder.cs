@@ -135,11 +135,11 @@ internal class DispatcherImplementationBuilder
                 var results = implementedInputInterface.TypeArguments.ToList();
                 var hasResponse = results.Count > 0;
                 var handlerMethod = _pipelineConfig.HandlerType.GetMembers().OfType<IMethodSymbol>().First();
+                var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
                 var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, results);
                 var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
                 var resultName = $"result{inputClass.GetFormattedFullname()}";
 
-                // TO DO: Check if GetService returns null and throw dedicated exception
                 AddInLine("case ");
                 AddInLine(inputClass.ToString());
                 AddInLine(" i: ");
@@ -148,19 +148,20 @@ internal class DispatcherImplementationBuilder
                     resultName,
                     asyncModifier,
                     $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
-                    handlerMethod));
+                    handlerMethod,
+                    dispatcherMethod));
             }
         }
     }
 
-    public string GetCaseTemplate(bool hasResponse, bool hasMultipleResults, string resultName, string @await,
-        string handlerType, IMethodSymbol handlerMethod)
+    private string GetCaseTemplate(bool hasResponse, bool hasMultipleResults, string resultName, string @await,
+        string handlerType, IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod)
     {
         if (hasResponse && !hasMultipleResults)
         {
             return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
             if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
             {GenerateSingleArgumentReturn(resultName)}";
         }
 
@@ -169,7 +170,7 @@ internal class DispatcherImplementationBuilder
             var genericResults = _pipelineConfig.HandlerType.TypeArguments.Skip(1).ToList();
             return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
             if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
             {GenerateMultipleArgumentReturn(resultName, genericResults)}";
         }
 
@@ -178,7 +179,7 @@ internal class DispatcherImplementationBuilder
             return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>();
             foreach (var {resultName}Handler in {resultName}Handlers)
                 {{
-                    {@await} {resultName}Handler.{handlerMethod.Name}(i, {handlerMethod.GetParametersString(1)});
+                    {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
                 }}
             break;";
         }
@@ -280,6 +281,13 @@ internal class DispatcherImplementationBuilder
 
         return $"{typeParameter.Name} : {string.Join(", ", constraints)}";
     }
+
+    private string GetParametersString(IMethodSymbol method, int skip)
+    {
+        var parameters = string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
+        return string.IsNullOrEmpty(parameters) ? "" : ", " + parameters;
+    }
+
 
     private void AddEmptyLine()
     {

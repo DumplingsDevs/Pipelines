@@ -1,4 +1,4 @@
-namespace Pipelines.Builder.Interfaces.Exceptions;
+namespace Pipelines.Builder.Exceptions;
 
 internal class DispatcherNotRegisteredException : Exception
 {

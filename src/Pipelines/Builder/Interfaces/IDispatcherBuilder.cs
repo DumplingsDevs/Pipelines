@@ -1,3 +1,5 @@
+using Pipelines.Builder.Exceptions;
+
 namespace Pipelines.Builder.Interfaces;
 
 public interface IDispatcherBuilder
@@ -7,7 +9,7 @@ public interface IDispatcherBuilder
     /// </summary>
     /// <typeparam name="TDispatcher">This is the Type of the Dispatcher interface to be added to the pipeline builder. This method expects a interface Type that will be implemented by Dispatcher.</typeparam>
     /// <returns>An IDispatcherBuilder instance that allows for further pipeline configuration.</returns>
-    /// <exception cref="Pipelines.Builder.Interfaces.Exceptions.DispatcherNotRegisteredException"></exception> 
+    /// <exception cref="Pipelines.Builder.Exceptions.DispatcherNotRegisteredException"></exception> 
     /// <exception cref="Pipelines.Builder.Validators.Shared.InterfaceConstraint.Exceptions.ProvidedTypeIsNotInterfaceException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.HandlerMethodNotFoundException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.MultipleHandlerMethodsException"></exception>
@@ -34,7 +36,7 @@ public interface IDispatcherBuilder
     /// <typeparam name="TDispatcher">This is the Type of the Dispatcher interface to be added to the pipeline builder. This method expects a interface Type that will be implemented by Dispatcher.</typeparam>
     /// <param name="options">DispatcherOptions instance defining the options for dispatcher.</param>
     /// <returns>An IDispatcherBuilder instance that allows for further pipeline configuration.</returns>
-    /// <exception cref="Pipelines.Builder.Interfaces.Exceptions.DispatcherNotRegisteredException"></exception> 
+    /// <exception cref="Pipelines.Builder.Exceptions.DispatcherNotRegisteredException"></exception> 
     /// <exception cref="Pipelines.Builder.Validators.Shared.InterfaceConstraint.Exceptions.ProvidedTypeIsNotInterfaceException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.HandlerMethodNotFoundException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.MultipleHandlerMethodsException"></exception>
