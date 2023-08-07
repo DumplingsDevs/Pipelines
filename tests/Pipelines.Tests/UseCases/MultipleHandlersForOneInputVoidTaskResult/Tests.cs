@@ -28,7 +28,7 @@ public class Tests
         _state = _dependencyContainer.GetService<DecoratorsState>();
     }
 
-    //[Test]
+    [Test]
     public async Task HappyPath()
     {
         //Arrange
@@ -45,6 +45,8 @@ public class Tests
         {
             typeof(LoggingDecorator<>).Name,
             nameof(ExampleCommandHandler),
+            typeof(LoggingDecorator<>).Name,
+            typeof(LoggingDecorator<>).Name,
             nameof(ExampleCommandHandlerTwo),
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);

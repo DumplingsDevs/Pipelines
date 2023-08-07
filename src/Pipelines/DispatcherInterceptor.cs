@@ -71,7 +71,7 @@ internal class DispatcherInterceptor : DispatchProxy
 
         if (handler is null)
         {
-            throw new HandlerNotRegisteredException();
+            throw new HandlerNotRegisteredException(handlerTypeWithInput);
         }
 
         return handler;
