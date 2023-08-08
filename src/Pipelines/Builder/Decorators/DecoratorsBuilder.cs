@@ -5,7 +5,7 @@ namespace Pipelines.Builder.Decorators;
 
 internal static class DecoratorsBuilder
 {
-    public static List<Type> BuildDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
+    internal static List<Type> BuildDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action, Type handlerType, params Assembly[] assemblies)
     {
         var builder = new ClosedTypeDecoratorsBuilder(assemblies, handlerType);
 

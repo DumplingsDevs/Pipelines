@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.Decorator.Constructor.Exceptions;
 
-internal class ConstructorValidationException : Exception
+public class ConstructorValidationException : Exception
 {
     private const string ErrorMessage =
         "Decorator type {0} does not have a compatible generic type with {1}.";

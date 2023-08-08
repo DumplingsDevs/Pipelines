@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 
-internal class TaskReturnTypeMismatchException: Exception
+public class TaskReturnTypeMismatchException: Exception
 {
     private static readonly string ExceptionMessageFormat = "One method returns a Task<> type while the other does not. Handler: {0}, Dispatcher: {1}.";
 

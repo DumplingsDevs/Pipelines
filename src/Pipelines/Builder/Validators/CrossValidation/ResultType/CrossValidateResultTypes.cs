@@ -5,9 +5,9 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType;
 
-public static class CrossValidateResultTypes
+internal static class CrossValidateResultTypes
 {
-    public static void Validate(Type handlerType, Type dispatcherType, MethodInfo handlerHandleMethod,
+    internal static void Validate(Type handlerType, Type dispatcherType, MethodInfo handlerHandleMethod,
         MethodInfo dispatcherHandleMethod)
     {
         var handlerMethod = GetMethodInfo(handlerType, handlerHandleMethod);

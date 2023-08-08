@@ -10,7 +10,7 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
     private readonly Type _handlerType;
     private readonly List<Func<Type, bool>> _predicates = new();
 
-    public ClosedTypeDecoratorsBuilder(Assembly[] assemblies, Type handlerType)
+    internal ClosedTypeDecoratorsBuilder(Assembly[] assemblies, Type handlerType)
     {
         _assemblies = assemblies;
         _handlerType = handlerType;

@@ -4,7 +4,7 @@ public class HandlerNotRegisteredException : Exception
 {
     private const string ErrorMessage = "Handler {} is not registered";
 
-    public HandlerNotRegisteredException(Type handlerTypeWithInput) : base(string.Format(ErrorMessage,
+    internal HandlerNotRegisteredException(Type handlerTypeWithInput) : base(string.Format(ErrorMessage,
         handlerTypeWithInput.Namespace))
     {
     }
