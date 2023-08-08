@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint.Exceptions;
 
-internal class ReturnTypesShouldHaveClassConstraintException : Exception
+public class ReturnTypesShouldHaveClassConstraintException : Exception
 {
     private const string ErrorMessage = "Return type {0} in type {1} does not contain class constraint";
 

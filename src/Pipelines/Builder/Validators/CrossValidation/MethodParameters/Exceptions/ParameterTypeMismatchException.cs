@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions;
 
-internal class ParameterTypeMismatchException : Exception
+public class ParameterTypeMismatchException : Exception
 {
     private static readonly string ErrorMessage = "The type of method parameter in the handler ({0}) does not match the type of parameter in the dispatcher ({1}) for parameter index {2}.";
 

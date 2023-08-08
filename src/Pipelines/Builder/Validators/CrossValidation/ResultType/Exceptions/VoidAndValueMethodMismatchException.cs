@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 
-internal class VoidAndValueMethodMismatchException : Exception
+public class VoidAndValueMethodMismatchException : Exception
 {
     private static readonly string ExceptionMessageFormat = "The return type of handler {0} does not match with the return type of dispatcher {1}.";
 

@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.Handler.InputType.Exceptions;
 
-internal class GenericArgumentsLengthMismatchException : Exception
+public class GenericArgumentsLengthMismatchException : Exception
 {
     private const string ErrorMessageFormat = "Mismatch in length of generic arguments. Expected {0}, but found {1}";
 

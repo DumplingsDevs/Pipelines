@@ -1,6 +1,6 @@
 namespace Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
 
-internal class ResultTypeCountMismatchException : Exception
+public class ResultTypeCountMismatchException : Exception
 {
     private const string ErrorMessageFormat =
         "Expected '{0}' result type(s) from source '{1}', but found '{2}' in source '{3}'";

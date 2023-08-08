@@ -4,9 +4,9 @@ using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 
-public static class CrossValidateMethodParameters
+internal static class CrossValidateMethodParameters
 {
-    public static void Validate(Type handlerType, Type dispatcherType, MethodInfo handlerHandleMethod,
+    internal static void Validate(Type handlerType, Type dispatcherType, MethodInfo handlerHandleMethod,
         MethodInfo dispatcherHandleMethod)
     {
         var handlerMethodParameters = GetMethodParameters(handlerType, handlerHandleMethod);
