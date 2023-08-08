@@ -1,8 +1,8 @@
 namespace Pipelines.Utils;
 
-public static class ParamValidator
+internal static class ParamValidator
 {
-    public static void NotNull(object parameter, string parameterName)
+    internal static void NotNull(object parameter, string parameterName)
     {
         if (parameter == null)
         {

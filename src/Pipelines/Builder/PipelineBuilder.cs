@@ -23,7 +23,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private readonly IServiceCollection _serviceCollection;
     private Type _handlerInterfaceType = null!;
     private MethodInfo _handlerHandleMethod = null!;
-    private Assembly _handlerAssembly = null!;
+    private Assembly[] _handlerAssemblies = null!;
     private Type _inputInterfaceType = null!;
     private Type _dispatcherInterfaceType = null!;
     private MethodInfo _dispatcherHandleMethod = null!;
@@ -45,10 +45,10 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly)
+    public IDispatcherBuilder AddHandler(Type handlerType, params Assembly[] assemblies)
     {
         _handlerInterfaceType = handlerType;
-        _handlerAssembly = assembly;
+        _handlerAssemblies = assemblies;
         ProvidedTypeShouldBeInterface.Validate(_handlerInterfaceType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputInterfaceType, _handlerInterfaceType);
         MethodShouldHaveAtLeastOneParameter.Validate(_handlerInterfaceType);
@@ -155,7 +155,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterHandlersWithDecorators()
     {
-        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssembly, _handlerInterfaceType)
+        var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssemblies, _handlerInterfaceType)
             .WhereConstructorDoesNotHaveGenericParameter(_handlerInterfaceType);
 
         _decoratorTypes.Reverse();
@@ -177,7 +177,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterGeneratedDispatcher()
     {
-        var dispatcherImplementations = _handlerAssembly.GetTypes()
+        var dispatcherImplementations =  Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => t.GetInterfaces()
                 .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
 
