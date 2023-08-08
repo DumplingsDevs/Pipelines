@@ -177,7 +177,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterGeneratedDispatcher()
     {
-        var dispatcherImplementations =  Assembly.GetExecutingAssembly().GetTypes()
+        var dispatcherImplementations = _handlerAssemblies.SelectMany(x => x.GetTypes())
             .Where(t => t.GetInterfaces()
                 .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
 
