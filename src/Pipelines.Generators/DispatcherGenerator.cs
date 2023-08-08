@@ -24,8 +24,7 @@ public class DispatcherGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        // GetPipelineConfigs2(context);
-        var configs = GetPipelineConfigs(context);
+        var configs = GetPipelineConfigs2(context);
 
         foreach (var config in configs)
         {
@@ -61,7 +60,7 @@ public class DispatcherGenerator : ISourceGenerator
         }
     }
 
-    private void GetPipelineConfigs2(GeneratorExecutionContext context)
+    private IEnumerable<PipelineConfig> GetPipelineConfigs2(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
 
@@ -78,26 +77,61 @@ public class DispatcherGenerator : ISourceGenerator
             if (syntaxReceiver is
                 { AddInputInvocation: not null, AddHandlerInvocation: not null, AddDispatcherInvocation: not null })
             {
-                var inputType = GetTypeSymbol(context.Compilation, syntaxReceiver.AddInputInvocation);
-                var handlerType = GetTypeSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation);
+                var inputType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddInputInvocation, "AddInput");
+                var handlerType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation, "AddHandler");
                 var dispatcherType =
-                    GetTypeSymbol(context.Compilation, syntaxReceiver.AddDispatcherInvocation);
-                
-                // yield return new PipelineConfig(dispatcherType, handlerType, inputType);
+                    GetGenericSymbol(context.Compilation, syntaxReceiver.AddDispatcherInvocation, "AddDispatcher");
+
+                yield return new PipelineConfig(dispatcherType, handlerType, inputType);
             }
         }
     }
 
-    private ITypeSymbol GetTypeSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax)
+    private INamedTypeSymbol GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, string methodName)
     {
-        var childs = invocationSyntax.ChildNodes().ToList();
-        var childs2 = invocationSyntax.DescendantNodes().ToList();
+        var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
+        var genericSyntax = invocationSyntax.DescendantNodes().OfType<GenericNameSyntax>().ToList();
+
+        foreach (var genericNameSyntax in genericSyntax)
+        {
+            var typeInfo = semanticModel.GetSymbolInfo(genericNameSyntax);
+
+            if (typeInfo is not { Symbol: IMethodSymbol methodSymbol }) continue;
+
+            if (methodSymbol.Name.Contains(methodName))
+            {
+                return (INamedTypeSymbol)methodSymbol.TypeArguments.FirstOrDefault();
+            }
+        }
+
+        return null;
+    }
+
+    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, string methodName)
+    {
+        var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
+
         var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>()
             .FirstOrDefault();
         if (typeOfSyntax != null)
         {
-            var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
-            return ModelExtensions.GetSymbolInfo(semanticModel, invocationSyntax).Symbol as INamedTypeSymbol;    
+            var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
+                .FirstOrDefault();
+
+            if (identifierSyntax != null)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
+                return (INamedTypeSymbol)typeInfo.Type!;
+            }
+
+            var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
+                .FirstOrDefault();
+
+            if (generic != null)
+            {
+                var typeInfo = semanticModel.GetSymbolInfo(generic);
+                return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
+            }
         }
 
         return null;
@@ -107,7 +141,7 @@ public class DispatcherGenerator : ISourceGenerator
     {
         // Tutaj można zarejestrować wszelkie niezbędne metadane
     }
-    
+
     private class SyntaxReceiver : CSharpSyntaxWalker
     {
         private readonly Compilation _compilation;
@@ -124,7 +158,9 @@ public class DispatcherGenerator : ISourceGenerator
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             // Visit each invocation expression and check if it matches our methods
-            var methodSymbol = ModelExtensions.GetSymbolInfo(_compilation.GetSemanticModel(node.SyntaxTree), node).Symbol as IMethodSymbol;
+            var methodSymbol =
+                ModelExtensions.GetSymbolInfo(_compilation.GetSemanticModel(node.SyntaxTree), node).Symbol as
+                    IMethodSymbol;
             if (methodSymbol?.Name == "AddInput")
             {
                 AddInputInvocation = node;
