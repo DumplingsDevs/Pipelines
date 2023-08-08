@@ -8,6 +8,6 @@ internal static class ValidateInputReturnTypes
     {
         var expectedResultTypes = inputType.GetGenericArguments();
         
-        ReturnTypesShouldHaveClassConstraintValidator.Validate(expectedResultTypes.ToList(), inputType);
+        ReturnTypesShouldBeClassOrHaveClassConstraintValidator.Validate(expectedResultTypes.ToList(), inputType);
     }
 }
