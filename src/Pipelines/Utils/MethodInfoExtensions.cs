@@ -2,10 +2,10 @@ using System.Reflection;
 
 namespace Pipelines.Utils;
 
-public static class MethodInfoExtensions
+internal static class MethodInfoExtensions
 {
     //If return type is generic Task<>, only generic arguments will be listed. E.g. Task<string,int> == string, int result types
-    public static List<Type> GetReturnTypes(this MethodInfo methodInfo)
+    internal static List<Type> GetReturnTypes(this MethodInfo methodInfo)
     {
         var returnTypes = new List<Type>();
         var returnType = methodInfo.ReturnType;
@@ -44,13 +44,13 @@ public static class MethodInfoExtensions
         return returnTypes;
     }
 
-    public static bool IsVoidOrTaskReturnType(this MethodInfo methodInfo)
+    internal static bool IsVoidOrTaskReturnType(this MethodInfo methodInfo)
     {
         var returnType = methodInfo.ReturnType;
         return returnType == typeof(void) || returnType == typeof(Task);
     }
     
-    public static bool IsGenericTaskReturnType(this MethodInfo methodInfo)
+    internal static bool IsGenericTaskReturnType(this MethodInfo methodInfo)
     {
         var returnType = methodInfo.ReturnType;
         return returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>);

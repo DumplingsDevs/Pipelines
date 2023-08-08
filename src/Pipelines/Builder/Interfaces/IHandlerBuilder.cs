@@ -8,7 +8,7 @@ public interface IHandlerBuilder
     /// Adds a specific Handler Interface Type to the pipeline builder. This interface will be implemented by Handlers.
     /// </summary>
     /// <param name="handlerType">This is the Type of the Handler interface to be added to the pipeline builder. This method expects a interface Type that will be implemented by Handlers</param>
-    /// <param name="assembly">The Assembly where the handlers are located</param>
+    /// <param name="assemblies">The Assemblies where the handlers are located</param>
     /// <returns>An IDispatcherBuilder instance that allows for further pipeline configuration.</returns>
     /// <exception cref="Pipelines.Builder.Validators.Shared.InterfaceConstraint.Exceptions.ProvidedTypeIsNotInterfaceException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.HandlerMethodNotFoundException"></exception>
@@ -26,5 +26,5 @@ public interface IHandlerBuilder
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.IsGenericMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.TypeMismatchException"></exception>
-    public IDispatcherBuilder AddHandler(Type handlerType, Assembly assembly);
+    public IDispatcherBuilder AddHandler(Type handlerType, params Assembly[] assemblies);
 }
