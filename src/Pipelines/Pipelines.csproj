@@ -5,7 +5,7 @@
         <Description>The fastest and most extensible pipeline in the .NET ecosystem</Description>
         <PackageId>DumplingsDevs.Pipelines</PackageId>
         <PackageTags>pipelines</PackageTags>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
