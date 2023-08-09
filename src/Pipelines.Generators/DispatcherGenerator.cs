@@ -16,15 +16,11 @@ namespace Pipelines.Generators;
 [Generator]
 public class DispatcherGenerator : ISourceGenerator
 {
-    private const string ConfigInterfaceName = "IPipelineGeneratorConfig";
-
-    private const string DispatcherTypeProperty = "GetDispatcherType";
-    private const string InputTypeProperty = "GetInputType";
-    private const string HandlerTypeProperty = "GetHandlerType";
+    private const string AddPipelinesMethod = "AddPipeline";
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var configs = GetPipelineConfigs2(context);
+        var configs = GetPipelineConfigs(context).Distinct();
 
         foreach (var config in configs)
         {
@@ -34,33 +30,12 @@ public class DispatcherGenerator : ISourceGenerator
             var classSourceCode = builder.Build();
             var sourceText = SourceText.From(classSourceCode, Encoding.UTF8);
             var sourceFileName = $"{interfaceName}Implementation.g.cs";
+            
             context.AddSource(sourceFileName, sourceText);
         }
     }
-
-    private static IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
-    {
-        var classes = context.GetClassNodeByInterface(ConfigInterfaceName).ToList();
-
-        foreach (var classDeclarationSyntax in classes)
-        {
-            var semanticModel = context.Compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-            var dispatcherType =
-                classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, DispatcherTypeProperty);
-            var inputType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, InputTypeProperty);
-            var handlerType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, HandlerTypeProperty);
-
-            if (dispatcherType is null || handlerType is null || inputType is null)
-            {
-                // TO DO - throw exception when null/empty?
-                continue;
-            }
-
-            yield return new PipelineConfig(dispatcherType, handlerType, inputType);
-        }
-    }
-
-    private IEnumerable<PipelineConfig> GetPipelineConfigs2(GeneratorExecutionContext context)
+    
+    private IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
 
@@ -77,8 +52,8 @@ public class DispatcherGenerator : ISourceGenerator
             if (syntaxReceiver is
                 { AddInputInvocation: not null, AddHandlerInvocation: not null, AddDispatcherInvocation: not null })
             {
-                var inputType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddInputInvocation, "AddInput");
-                var handlerType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation, "AddHandler");
+                var inputType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddInputInvocation, 0);
+                var handlerType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation, 1);
                 var dispatcherType =
                     GetGenericSymbol(context.Compilation, syntaxReceiver.AddDispatcherInvocation, "AddDispatcher");
 
@@ -107,14 +82,14 @@ public class DispatcherGenerator : ISourceGenerator
         return null;
     }
 
-    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, string methodName)
+    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, int skip)
     {
-        var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
 
-        var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>()
-            .FirstOrDefault();
-        if (typeOfSyntax != null)
+        var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip).FirstOrDefault();
+        if (typeOfSyntax is not null)
         {
+            var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
+
             var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
                 .FirstOrDefault();
 
@@ -123,7 +98,7 @@ public class DispatcherGenerator : ISourceGenerator
                 var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
                 return (INamedTypeSymbol)typeInfo.Type!;
             }
-
+            
             var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
                 .FirstOrDefault();
 
@@ -131,6 +106,14 @@ public class DispatcherGenerator : ISourceGenerator
             {
                 var typeInfo = semanticModel.GetSymbolInfo(generic);
                 return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
+            }
+
+            var childSyntaxType = typeOfSyntax.ChildNodes().FirstOrDefault();
+
+            if (childSyntaxType != null)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(childSyntaxType);
+                return (INamedTypeSymbol)typeInfo.Type!;
             }
         }
 

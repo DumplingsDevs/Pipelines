@@ -2,16 +2,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Pipelines.Generators.Models;
 
-internal class PipelineConfig
+internal record PipelineConfig(INamedTypeSymbol DispatcherType, INamedTypeSymbol HandlerType, INamedTypeSymbol InputType)
 {
-    public PipelineConfig(INamedTypeSymbol dispatcherType, INamedTypeSymbol handlerType, INamedTypeSymbol inputType)
-    {
-        DispatcherType = dispatcherType;
-        HandlerType = handlerType;
-        InputType = inputType;
-    }
-
-    public INamedTypeSymbol DispatcherType { get; }
-    public INamedTypeSymbol HandlerType { get; }
-    public INamedTypeSymbol InputType { get; }
+    public INamedTypeSymbol DispatcherType { get; } = DispatcherType;
+    public INamedTypeSymbol HandlerType { get; } = HandlerType;
+    public INamedTypeSymbol InputType { get; } = InputType;
 }

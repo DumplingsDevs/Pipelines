@@ -31,7 +31,7 @@ async Task ManualBenchmark()
 
     services.AddPipeline()
         .AddInput(typeof(Pipelines.Benchmarks.Types.IRequest<>))
-        .AddHandler((typeof(Pipelines.Benchmarks.Types.IRequestHandler<,>)), assembly)
+        .AddHandler(typeof(Pipelines.Benchmarks.Types.IRequestHandler<,>), assembly)
         .AddDispatcher<IRequestDispatcher>()
         .Build();
 
