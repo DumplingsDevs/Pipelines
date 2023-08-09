@@ -9,12 +9,20 @@ internal static class ValidateResultTypesWithDispatcherInputResultTypes
         var expectedResultTypes = inputType.GetGenericArguments();
         var handleMethod = handlerType.GetMethods().First();
 
-        //compare types found in inputType generic arguments (IICommand<TResult>) with method return types (Task<TResult>)
-        MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType, inputType);
+        // if there are no defined results in the Input Type, we do not validate the Results - only Cross Validator will consistency with Handler 
+        if (expectedResultTypes.Any())
+        {
+            //compare types found in inputType generic arguments (IICommand<TResult>) with method return types (Task<TResult>)
+            MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType, inputType);
+        }
 
         var genericMethodTypes = handleMethod.GetGenericArguments();
 
-        //compare types found in method generic arguments (Handler<TResult>) with method return types (Task<TResult>)
-        MethodResultTypesValidator.Validate(handleMethod, genericMethodTypes, handlerType, handlerType);
+        // if there are no defined generic results in the Handler method (like, Handler<TResult>) - then we do not validate the Results - only Cross Validator will consistency with Handler 
+        if (genericMethodTypes.Any())
+        {
+            //compare types found in method generic arguments (Handler<TResult>) with method return types (Task<TResult>)
+            MethodResultTypesValidator.Validate(handleMethod, genericMethodTypes, handlerType, handlerType);
+        }
     }
 }

@@ -14,8 +14,12 @@ internal static class ValidateResultTypesWithHandlerGenericArguments
         var handleMethod = handlerType.GetMethods().First();
 
         var expectedResultTypes = GetResultTypes(genericArguments);
-        //compare types found in Handler Generic Type with method return types 
-        MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType, handlerType);
+        // if there are no defined results in the Input Type, we do not validate the Results - only Cross Validator will check it with Dispatcher 
+        if (expectedResultTypes.Any())
+        {
+            //compare types found in Handler Generic Type with method return types 
+            MethodResultTypesValidator.Validate(handleMethod, expectedResultTypes, handlerType, handlerType);
+        }
     }
 
     private static Type[] GetResultTypes(Type[] genericArguments)
