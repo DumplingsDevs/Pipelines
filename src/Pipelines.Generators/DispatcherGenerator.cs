@@ -16,8 +16,6 @@ namespace Pipelines.Generators;
 [Generator]
 public class DispatcherGenerator : ISourceGenerator
 {
-    private const string AddPipelinesMethod = "AddPipeline";
-
     public void Execute(GeneratorExecutionContext context)
     {
         var configs = GetPipelineConfigs(context).Distinct();
