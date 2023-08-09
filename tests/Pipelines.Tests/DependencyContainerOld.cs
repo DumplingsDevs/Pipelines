@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using Pipelines.Tests.TestData;
+using Pipelines.Tests.UseCases.NotGenericResult.Sample;
+using Pipelines.Tests.UseCases.NotGenericResult.Types;
 
 namespace Pipelines.Tests;
 

@@ -1,5 +1,6 @@
-namespace Pipelines.Tests.UseCases.TaskVoidHandler.Sample;
-using Types;
+using Pipelines.Tests.UseCases.NotGenericResult.Types;
+
+namespace Pipelines.Tests.UseCases.NotGenericResult.Sample;
 
 public class ExampleCommandHandler : ICommandHandler<ExampleCommand>
 {
@@ -10,9 +11,9 @@ public class ExampleCommandHandler : ICommandHandler<ExampleCommand>
         _decoratorsState = decoratorsState;
     }
 
-    public Task HandleAsync(ExampleCommand command, CancellationToken token)
+    public Task<string> HandleAsync(ExampleCommand command, CancellationToken token)
     {
         _decoratorsState.Status.Add(nameof(ExampleCommandHandler));
-        return Task.CompletedTask;
+        return Task.FromResult($"It's working!, {command.Name}, {command.Value}");
     }
 }
