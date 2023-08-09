@@ -1,3 +1,6 @@
 namespace Pipelines;
 
-public record DecoratorOptions(bool StrictMode = true);
+public class DecoratorOptions
+{
+    public bool StrictMode { get; set; } = true;
+};
