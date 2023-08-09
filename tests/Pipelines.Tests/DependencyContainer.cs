@@ -14,25 +14,19 @@ public class DependencyContainer
         _services = new ServiceCollection();
     }
 
-    public void RegisterPipeline<TDispatcher>(Assembly handlersAssembly,
-        Type inputType, Type handlerType, Action<IPipelineDecoratorBuilder>? decoratorBuilder = null) where TDispatcher : class
+    public void RegisterPipeline(Func<IInputBuilder, IPipelineBuildBuilder>? pipelineBuilder = null)
     {
         var builder = _services
-            .AddPipeline()
-            .AddInput(inputType)
-            .AddHandler(handlerType, handlersAssembly)
-            .AddDispatcher<TDispatcher>();
+            .AddPipeline();
 
-        decoratorBuilder?.Invoke(builder);
-
-        builder.Build();
+        pipelineBuilder(builder).Build();
     }
 
     public void BuildContainer()
     {
         _provider = _services.BuildServiceProvider();
     }
-    
+
     public void RegisterSingleton<TType>() where TType : class
     {
         _services.AddSingleton<TType>();

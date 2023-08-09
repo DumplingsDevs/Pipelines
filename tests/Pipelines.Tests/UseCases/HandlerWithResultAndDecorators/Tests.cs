@@ -15,20 +15,19 @@ public class Tests
     {
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
-        _dependencyContainer.RegisterPipeline<IRequestDispatcher>(assembly, typeof(IRequest<>),
-            typeof(IRequestHandler<,>), builder =>
+        
+        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IRequest<>))
+            .AddHandler(typeof(IRequestHandler<,>), assembly)
+            .AddDispatcher<IRequestDispatcher>()
+            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+            .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
+            .WithClosedTypeDecorators(x =>
             {
-                builder
-                    .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-                    .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
-                .WithClosedTypeDecorators(x =>
-                {
-                    x.WithImplementedInterface<IDecorator>();
-                    x.WithInheritedClass<BaseDecorator>();
-                    x.WithAttribute<DecoratorAttribute>();
-                    x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
-                }, Assembly.GetExecutingAssembly());
-            });
+                x.WithImplementedInterface<IDecorator>();
+                x.WithInheritedClass<BaseDecorator>();
+                x.WithAttribute<DecoratorAttribute>();
+                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+            }, Assembly.GetExecutingAssembly()));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
 

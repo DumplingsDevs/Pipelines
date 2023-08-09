@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Pipelines.Generators.Builders;
 using Pipelines.Generators.Models;
 using Pipelines.Generators.Extensions;
+using Pipelines.Generators.Syntax;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
@@ -14,15 +17,9 @@ namespace Pipelines.Generators;
 [Generator]
 public class DispatcherGenerator : ISourceGenerator
 {
-    private const string ConfigInterfaceName = "IPipelineGeneratorConfig";
-
-    private const string DispatcherTypeProperty = "GetDispatcherType";
-    private const string InputTypeProperty = "GetInputType";
-    private const string HandlerTypeProperty = "GetHandlerType";
-    
     public void Execute(GeneratorExecutionContext context)
     {
-        var configs = GetPipelineConfigs(context);
+        var configs = GetPipelineConfigs(context).Distinct();
 
         foreach (var config in configs)
         {
@@ -32,30 +29,94 @@ public class DispatcherGenerator : ISourceGenerator
             var classSourceCode = builder.Build();
             var sourceText = SourceText.From(classSourceCode, Encoding.UTF8);
             var sourceFileName = $"{interfaceName}Implementation.g.cs";
+            
             context.AddSource(sourceFileName, sourceText);
         }
     }
-
-    private static IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
+    
+    private IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
     {
-        var classes = context.GetClassNodeByInterface(ConfigInterfaceName).ToList();
+        var syntaxTrees = context.Compilation.SyntaxTrees;
 
-        foreach (var classDeclarationSyntax in classes)
+        // Process all syntax trees in the compilation
+        foreach (var syntaxTree in syntaxTrees)
         {
-            var semanticModel = context.Compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-            var dispatcherType =
-                classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, DispatcherTypeProperty);
-            var inputType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, InputTypeProperty);
-            var handlerType = classDeclarationSyntax.GetPropertyTypeSymbol(semanticModel, HandlerTypeProperty);
+            var root = syntaxTree.GetRoot();
+            var syntaxReceiver = new SyntaxReceiver(context.Compilation);
 
-            if (dispatcherType is null || handlerType is null || inputType is null)
+            // Visit the syntax tree to find the relevant method invocations
+            syntaxReceiver.Visit(root);
+
+            // Check if we have found all necessary method invocations
+            if (syntaxReceiver is
+                { AddInputInvocation: not null, AddHandlerInvocation: not null, AddDispatcherInvocation: not null })
             {
-                // TO DO - throw exception when null/empty?
-                continue;
+                var inputType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddInputInvocation, 0);
+                var handlerType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation, 1);
+                var dispatcherType =
+                    GetGenericSymbol(context.Compilation, syntaxReceiver.AddDispatcherInvocation, "AddDispatcher");
+
+                yield return new PipelineConfig(dispatcherType, handlerType, inputType);
+            }
+        }
+    }
+
+    private INamedTypeSymbol GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, string methodName)
+    {
+        var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
+        var genericSyntax = invocationSyntax.DescendantNodes().OfType<GenericNameSyntax>().ToList();
+
+        foreach (var genericNameSyntax in genericSyntax)
+        {
+            var typeInfo = semanticModel.GetSymbolInfo(genericNameSyntax);
+
+            if (typeInfo is not { Symbol: IMethodSymbol methodSymbol }) continue;
+
+            if (methodSymbol.Name.Contains(methodName))
+            {
+                return (INamedTypeSymbol)methodSymbol.TypeArguments.FirstOrDefault();
+            }
+        }
+
+        return null;
+    }
+
+    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, int skip)
+    {
+
+        var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip).FirstOrDefault();
+        if (typeOfSyntax is not null)
+        {
+            var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
+
+            var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
+                .FirstOrDefault();
+
+            if (identifierSyntax != null)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
+                return (INamedTypeSymbol)typeInfo.Type!;
             }
             
-            yield return new PipelineConfig(dispatcherType, handlerType, inputType);
+            var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
+                .FirstOrDefault();
+
+            if (generic != null)
+            {
+                var typeInfo = semanticModel.GetSymbolInfo(generic);
+                return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
+            }
+
+            var childSyntaxType = typeOfSyntax.ChildNodes().FirstOrDefault();
+
+            if (childSyntaxType != null)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(childSyntaxType);
+                return (INamedTypeSymbol)typeInfo.Type!;
+            }
         }
+
+        return null;
     }
 
     public void Initialize(GeneratorInitializationContext context)
