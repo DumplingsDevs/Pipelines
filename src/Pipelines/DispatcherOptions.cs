@@ -1,3 +1,6 @@
 namespace Pipelines;
 
-public record DispatcherOptions(bool UseReflectionProxyImplementation = false);
+public class DispatcherOptions
+{
+    public bool UseReflectionProxyImplementation { get; set; } = false;
+};
