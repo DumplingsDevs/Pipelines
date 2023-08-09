@@ -10,7 +10,6 @@ using Pipelines.Builder.Validators.Dispatcher.InputType;
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Handler.InputType;
 using Pipelines.Builder.Validators.Handler.ResultTypes;
-using Pipelines.Builder.Validators.Input.ResultTypes;
 using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
 using Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
@@ -39,7 +38,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IHandlerBuilder AddInput(Type type)
     {
         ProvidedTypeShouldBeInterface.Validate(type);
-        ValidateInputReturnTypes.Validate(type);
 
         _inputInterfaceType = type;
         return this;
