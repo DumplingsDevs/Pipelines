@@ -121,49 +121,76 @@ internal class DispatcherImplementationBuilder
     //     return ((result.Item1 as TResult), (result.Item2 as TResult2));
     private void BuildSwitchBody()
     {
-        foreach (var classDeclaration in _context.GetTypeNodes())
+        var inputImplementations = GetInputImplementations();
+        foreach (var inputClass in inputImplementations)
         {
-            var semanticModel = _context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-            var inputClass = semanticModel.GetDeclaredSymbol(classDeclaration);
-            var interfaces = ((ITypeSymbol)inputClass).AllInterfaces.ToList();
-            var implementedInputInterface = interfaces.FirstOrDefault(x =>
+            var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
+                .First();
+            var handlerResults = GetHandlerArgumentResults(handlerMethod);
+            var hasMultipleResults = handlerResults.Count > 1;
+            var inputResults = _pipelineConfig.InputType.TypeArguments.ToList();
+            var hasResponse = handlerResults.Count > 0;
+            var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
+            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, inputResults);
+            var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
+            var resultName = $"result{inputClass.GetFormattedFullname()}";
+
+            AddInLine("case ");
+            AddInLine(inputClass.ToString());
+            AddInLine(" i: ");
+            AddLine(GetCaseTemplate(hasResponse,
+                hasMultipleResults,
+                resultName,
+                asyncModifier,
+                $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
+                handlerMethod,
+                dispatcherMethod,
+                handlerResults));
+        }
+    }
+
+    private List<INamedTypeSymbol> GetInputImplementations()
+    {
+        var allTypes = new List<INamedTypeSymbol>();
+        
+        List<IAssemblySymbol> assemblySymbol = _context.Compilation.SourceModule.ReferencedAssemblySymbols.ToList();
+        assemblySymbol.Add(_context.Compilation.Assembly);
+        
+        foreach (var assembly in assemblySymbol)
+        {
+            ProcessNamespace(assembly.GlobalNamespace, allTypes);
+        }
+
+        return allTypes;
+    }
+
+    private void ProcessNamespace(INamespaceSymbol namespaceSymbol, List<INamedTypeSymbol> allTypes)
+    {
+        foreach (var typeSymbol in namespaceSymbol.GetTypeMembers())
+        {
+            var implementsInputInterface = typeSymbol.AllInterfaces.Any(x =>
                 SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
-
-            if (implementedInputInterface != null)
+            if (implementsInputInterface)
             {
-                var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().First();
-                var handlerResults = GetHandlerArgumentResults(handlerMethod);
-                var hasMultipleResults = handlerResults.Count > 1;
-                var inputResults = implementedInputInterface.TypeArguments.ToList();
-                var hasResponse = handlerResults.Count > 0;
-                var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
-                var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, inputResults);
-                var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
-                var resultName = $"result{inputClass.GetFormattedFullname()}";
-
-                AddInLine("case ");
-                AddInLine(inputClass.ToString());
-                AddInLine(" i: ");
-                AddLine(GetCaseTemplate(hasResponse,
-                    hasMultipleResults,
-                    resultName,
-                    asyncModifier,
-                    $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
-                    handlerMethod,
-                    dispatcherMethod,
-                    handlerResults));
+                allTypes.Add(typeSymbol);
             }
+        }
+
+        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
+        {
+            ProcessNamespace(nestedNamespace, allTypes);
         }
     }
 
     private List<ITypeSymbol> GetHandlerArgumentResults(IMethodSymbol methodSymbol)
     {
         var handlerResultTypeArguments = ((INamedTypeSymbol)methodSymbol.ReturnType).TypeArguments.ToList();
-        
+
         if (handlerResultTypeArguments.Count > 1)
         {
             return handlerResultTypeArguments;
         }
+
         if (handlerResultTypeArguments.Count == 0)
         {
             return new List<ITypeSymbol>();

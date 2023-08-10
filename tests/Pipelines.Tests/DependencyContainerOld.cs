@@ -12,12 +12,12 @@ public class DependencyContainerOld
     {
         _services = new ServiceCollection();
         _services.AddScoped<ICommandHandler<ExampleCommand>, ExampleCommandHandler>();
-        _services
-            .AddPipeline()
-            .AddInput(typeof(ICommand))
-            .AddHandler(typeof(ICommandHandler<>), typeof(DependencyContainerOld).Assembly)
-            .AddDispatcher<ICommandDispatcher>()
-            .Build();
+        // _services
+        //     .AddPipeline()
+        //     .AddInput(typeof(ICommand))
+        //     .AddHandler(typeof(ICommandHandler<>), typeof(DependencyContainerOld).Assembly)
+        //     .AddDispatcher<ICommandDispatcher>()
+        //     .Build();
     }
 
     public void BuildContainer()
