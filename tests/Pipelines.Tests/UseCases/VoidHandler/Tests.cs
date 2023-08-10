@@ -38,6 +38,7 @@ public class Tests
         CollectionAssert.AreEqual(new List<string>
         {
             typeof(LoggingDecorator<>).Name,
+            nameof(ExampleCommandHandler),
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);
     }

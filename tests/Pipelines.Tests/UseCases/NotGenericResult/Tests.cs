@@ -1,7 +1,6 @@
-using Pipelines.Tests.UseCases.TaskVoidHandler.Sample;
-using Pipelines.Tests.UseCases.TaskVoidHandler.Types;
-
-namespace Pipelines.Tests.UseCases.TaskVoidHandler;
+namespace Pipelines.Tests.UseCases.NotGenericResult;
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -30,7 +29,7 @@ public class Tests
     public async Task HappyPath()
     {
         //Arrange
-        var request = new ExampleCommand("My test request");
+        var request = new ExampleCommand("My test request", 5);
 
         //Act
         var result = _commandDispatcher.SendAsync(request, new CancellationToken());

@@ -8,14 +8,14 @@ namespace Pipelines.Tests.Builder.Validators.Dispatcher.ResultTypes;
 public class ValidateResultTypesWithDispatcherInputResultTypesTests
 {
     [Test]
-    public void Validate_GivenIDispatcherMismatchGenericMethodArgumentAndInputResultType_ThrowsException()
+    public void Validate_GivenIIDispatcherGenericReturnTypeICommandWithoutResultType_DoesNotThrowException()
     {
         // Arrange
-        var dispatcherType = typeof(IDispatcherMismatchGenericMethodArgumentAndInputResultType);
+        var dispatcherType = typeof(IDispatcherGenericReturnTypeICommandWithoutResultType);
         var commandType = typeof(ICommand);
 
         // Act & Assert
-        Assert.Throws<ExpectedVoidMethodException>(() =>
+        Assert.DoesNotThrow(() =>
             ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType));
     }
 
@@ -32,7 +32,8 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
     }
 
     [Test]
-    public void Validate_GivenIDispatcherWithIntResult_InputResultTypeMismatch_CommandWithoutClassConstraint_ThrowsException()
+    public void
+        Validate_GivenIDispatcherWithIntResult_InputResultTypeMismatch_CommandWithoutClassConstraint_ThrowsException()
     {
         // Arrange
         var dispatcherType = typeof(IDispatcherWithResult);
