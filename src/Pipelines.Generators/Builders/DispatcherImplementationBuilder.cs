@@ -124,11 +124,15 @@ internal class DispatcherImplementationBuilder
         var inputImplementations = GetInputImplementations();
         foreach (var inputClass in inputImplementations)
         {
+            var interfaces = inputClass.AllInterfaces.ToList();
+            var implementedInputInterface = interfaces.FirstOrDefault(x =>
+                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
+
             var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
                 .First();
             var handlerResults = GetHandlerArgumentResults(handlerMethod);
             var hasMultipleResults = handlerResults.Count > 1;
-            var inputResults = _pipelineConfig.InputType.TypeArguments.ToList();
+            var inputResults = implementedInputInterface.TypeArguments.ToList();
             var hasResponse = handlerResults.Count > 0;
             var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
             var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, inputResults);
