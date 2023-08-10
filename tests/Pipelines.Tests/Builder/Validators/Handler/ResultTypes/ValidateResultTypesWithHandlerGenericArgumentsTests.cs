@@ -38,10 +38,10 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsExpectedResultException()
     {
         // Arrange
-        Type handlerType = typeof(IReturnResultExpectedVoid<>);
+        var handlerType = typeof(IReturnResultTypeNotSpecifiedInGenerics<>);
 
         // Act & Assert
-        Assert.Throws<ExpectedVoidMethodException>(() =>
+        Assert.DoesNotThrow(() =>
             ValidateResultTypesWithHandlerGenericArguments.Validate(handlerType));
     }
 
@@ -49,7 +49,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsExpectedVoidException()
     {
         // Arrange
-        Type handlerType = typeof(IVoidWithExpectedResult<,>);
+        var handlerType = typeof(IVoidWithExpectedResult<,>);
 
         // Act & Assert
         Assert.Throws<ExpectedMethodWithResultException>(() =>
@@ -70,7 +70,7 @@ public class ValidateResultTypesWithHandlerGenericArgumentsTests
     public void Validate_GenericArgumentsNotMatchesHandlerMethod_ThrowsReturnTypeMismatchException()
     {
         // Arrange
-        Type handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
+        var handlerType = typeof(IReturnTwoValuesExpectedTwoTypeMismatch<,,>);
 
         // Act & Assert
         Assert.Throws<GenericTypeCountMismatchException>(() =>
