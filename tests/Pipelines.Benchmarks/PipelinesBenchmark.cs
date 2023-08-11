@@ -16,11 +16,13 @@ namespace Pipelines.Benchmarks;
 [RankColumn]
 public class PipelinesBenchmark
 {
+    private const bool UseReflectionProxyImplementation = false;
+
     private IServiceProvider _pipelinesProvider = null!;
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
     private IServiceProvider _mediatorWithBehavioursProvider = null!;
-
+    
     [GlobalSetup(Target = nameof(Pipelines))]
     public void SetupPipelines()
     {
@@ -30,7 +32,8 @@ public class PipelinesBenchmark
         services.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
-            .AddDispatcher<IRequestDispatcher>(executingAssembly)
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(UseReflectionProxyImplementation),
+                executingAssembly)
             .Build();
         _pipelinesProvider = services.BuildServiceProvider();
     }
@@ -45,7 +48,8 @@ public class PipelinesBenchmark
         servicesWithDecorators.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
-            .AddDispatcher<IRequestDispatcher>(assembly)
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(UseReflectionProxyImplementation),
+                assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
             .WithClosedTypeDecorators(x =>
