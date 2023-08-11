@@ -26,10 +26,11 @@ public class PipelinesBenchmark
     {
         var services = new ServiceCollection();
 
+        var executingAssembly = Assembly.GetExecutingAssembly();
         services.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
-            .AddHandler((typeof(Types.IRequestHandler<,>)), Assembly.GetExecutingAssembly())
-            .AddDispatcher<IRequestDispatcher>()
+            .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
+            .AddDispatcher<IRequestDispatcher>(executingAssembly)
             .Build();
         _pipelinesProvider = services.BuildServiceProvider();
     }
@@ -44,7 +45,7 @@ public class PipelinesBenchmark
         servicesWithDecorators.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
-            .AddDispatcher<IRequestDispatcher>()
+            .AddDispatcher<IRequestDispatcher>(assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
             .WithClosedTypeDecorators(x =>

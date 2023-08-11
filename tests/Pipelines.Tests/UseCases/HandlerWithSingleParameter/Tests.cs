@@ -14,7 +14,7 @@ public class Tests
         
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand<>))
             .AddHandler(typeof(ICommandHandler<,>), assembly)
-            .AddDispatcher<ICommandDispatcher>());
+            .AddDispatcher<ICommandDispatcher>(assembly));
         
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
