@@ -16,7 +16,8 @@ public class Tests
 
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand<,>))
             .AddHandler(typeof(ICommandHandler<,,>), assembly)
-            .AddDispatcher<ICommandDispatcher>(assembly)
+            .AddDispatcher<ICommandDispatcher>(
+                new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,,>)));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
@@ -38,7 +39,7 @@ public class Tests
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
         Assert.That(result.Item2.Value, Is.EqualTo("Value"));
-        
+
         CollectionAssert.AreEqual(new List<string>
         {
             typeof(LoggingDecorator<,,>).Name,

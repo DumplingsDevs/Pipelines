@@ -15,10 +15,11 @@ public class Tests
     {
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
-        
+
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IRequest<>))
             .AddHandler(typeof(IRequestHandler<,>), assembly)
-            .AddDispatcher<IRequestDispatcher>(assembly)
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
+                assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
             .WithClosedTypeDecorators(x =>

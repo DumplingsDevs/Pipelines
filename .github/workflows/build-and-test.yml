@@ -44,5 +44,12 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-      - name: Run tests
+      - name: Run tests with Proxy Dispatcher
         run: dotnet test --configuration Release --no-restore --verbosity normal
+        env:
+          USE_REFLECTION_PROXY_IMPLEMENTATION: true
+
+      - name: Run tests with Source Generated Dispatcher
+        run: dotnet test --configuration Release --no-restore --verbosity normal
+        env:
+          USE_REFLECTION_PROXY_IMPLEMENTATION: false
