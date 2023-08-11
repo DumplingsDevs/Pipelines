@@ -18,7 +18,7 @@ public class Tests
         
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IRequest<>))
             .AddHandler(typeof(IRequestHandler<,>), assembly)
-            .AddDispatcher<IRequestDispatcher>()
+            .AddDispatcher<IRequestDispatcher>(assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
             .WithClosedTypeDecorators(x =>

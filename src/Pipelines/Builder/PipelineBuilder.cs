@@ -25,6 +25,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private Assembly[] _handlerAssemblies = null!;
     private Type _inputInterfaceType = null!;
     private Type _dispatcherInterfaceType = null!;
+    private Assembly _pipelineAssembly = null!;
     private MethodInfo _dispatcherHandleMethod = null!;
     private readonly List<Type> _decoratorTypes = new();
     private Func<IServiceProvider, object> _dispatcherProxy = null!;
@@ -58,14 +59,16 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>() where TDispatcher : class
+    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>(Assembly pipelineAssembly) where TDispatcher : class
     {
-        return AddDispatcher<TDispatcher>(new DispatcherOptions());
+        return AddDispatcher<TDispatcher>(new DispatcherOptions(), pipelineAssembly);
     }
 
-    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>(DispatcherOptions options) where TDispatcher : class
+    public IPipelineDecoratorBuilder AddDispatcher<TDispatcher>(DispatcherOptions options, Assembly pipelineAssembly)
+        where TDispatcher : class
     {
         _dispatcherInterfaceType = typeof(TDispatcher);
+        _pipelineAssembly = pipelineAssembly;
 
         ProvidedTypeShouldBeInterface.Validate(_dispatcherInterfaceType);
         ExactlyOneHandleMethodShouldBeDefined.Validate(_inputInterfaceType, _dispatcherInterfaceType);
@@ -175,7 +178,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
 
     private void RegisterGeneratedDispatcher()
     {
-        var dispatcherImplementations = _handlerAssemblies.SelectMany(x => x.GetTypes())
+        var dispatcherImplementations = _pipelineAssembly.GetTypes()
             .Where(t => t.GetInterfaces()
                 .Any(i => TypeNamespaceComparer.CompareWithoutFullName(i, _dispatcherInterfaceType))).ToList();
 
