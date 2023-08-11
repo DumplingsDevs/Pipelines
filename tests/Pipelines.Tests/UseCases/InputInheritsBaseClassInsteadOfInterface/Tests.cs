@@ -49,14 +49,15 @@ public class Tests
     }
 
     [Test]
-    public async Task HandlerNotFound()
+    public Task HandlerNotFound()
     {
         //Arrange
         var request = new ExampleCommand2("My test request");
-        await _commandDispatcher.SendAsync(request, new CancellationToken());
         
         //Act & Assert
         Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
             await _commandDispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }
