@@ -41,8 +41,15 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run tests
+      - name: Run tests with Proxy Dispatcher
         run: dotnet test --configuration Release --no-restore --verbosity normal
+        env:
+          USE_REFLECTION_PROXY_IMPLEMENTATION: true
+
+      - name: Run tests with Source Generated Dispatcher
+        run: dotnet test --configuration Release --no-restore --verbosity normal
+        env:
+          USE_REFLECTION_PROXY_IMPLEMENTATION: false
       
       - name: Set version from git tag
         id: get_version
