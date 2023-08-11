@@ -1,7 +1,9 @@
-using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Sample;
-using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Types;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple;
+
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -45,5 +47,18 @@ public class Tests
             typeof(LoggingDecorator<,,>).Name,
             typeof(LoggingDecorator<,,>).Name,
         }, _state.Status);
+    }
+
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _commandDispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }

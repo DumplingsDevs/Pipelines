@@ -1,26 +1,29 @@
-using Pipelines.Tests.UseCases.HandlerWithResult.Types;
-using ExampleCommand = Pipelines.Tests.UseCases.HandlerWithResult.Sample.ExampleCommand;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResult;
+
+using Types;
+using Sample;
 
 public class Tests
 {
     private readonly ICommandDispatcher _commandDispatcher;
     private readonly DependencyContainer _dependencyContainer;
+
     public Tests()
     {
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
-        
+
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand<>))
             .AddHandler(typeof(ICommandHandler<,>), assembly)
             .AddDispatcher<ICommandDispatcher>(
                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        
+
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
     }
-    
+
     [Test]
     public async Task HappyPath()
     {
@@ -29,8 +32,21 @@ public class Tests
 
         //Act
         var result = await _commandDispatcher.SendAsync(request, new CancellationToken());
-            
+
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request"));
+    }
+
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _commandDispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }

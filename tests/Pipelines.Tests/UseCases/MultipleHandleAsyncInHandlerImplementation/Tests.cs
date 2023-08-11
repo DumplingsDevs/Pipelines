@@ -1,7 +1,8 @@
-using Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Sample;
-using Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation.Types;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.MultipleHandleAsyncInHandlerImplementation;
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -33,5 +34,18 @@ public class Tests
 
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request"));
+    }
+    
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _commandDispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }

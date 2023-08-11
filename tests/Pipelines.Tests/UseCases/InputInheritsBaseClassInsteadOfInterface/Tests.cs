@@ -1,7 +1,8 @@
-using Pipelines.Tests.UseCases.InputInheritsBaseClassInsteadOfInterface.Sample;
-using Pipelines.Tests.UseCases.InputInheritsBaseClassInsteadOfInterface.Types;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.InputInheritsBaseClassInsteadOfInterface;
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -45,5 +46,17 @@ public class Tests
             typeof(LoggingDecorator<>).Name,
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);
+    }
+
+    [Test]
+    public async Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+        await _commandDispatcher.SendAsync(request, new CancellationToken());
+        
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _commandDispatcher.SendAsync(request, new CancellationToken()));
     }
 }

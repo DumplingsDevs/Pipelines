@@ -1,9 +1,10 @@
 using System.Reflection;
-using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample;
+using Pipelines.Exceptions;
 using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
-using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators;
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -65,5 +66,18 @@ public class Tests
             typeof(TracingDecorator<,>).Name,
             typeof(LoggingDecorator<,>).Name,
         }, _state.Status);
+    }
+    
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleRequest2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _requestDispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }
