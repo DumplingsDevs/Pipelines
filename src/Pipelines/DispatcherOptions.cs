@@ -2,5 +2,15 @@ namespace Pipelines;
 
 public class DispatcherOptions
 {
-    public bool UseReflectionProxyImplementation { get; set; } = false;
+    public DispatcherOptions(bool useReflectionProxyImplementation)
+    {
+        UseReflectionProxyImplementation = useReflectionProxyImplementation;
+    }
+
+    public DispatcherOptions()
+    {
+        UseReflectionProxyImplementation = false;
+    }
+
+    public bool UseReflectionProxyImplementation { get; }
 };

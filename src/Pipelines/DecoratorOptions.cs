@@ -2,5 +2,15 @@ namespace Pipelines;
 
 public class DecoratorOptions
 {
-    public bool StrictMode { get; set; } = true;
+    public DecoratorOptions(bool strictMode)
+    {
+        StrictMode = strictMode;
+    }
+    
+    public DecoratorOptions()
+    {
+        StrictMode = true;
+    }
+
+    public bool StrictMode { get; }
 };
