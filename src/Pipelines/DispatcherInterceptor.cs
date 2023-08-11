@@ -28,19 +28,28 @@ internal class DispatcherInterceptor : DispatchProxy
         return HandleExecutedMethod(args!);
     }
 
-    private MethodInfo? _method;
-
     private object? HandleExecutedMethod(object[] args)
     {
         ValidateArgs(args);
 
         var inputType = GetInputType(args);
 
-        var handler = GetHandlerService(inputType, _inputInterfaceType);
+        var handlers = GetHandlerService(inputType, _inputInterfaceType);
+        if (handlers.Count == 1)
+        {
+            var handler = handlers.First();
+            var method = GetHandlerMethod(handlers.First(), _handlerInterfaceType);
+            return method.Invoke(handler, args);
+        }
 
-        _method ??= GetHandlerMethod(handler, _handlerInterfaceType);
+        object? result = null;
+        foreach (var handler in handlers)
+        {
+            var method = GetHandlerMethod(handlers.First(), _handlerInterfaceType);
+            result = method.Invoke(handler, args);
+        }
 
-        return _method.Invoke(handler, args);
+        return result;
     }
 
     private static MethodInfo GetHandlerMethod(object handler, Type handlerInterfaceType)
@@ -56,10 +65,10 @@ internal class DispatcherInterceptor : DispatchProxy
         return interfaceMap.InterfaceMethods.First();
     }
 
-    private object GetHandlerService(Type inputType, Type inputInterfaceType)
+    private List<object?> GetHandlerService(Type inputType, Type inputInterfaceType)
     {
         var typesForGenericType = new List<Type> { inputType };
-       
+
         var resultType = GetResultType(inputType, inputInterfaceType);
         if (resultType is not null)
         {
@@ -67,14 +76,16 @@ internal class DispatcherInterceptor : DispatchProxy
         }
 
         var handlerTypeWithInput = _handlerInterfaceType.MakeGenericType(typesForGenericType.ToArray());
-        var handler = _serviceProvider.GetService(handlerTypeWithInput);
+        var handlers = _serviceProvider.GetServices(handlerTypeWithInput);
 
-        if (handler is null)
+        var handlerService = handlers.ToList();
+
+        if (handlers is null || !handlerService.Any())
         {
             throw new HandlerNotRegisteredException(handlerTypeWithInput);
         }
 
-        return handler;
+        return handlerService;
     }
 
     private void ValidateArgs(object?[]? args)
@@ -95,8 +106,9 @@ internal class DispatcherInterceptor : DispatchProxy
     private static Type[]? GetResultType(Type queryType, Type inputTypeInterface)
     {
         var queryInterfaceType =
-            queryType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == inputTypeInterface);
-        
+            queryType.GetInterfaces()
+                .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == inputTypeInterface);
+
         return queryInterfaceType?.GetGenericArguments();
     }
 }
