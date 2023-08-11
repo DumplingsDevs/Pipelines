@@ -1,3 +1,4 @@
+using Pipelines.Exceptions;
 using Pipelines.Tests.Models;
 using Pipelines.Tests.UseCases.HandlerWithInputFromDifferentLibrary.Types;
 
@@ -31,5 +32,16 @@ public class Tests
             
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request"));
+    }
+    
+    [Test]
+    public void HandlerNotFound()
+    {
+        //Arrange
+        var request = new Pipelines.Tests.Models.ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _commandDispatcher.SendAsync(request, new CancellationToken()));
     }
 }
