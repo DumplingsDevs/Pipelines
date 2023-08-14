@@ -2,7 +2,7 @@
 ------
 
 
-<i>```Discover the power of the most advanced pipeline creator in the .NET ecosystem! Our library is perfectly tailored for crafting pipelines for Queries, Commands, Domain Events, and beyond. Whether you're seeking to separate code execution logic from its invocation (Mediation pattern) our tool provides the flexibility to make your vision come to life. The only limitation is your imagination.``` </i>
+<i>```Discover the power of the most advanced pipeline creator in the .NET ecosystem! Our library is perfectly tailored for crafting pipelines for Queries, Commands, Domain Events, and beyond. Whether you're seeking to separate code execution logic from its invocation (Mediation pattern) our tool provides the flexibility to make your vision come to life.``` </i>
 
 ----
 
@@ -21,7 +21,7 @@
 
 # Installation
 
-```cs
+```
 dotnet add package DumplingsDevs.Pipelines
 dotnet add package DumplingsDevs.Pipelines.Generators
 
@@ -55,7 +55,10 @@ TO DO
 
 ```
 
-## 4. Use 
+## 4. Implement first decorator (optional step)
+
+
+## 5. Use 
 
 ```cs
 TO DO
