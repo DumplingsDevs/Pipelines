@@ -60,7 +60,7 @@ public interface IDispatcher
 
 ## 2. Implement first decorator (optional step)
 ```cs
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
 {
     private readonly IHandler<TCommand, TResult> _handler;
     private readonly ILogger _logger;
