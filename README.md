@@ -52,22 +52,34 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
 }
 
 ```
 
-## 2. Register pipeline
 
+## 2. Implement first decorator (optional step)
 ```cs
-var handlersAssembly = //Assembly where handlers assembly are implemented
-var dispatcherAssembly = //Assembly where AddPipeline gets invoked
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly ILogger _logger;
+    
+    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger logger)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
 
-_services
-    .AddPipeline()
-    .AddInput(typeof(IInput<>))
-            .AddHandler(typeof(IHandler<,>), handlersAssembly)
-            .AddDispatcher<IDispatcher>(dispatcherAssembly)
+    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
+    {
+        _logger.Log(LogLevel.Information,"Executing handler for input {0}", typeof(TCommand));
+        var result = await _handler.HandleAsync(request, token);
+        _logger.Log(LogLevel.Information,"Executed handler for input {0}", typeof(TCommand));
+
+        return result;
+    }
+}
 
 ```
 
@@ -92,29 +104,18 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 }
 
 ```
+## 4. Register pipeline
 
-## 4. Implement first decorator (optional step)
 ```cs
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
-{
-    private readonly IHandler<TCommand, TResult> _handler;
-    private readonly ILogger _logger;
-    
-    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger logger)
-    {
-        _handler = handler;
-        _logger = logger;
-    }
+var handlersAssembly = //Assembly where handlers assembly are implemented
+var dispatcherAssembly = //Assembly where AddPipeline gets invoked
 
-    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
-    {
-        _logger.Log(LogLevel.Information,"Executing handler for input {0}", typeof(TCommand));
-        var result = await _handler.HandleAsync(request, token);
-        _logger.Log(LogLevel.Information,"Executed handler for input {0}", typeof(TCommand));
-
-        return result;
-    }
-}
+_services
+    .AddPipeline()
+    .AddInput(typeof(IInput<>))
+            .AddHandler(typeof(IHandler<,>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
+              .WithOpenTypeDecorator(typeof(LoggingDecorator<,>));
 
 ```
 
