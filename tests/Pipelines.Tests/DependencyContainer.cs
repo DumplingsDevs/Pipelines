@@ -12,6 +12,7 @@ public class DependencyContainer
     public DependencyContainer()
     {
         _services = new ServiceCollection();
+        _services.AddLogging();
     }
 
     public void RegisterPipeline(Func<IInputBuilder, IPipelineBuildBuilder>? pipelineBuilder = null)
