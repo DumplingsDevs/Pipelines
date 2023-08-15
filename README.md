@@ -20,14 +20,14 @@
 ✅ <b>Designed with Developers in Mind</b> - Built considering the needs of developers, our tool eases and accelerates your work while maintaining the highest standards.
 
 # Installation
-
+----
 ```
 dotnet add package DumplingsDevs.Pipelines
 dotnet add package DumplingsDevs.Pipelines.Generators
 ```
 
 # Quick Start
-
+---- 
 ## 1. Define your own types
 
 ### 1.1 Input 
@@ -129,7 +129,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 
 # Key Concepts
-
+------
 ## Building blocks
 ### 1. Input 
 First method parameter in Handler and Dispatcher methods. Will be used for finding relevant Handler. 
@@ -190,9 +190,12 @@ public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand 
 ```
 
 ### 3. Dispatcher
-Dispatcher implementation is provided by `Pipelines`. It is resposible for find proper Handler for provided Input. 
+Dispatcher implementation is provided by `Pipelines`. It is resposible for find and execute proper Handler for provided Input along with decorators.
 
-It is not resposible for apply Decorators because Decorators are applying on handlers during registering handlers in DI.
+NOTE:
+<i>
+Dispatcher is not resposible for apply Decorators by its own because Decorators gets applied on handlers during registering handlers in Dependency Injection Container.
+</i>
 
 Examples:
 
@@ -236,9 +239,72 @@ public interface ICommandDispatcher
 }
 ```
 
-- Decorators
+### 4. Decorators
+Works exacly the same like Middlewares in .NET. Decorators can be applied both for OpenTypes and ClosedTypes.
 
-## How it works? 
+To implement new decorator there two things that needs to be done:
+- implement Handler interface
+- inject Handler instance in Constructor
+
+Decorators order is based on register order (first registered first executed)
+
+There is a lot of ways how to register Closed Types Decorators:
+
+```cs
+.AddDispatcher<ICommandDispatcher>(dispatcherAssembly)
+    .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+            .WithClosedTypeDecorators(x =>
+            {
+                x.WithImplementedInterface<IDecorator>();
+                x.WithInheritedClass<BaseDecorator>();
+                x.WithAttribute<DecoratorAttribute>();
+                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+            }, decoratorsAssembly1, decoratorsAssembly2);
+```
+
+Open Type Decorator example:
+```cs
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
+{
+    private readonly IHandler<TCommand, TResult> _handler;
+   
+    public LoggingDecorator(IHandler<TCommand, TResult> handler)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
+    {
+
+        var result = await _handler.HandleAsync(request, token);
+
+        return result;
+    }
+}
+```
+
+Closed Type Decorator example:
+```cs
+public class
+    ExampleRequestDecoratorFive : IDecorator, IRequestHandler<ExampleRequest,
+        ExampleCommandResult>
+{
+    private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
+
+    public ExampleRequestDecoratorFive(
+        IRequestHandler<ExampleRequest, ExampleCommandResult> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
+        CancellationToken token)
+    {
+        var result = await _handler.HandleAsync(request, token);
+        return result;
+    }
+```
 
 # Configuration options
 
