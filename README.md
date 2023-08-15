@@ -24,7 +24,6 @@
 ```
 dotnet add package DumplingsDevs.Pipelines
 dotnet add package DumplingsDevs.Pipelines.Generators
-
 ```
 
 # Quick Start
@@ -43,18 +42,15 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 {
     public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
 }
-
 ```
 
 ### 1.3 Dispatcher
 
 ```cs
-
 public interface IDispatcher
 {
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
 }
-
 ```
 
 
@@ -80,7 +76,6 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> w
         return result;
     }
 }
-
 ```
 
 ## 3. Implement first handler
@@ -102,7 +97,6 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
         return Task.FromResult(new ExampleCommandResult(input.Value));
     }
 }
-
 ```
 ## 4. Register pipeline
 
