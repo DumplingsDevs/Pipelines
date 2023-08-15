@@ -131,8 +131,66 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # Key Concepts
 
 ## Building blocks
-- Input
-- Hanlder
+### 1. Input 
+First method parameter in Handler and Dispatcher methods. Will be used for finding relevant Handler. 
+
+Generic Arguments defines result types. `Pipelines` supports both void and with results handling.
+
+Examples: 
+```cs
+public interface ICommand {} 
+public interface ICommand<TResult>{}
+public interface ICommand<TResult,TResult2> {}
+
+```
+
+### 2. Handler
+Class where you application logic will be executed.
+Handlers can return asynchronus results (Task) or synchronus (void or simple types).
+
+In case, when all handlers will return exactly same return type, you don't need to define it on Input Generic Arguments. 
+
+Examples: 
+```cs
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
+{
+    public void Handle(TCommand command, CancellationToken token);
+}
+
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
+{
+    public string Handle(TCommand command, CancellationToken token);
+}
+
+public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand : ICommand<TResult, TResult2>
+{
+    public (TResult, TResult2) Handle(TCommand command, CancellationToken token);
+}
+```
+
+
+```cs
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
+{
+    public Task HandleAsync(TCommand command, CancellationToken token);
+}
+
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
+{
+    public Task<string> HandleAsync(TCommand command, CancellationToken token);
+}
+
+public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand<TResult>
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+
+public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand : ICommand<TResult, TResult2>
+{
+    public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
+}
+```
+
 - Dispatcher
 - Decorators
 
