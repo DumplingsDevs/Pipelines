@@ -141,7 +141,6 @@ Examples:
 public interface ICommand {} 
 public interface ICommand<TResult>{}
 public interface ICommand<TResult,TResult2> {}
-
 ```
 
 ### 2. Handler
@@ -168,7 +167,6 @@ public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand 
 }
 ```
 
-
 ```cs
 public interface ICommandHandler<in TCommand> where TCommand : ICommand
 {
@@ -191,7 +189,53 @@ public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand 
 }
 ```
 
-- Dispatcher
+### 3. Dispatcher
+Dispatcher implementation is provided by `Pipelines`. It is resposible for find proper Handler for provided Input. 
+
+It is not resposible for apply Decorators because Decorators are applying on handlers during registering handlers in DI.
+
+Examples:
+
+```cs
+public interface ICommandDispatcher
+{
+    public void Send(ICommand command);
+}
+
+public interface ICommandDispatcher
+{
+    public string Send(ICommand command);
+}
+
+public interface ICommandDispatcher
+{
+    public (TResult, TResult2) Send<TResult, TResult2>(ICommand<TResult, TResult2> command);
+}
+```
+
+```cs
+public interface ICommandDispatcher
+{
+    public Task SendAsync(ICommand command, CancellationToken token);
+}
+
+public interface ICommandDispatcher
+{
+    public Task<string> SendAsync(ICommand command, CancellationToken token);
+}
+
+public interface ICommandDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken token);
+}
+
+public interface ICommandDispatcher
+{
+    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(ICommand<TResult, TResult2> command,
+        CancellationToken token);
+}
+```
+
 - Decorators
 
 ## How it works? 
