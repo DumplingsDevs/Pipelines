@@ -17,7 +17,7 @@
 
 ✅ <b>Type Validators</b> - If you inadvertently provide inconsistent types, such as discrepancies between the dispatcher and handler, type validators will alert you immediately with exceptions, ensuring the integrity and correctness of your configurations.
 
-✅ <b>Designed with Developers in Mind</b> - Built considering the needs of developers, our tool eases and accelerates your work while maintaining the highest standards.
+✅ <b>Designed with Developers in Mind</b> - Constructed with the developer's requirements at heart, our tool simplifies and accelerates your work, always upholding top-notch standards.
 
 # Installation
 ----
@@ -31,6 +31,7 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 ## 1. Define your own types
 
 ### 1.1 Input 
+
 ```cs
 public interface IInput<TResult>{ }
 ```
@@ -132,9 +133,9 @@ public static void CreateExampleEndpoint(this WebApplication app)
 ------
 ## Building blocks
 ### 1. Input 
-First method parameter in Handler and Dispatcher methods. Will be used for finding relevant Handler. 
+First method parameter in the Handler and Dispatcher methods, guiding the identification of the appropriate Handler. Pipelines supports handling with both void and results.
 
-Generic Arguments defines result types. `Pipelines` supports both void and with results handling.
+Generic Arguments defines result types. `Pipelines` supports handling with both void and results.
 
 Examples: 
 ```cs
@@ -144,8 +145,7 @@ public interface ICommand<TResult,TResult2> {}
 ```
 
 ### 2. Handler
-Class where you application logic will be executed.
-Handlers can return asynchronus results (Task) or synchronus (void or simple types).
+The epicenter of your application logic. Handlers can yield synchronous (like void or simple types) or asynchronous results.
 
 In case, when all handlers will return exactly same return type, you don't need to define it on Input Generic Arguments. 
 
@@ -190,7 +190,7 @@ public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand 
 ```
 
 ### 3. Dispatcher
-Dispatcher implementation is provided by `Pipelines`. It is resposible for find and execute proper Handler for provided Input along with decorators.
+Dispatcher implementation is provided by `Pipelines`. Dispatcher ensures the right Handler (with decorators) is triggered based on the Input.
 
 NOTE:
 <i>
@@ -240,13 +240,13 @@ public interface ICommandDispatcher
 ```
 
 ### 4. Decorators
-Works exacly the same like Middlewares in .NET. Decorators can be applied both for OpenTypes and ClosedTypes.
+Analogous to Middlewares in .NET. Decorators can be applied both for OpenTypes and ClosedTypes.
 
 To implement new decorator there two things that needs to be done:
 - implement Handler interface
 - inject Handler instance in Constructor
 
-Decorators order is based on register order (first registered first executed)
+When registering decorators, ensure the order of registration in the DI container is the same as the execution order you desire.
 
 There is a lot of ways how to register Closed Types Decorators:
 
@@ -305,6 +305,18 @@ public class
         return result;
     }
 ```
+
+# Execution Flow
+
+1. An Input is dispatched using the Dispatcher.
+
+2. The Dispatcher identifies the appropriate Handler based on the Input type.
+
+3. If there are any Decorators, they get executed. They can apply logic before, after, or around the handler's execution.
+
+4. The Handler executes the primary logic.
+
+5. The result (if any) is returned to the caller.
 
 # Configuration options
 
