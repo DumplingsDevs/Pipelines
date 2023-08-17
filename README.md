@@ -60,7 +60,7 @@ public interface IDispatcher
 
 
 ## 2. Implement first decorator (optional step)
-Think of them as layers of logic that execute before or after the handler.
+Analogous to Middlewares in .NET. Think of them as layers of logic that execute before or after the handler.
 
 ```cs
 public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
