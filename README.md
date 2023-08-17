@@ -139,6 +139,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # Detailed documentation
 ------
 - [Key Concepts](docs/key_concepts.md)
+- [Source generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Code examples](docs/code_examples.md)
 - [Configuration](docs/configuration.md)
 - [Troubleshooting](docs/troubleshooting.md)
