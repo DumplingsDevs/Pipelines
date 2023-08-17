@@ -32,11 +32,14 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 
 ### 1.1 Input 
 
+The "Input" acts as the initial parameter for Handler and Dispatcher methods, guiding the search for the relevant Handler.
+
 ```cs
 public interface IInput<TResult>{ }
 ```
 
 ### 1.2 Handler
+Handlers house the application logic and can generate both synchronous and asynchronous results.
 
 ```cs
 public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
@@ -46,6 +49,7 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 ```
 
 ### 1.3 Dispatcher
+Serving as a bridge between inputs and their respective handlers, the Dispatcher ensures the appropriate Handler is triggered for a given Input.
 
 ```cs
 public interface IDispatcher
@@ -100,6 +104,7 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 }
 ```
 ## 4. Register pipeline
+In your application's initialization, such as Startup.cs:
 
 ```cs
 var handlersAssembly = //Assembly where handlers assembly are implemented
@@ -240,7 +245,7 @@ public interface ICommandDispatcher
 ```
 
 ### 4. Decorators
-Analogous to Middlewares in .NET. Decorators can be applied both for OpenTypes and ClosedTypes.
+Analogous to Middlewares in .NET. Decorators wrap around handlers to extend or modify their behavior. Think of them as layers of logic that execute before or after the handler. Decorators can be applied both for OpenTypes and ClosedTypes.
 
 To implement new decorator there two things that needs to be done:
 - implement Handler interface
