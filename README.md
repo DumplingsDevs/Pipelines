@@ -141,8 +141,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [Key Concepts](docs/key_concepts.md)
 - [Code examples](docs/code_examples.md)
 - [Configuration](docs/configuration.md)
-
-# Configuration options
+- [Troubleshooting](docs/troubleshooting.md)
 
 # Limitations
 
