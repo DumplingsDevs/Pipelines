@@ -142,6 +142,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [Code examples](docs/code_examples.md)
 - [Configuration](docs/configuration.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [ADR](docs/adr.md)
 
 # Limitations
 
