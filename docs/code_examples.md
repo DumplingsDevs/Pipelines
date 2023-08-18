@@ -19,6 +19,29 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
 
 ## 1. Pipeline registration
 
+```cs
+var handlersAssembly = //Assembly where handlers assembly are implemented
+var dispatcherAssembly = //Assembly where AddPipeline gets invoked
+var decoratorsAssembly1 = //Assembly where decorators are implemented
+var decoratorsAssembly2 = //Another Assembly where decorators are implemented
+
+_services
+    .AddPipeline()
+    .AddInput(typeof(IInput<>))
+            .AddHandler(typeof(IHandler<,>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
+            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+            .WithClosedTypeDecorators(x =>
+            {
+                x.WithImplementedInterface<IDecorator>();
+                x.WithInheritedClass<BaseDecorator>();
+                x.WithAttribute<DecoratorAttribute>();
+                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+            }, decoratorsAssembly1, decoratorsAssembly2);
+
+              
+```
+
 ## 2. Async Pipelines
 
 ### 2.1 Task result
