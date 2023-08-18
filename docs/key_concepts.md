@@ -116,36 +116,36 @@ To implement new decorator there two things that needs to be done:
 - inject Handler instance in Constructor
 
 When registering decorators, ensure the order of registration in the DI container is the same as the execution order you desire.
-
-//              │   ┌─────────────────────┐   │
-//              │   │ Decorator1:IHandler │   │
-//              │   └─────────────────────┘   │
-//              │                             │
-//              │   ┌─────────────────────┐   │
-//              │   │ Decorator2:IHandler │   │
-//              │   └─────────────────────┘   │
-// Registration │                             │  Invoke
-//  direction   │   ┌─────────────────────┐   │ direction
-//              │   │ Decorator3:IHandler │   │
-//              │   └─────────────────────┘   │
-//              ▼                             │
-//                   ┌──────────────────┐     │
-//                   │ Handler:IHandler │     │
-//                   └──────────────────┘     │
-//                                            │
-//                  ┌─────────────────────┐   │
-//                  │ Decorator3:IHandler │   │
-//                  └─────────────────────┘   │
-//                                            │
-//                  ┌─────────────────────┐   │
-//                  │ Decorator2:IHandler │   │
-//                  └─────────────────────┘   │
-//                                            │  
-//                  ┌─────────────────────┐   │ 
-//                  │ Decorator1:IHandler │   │
-//                  └─────────────────────┘   │
-//                                            ▼
-
+```
+                          │   ┌─────────────────────┐   │
+                          │   │ Decorator1:IHandler │   │
+                          │   └─────────────────────┘   │
+                          │                             │
+                          │   ┌─────────────────────┐   │
+                          │   │ Decorator2:IHandler │   │
+                          │   └─────────────────────┘   │
+             Registration │                             │  Invoke
+              direction   │   ┌─────────────────────┐   │ direction
+                          │   │ Decorator3:IHandler │   │
+                          │   └─────────────────────┘   │
+                          ▼                             │
+                               ┌──────────────────┐     │
+                               │ Handler:IHandler │     │
+                               └──────────────────┘     │
+                                                        │
+                              ┌─────────────────────┐   │
+                              │ Decorator3:IHandler │   │
+                              └─────────────────────┘   │
+                                                        │
+                              ┌─────────────────────┐   │
+                              │ Decorator2:IHandler │   │
+                              └─────────────────────┘   │
+                                                        │  
+                              ┌─────────────────────┐   │ 
+                              │ Decorator1:IHandler │   │
+                              └─────────────────────┘   │
+                                                        ▼
+```
 
 There is a lot of ways how to register Closed Types Decorators:
 
