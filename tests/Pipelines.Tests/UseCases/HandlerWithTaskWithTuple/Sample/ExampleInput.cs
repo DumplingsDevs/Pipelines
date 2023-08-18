@@ -2,4 +2,4 @@ using Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Types;
 
 namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Sample;
 
-public record ExampleCommand(string Value) : ICommand<ExampleCommandResult, ExampleCommandResultSecond>;
+public record ExampleInput(string Value) : IInput<ExampleCommandResult, ExampleCommandResultSecond>;

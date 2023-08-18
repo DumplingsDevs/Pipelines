@@ -75,6 +75,71 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
 
 ----
+## Handler with Generic Task Tuple result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput<TResult, TResult2> { }
+```
+```cs
+// Handler Interface
+public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+{
+    public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token);
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleCommandResult, ExampleCommandResultSecond>;
+```
+
+```cs
+// Result Implementation
+public record ExampleCommandResult(string Value);
+public record ExampleCommandResultSecond(string Value);
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
+    where TCommand : IInput<TResult,TResult2>
+{
+    private readonly IHandler<TCommand, TResult, TResult2> _handler;
+    private readonly DecoratorsState _state;
+
+    public LoggingDecorator(IHandler<TCommand, TResult, TResult2> handler, DecoratorsState state)
+    {
+        _handler = handler;
+        _state = state;
+    }
+
+    public async Task<(TResult,TResult2)> HandleAsync(TCommand request, CancellationToken token)
+    {
+        _state.Status.Add(typeof(LoggingDecorator<,,>).Name);
+        var result = await _handler.HandleAsync(request, token);
+        _state.Status.Add(typeof(LoggingDecorator<,,>).Name);
+
+        return result;
+    }
+}
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithTaskWithTuple/)
+
+----
 ## Template for next examples
 
 <b> Interfaces </b>
@@ -102,3 +167,5 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 ```cs
 // Open Type Decorator Implementation
 ```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
