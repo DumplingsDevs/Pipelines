@@ -5,22 +5,23 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
 ------
 ## Table of Content 
 
-- [1. Async pipelines](#1-async-pipelines)
-  - [1.1 Task result](#12-task-result)
-  - [1.2 Generic Task result](#12-generic-task-result)
-  - [1.3 Generic Task Tuple result](#13-generic-task-tuple-result)
-  - [1.4 Multiple method parameters](#13-generic-task-tuple-result)
-  - [1.5 No generic result](#13-generic-task-tuple-result)
-
-
-- [2. Sync pipelines](#1-building-blocks)
+- [1. Pipeline registration](#1-pipeline-registration)
+- [2. Async pipelines](#2-async-pipelines)
+  - [2.1 Task result](#21-task-result)
+  - [2.2 Generic Task result](#22-generic-task-result)
+  - [2.3 Generic Task Tuple result](#23-generic-task-tuple-result)
+  - [2.4 Multiple method parameters](#24-multiple-method-parameters)
+  - [2.5 No generic result](#25-no-generic-result)
+- [3. Sync pipelines](#3-sync-pipelines)
 
 ------
 
 
-## 1. Async Pipelines
+## 1. Pipeline registration
 
-### Task result
+## 2. Async Pipelines
+
+### 2.1 Task result
 
 <b> Interfaces </b>
 
@@ -92,7 +93,7 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ----
 
-### 1.2 Generic Task result
+### 2.2 Generic Task result
 
 <b> Interfaces </b>
 
@@ -166,7 +167,7 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
 
 ----
-## 1.3 Generic Task Tuple result
+### 2.3 Generic Task Tuple result
 
 <b> Interfaces </b>
 
@@ -231,7 +232,83 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithTaskWithTuple/)
 
 ----
-## Template for next examples
+### 2.4 Multiple method parameters
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput<TResult> { }
+```
+```cs
+// Handler Interface
+public interface IInputHandler<in TCommand, TResult> 
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething,
+        Dictionary<string, string> fancyDictionary);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken t, bool canDoSomething,
+        Dictionary<string, string> dictionary);
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleCommandResult>;
+```
+
+```cs
+// Result Implementation
+public record ExampleCommandResult(string Value);
+```
+
+```cs
+// Handler Implementation
+public class ExampleInputHandler : IInputHandler<ExampleInput, ExampleCommandResult>
+{
+    public Task<ExampleCommandResult> HandleAsync(ExampleInput input, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
+    {
+        return Task.FromResult(new ExampleCommandResult(input.Value));
+    }
+}
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
+    where TCommand : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+
+    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public async Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
+    {
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        var result = await _handler.HandleAsync(command, token, canDoSomething, fancyDictionary);
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+
+        return result;
+    }
+}
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithMultipleParameters/)
+
+----
+### 2.5 No generic result
 
 <b> Interfaces </b>
 
@@ -256,10 +333,15 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 ```
 
 ```cs
+// Handler Implementation
+```
+
+```cs
 // Open Type Decorator Implementation
 ```
 
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
 
 ----
 ### Template for next examples
