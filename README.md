@@ -2,7 +2,7 @@
 ------
 
 
-<i>```'Pipelines' is perfectly tailored for creating pipelines for Queries, Commands, Domain Events, and any other pipeline using your OWN types. Everywhere in your app will remain unaware of 'Pipelines' usage, with the exception of pipeline registration. If you're aiming to separate code execution logic from its invocation, such as with the Mediation pattern, this tool offers the flexibility you require.```</i>
+<i>```'Pipelines' is perfectly tailored for creating pipelines for Queries, Commands, Domain Events, any other pipeline utilizing your OWN types. Everywhere in your app will remain unaware of 'Pipelines' usage, with the exception of pipeline registration. If you're aiming to separate code execution logic from its invocation, such as with the Mediation pattern, this tool offers the flexibility you require.```</i>
 
 ----
 
