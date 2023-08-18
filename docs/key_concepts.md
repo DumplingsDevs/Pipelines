@@ -1,7 +1,22 @@
 # Key Concepts
+
+In this section of the documentation, you'll learn about the core components of our tool, including inputs, handlers, dispatchers, and decorators. Additionally, we'll explain how 'Pipeline' manages multiple handlers for a single input.
+
+-----
+
+## Table of Content 
+
+- [1. Building blocks](#1-building-blocks)
+  - [1.1 Input](#11-input)
+  - [1.2 Handler](#12-handler)
+  - [1.3 Dispatcher](#13-dispatcher)
+  - [1.4 Decorators](#14-decorators)
+- [2. Multiple handlers for same Input](#2-multiple-handlers-for-same-input)
+- [3. Execution Flow](#3-execution-flow)
 ------
-## Building blocks
-### 1. Input 
+
+## 1 Building blocks
+### 1.1 Input 
 First method parameter in the Handler and Dispatcher methods, guiding the identification of the appropriate Handler. Pipelines supports handling with both void and results.
 
 Generic Arguments defines result types. `Pipelines` supports handling with both void and results.
@@ -13,7 +28,7 @@ public interface ICommand<TResult>{}
 public interface ICommand<TResult,TResult2> {}
 ```
 
-### 2. Handler
+### 1.2 Handler
 The epicenter of your application logic. Handlers can yield synchronous (like void or simple types) or asynchronous results.
 
 In case, when all handlers will return exactly same return type, you don't need to define it on Input Generic Arguments. 
@@ -58,7 +73,7 @@ public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand 
 }
 ```
 
-### 3. Dispatcher
+### 1.3 Dispatcher
 Dispatcher implementation is provided by `Pipelines`. Dispatcher ensures the right Handler (with decorators) is triggered based on the Input.
 
 NOTE:
@@ -108,7 +123,7 @@ public interface ICommandDispatcher
 }
 ```
 
-### 4. Decorators
+### 1.4 Decorators
 Analogous to Middlewares in .NET. Decorators wrap around handlers to extend or modify their behavior. Think of them as layers of logic that execute before or after the handler. Decorators can be applied both for Open Types and Closed Types.
 
 To implement new decorator there two things that needs to be done:
@@ -205,7 +220,40 @@ public class
     }
 ```
 
-## Execution Flow
+## 2. Multiple handlers for same Input
+In situations where you have multiple handlers for a single type of input, the dispatcher will execute each one, including their associated decorators. This use case is highly likely when you are creating a Pipeline for Domain Event Execution.
+
+
+```
+    Dispatcher Invocation │                             │  Handler1
+              direction   │   ┌─────────────────────┐   │  Execution
+                          │   │ Decorator :IHandler │   │
+                          │   └─────────────────────┘   │
+                          │                             │
+                          │    ┌──────────────────┐     │
+                          │    │ Handler1:IHandler│     │
+                          │    └──────────────────┘     │
+                          │                             │
+                          │   ┌─────────────────────┐   │
+                          │   │ Decorator:IHandler  │   │
+                          │   └─────────────────────┘   ▼
+                          │                              
+                          │                                Handler2 
+                          │   ┌─────────────────────┐   │  Execution
+                          │   │ Decorator:IHandler  │   │
+                          │   └─────────────────────┘   │
+                          │                             │
+                          │    ┌──────────────────┐     │
+                          │    │ Handler2:IHandler│     │
+                          │    └──────────────────┘     │
+                          │                             │
+                          │   ┌─────────────────────┐   │
+                          │   │ Decorator:IHandler  │   │
+                          │   └─────────────────────┘   │
+                          ▼                             ▼
+```
+
+## 3. Execution Flow
 
 1. An Input is dispatched using the Dispatcher.
 
