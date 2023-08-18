@@ -1,7 +1,98 @@
 # Code examples
+
+In this section of the documentation, you'll find ready-to-copy examples of pipelines.
+
+------
+## Table of Content 
+
+- [1. Async pipelines](#1-async-pipelines)
+  - [1.1 Task result](#12-task-result)
+  - [1.2 Generic Task result](#12-generic-task-result)
+  - [1.3 Generic Task Tuple result](#13-generic-task-tuple-result)
+  - [1.4 Multiple method parameters](#13-generic-task-tuple-result)
+  - [1.5 No generic result](#13-generic-task-tuple-result)
+
+
+- [2. Sync pipelines](#1-building-blocks)
+
 ------
 
-## Handler with Generic Task result
+
+## 1. Async Pipelines
+
+### Task result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput { }
+```
+```cs
+// Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public Task HandleAsync(TCommand command, CancellationToken token);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public Task SendAsync(IInput input, CancellationToken token);
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Value) : IInput;
+```
+
+```cs
+// Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public Task HandleAsync(ExampleInput input, CancellationToken token)
+    {
+        return Task.CompletedTask;
+    }
+}
+
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task HandleAsync(TCommand request, CancellationToken token)
+    {
+        // Add logic there
+
+        var result = _handler.HandleAsync(request, token);
+
+        // Add logic there
+
+        return result;
+    }
+}
+
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/TaskVoidHandler/)
+
+----
+
+### 1.2 Generic Task result
 
 <b> Interfaces </b>
 
@@ -75,7 +166,7 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
 
 ----
-## Handler with Generic Task Tuple result
+## 1.3 Generic Task Tuple result
 
 <b> Interfaces </b>
 
@@ -162,6 +253,41 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 
 ```cs
 // Result Implementation
+```
+
+```cs
+// Open Type Decorator Implementation
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
+----
+### Template for next examples
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+```
+```cs
+// Handler Interface
+```
+```cs
+// Dispatcher Interface
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+```
+
+```cs
+// Result Implementation
+```
+
+```cs
+// Handler Implementation
 ```
 
 ```cs

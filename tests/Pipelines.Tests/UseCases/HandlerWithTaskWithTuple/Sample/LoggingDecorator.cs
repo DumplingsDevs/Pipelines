@@ -4,7 +4,7 @@ namespace Pipelines.Tests.UseCases.HandlerWithTaskWithTuple.Sample;
 using Types;
 
 public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult,TResult2>
+    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2 : class
 {
     private readonly IHandler<TCommand, TResult, TResult2> _handler;
     private readonly DecoratorsState _state;
