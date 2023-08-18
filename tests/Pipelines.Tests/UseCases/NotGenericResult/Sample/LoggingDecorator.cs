@@ -1,13 +1,13 @@
 namespace Pipelines.Tests.UseCases.NotGenericResult.Sample;
 using Types;
 
-public class LoggingDecorator<TCommand> : ICommandHandler<TCommand>
-    where TCommand : ICommand
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
 {
-    private readonly ICommandHandler<TCommand> _handler;
+    private readonly IHandler<TCommand> _handler;
     private readonly DecoratorsState _state;
 
-    public LoggingDecorator(ICommandHandler<TCommand> handler, DecoratorsState state)
+    public LoggingDecorator(IHandler<TCommand> handler, DecoratorsState state)
     {
         _handler = handler;
         _state = state;

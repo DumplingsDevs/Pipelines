@@ -38,7 +38,6 @@ _services
                 x.WithAttribute<DecoratorAttribute>();
                 x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
             }, decoratorsAssembly1, decoratorsAssembly2);
-
               
 ```
 
@@ -337,33 +336,63 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 
 ```cs
 // Input Interface
+public interface IInput { }
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public Task<string> HandleAsync(TCommand command, CancellationToken token);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInput inputWithResult, CancellationToken token);
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
-```
-
-```cs
-// Result Implementation
+public record ExampleInput(string Name, int Value) : IInput;
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public Task<string> HandleAsync(ExampleInput input, CancellationToken token)
+    {
+        return Task.FromResult($"It's working!, {input.Name}, {input.Value}");
+    }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<string> HandleAsync(TCommand request, CancellationToken token)
+    {
+        var result = _handler.HandleAsync(request, token);
+
+        return result;
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/NotGenericResult/)
 
 
 ----
