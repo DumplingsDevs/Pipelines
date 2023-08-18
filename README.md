@@ -107,7 +107,7 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 ## 4. Register pipeline
 In your application's initialization, such as `Startup.cs`:
 
-<b> IMPORTANT! All provided types must be specified using the typeof() method! </b.
+<b> IMPORTANT! All provided types must be specified using the typeof() method! </b>
 
 ```cs
 var handlersAssembly = //Assembly where handlers assembly are implemented
