@@ -147,5 +147,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [ADR](docs/adr.md)
 
 # Limitations
+- Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
+
 
 
