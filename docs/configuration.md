@@ -1,45 +1,40 @@
 # Configuration
-------
 
-In this section of the documentation, you'll learn how you can configure Pipeline.
+In this section of the documentation, you'll learn how to configure Pipeline.
 
 -----
 
-## Table of Content 
+## Table of Contents
 
 - [1. Pipeline Builder](#1-pipeline-builder)
   - [1.1 DispatcherOptions](#11-dispatcheroptions)
   - [1.2 DecoratorOptions](#12-decoratoroptions)
+-----
 
-------
-
-## 1. Pipleline builder
+## 1. Pipeline Builder
 
 ### 1.1 DispatcherOptions
 
-Dispatcher options can be set in AddDispatcher<>() method.
+Dispatcher options can be set using the `AddDispatcher<>()` method.
 
-### 1.1.1 UseReflectionProxyImplementation
+#### 1.1.1 UseReflectionProxyImplementation
 
-<b>Default value</b> - false
+**Default value**: `false`
 
-Allow to chose which type of Dispatcher application would like to use.
+Choose the type of Dispatcher your application would like to use:
 
-When true, the Dispatcher will use implementation based on Reflection.
-
-When false, the Dispatcher will use source generated dispatcher.
+- **When true**: The Dispatcher uses an implementation based on reflection.
+- **When false**: The Dispatcher uses a source-generated dispatcher.
 
 ### 1.2 DecoratorOptions
 
-Decorator options can be set in WithOpenTypeDecorator()/WithClosedTypeDecorator() methods.
+Decorator options can be set using the `WithOpenTypeDecorator()` and `WithClosedTypeDecorator()` methods.
 
-### 1.2.1 StrictMode
-<b>Default value</b> - true
+#### 1.2.1 StrictMode
 
-Allow to chose if Validators should throw an exception when Pipeline builder will found out that decorators is not implemented correctly.
+**Default value**: `true`
 
-When true, when Pipeline Builder will found out incorrect Decorator implementation, will throw an exception.
+Choose whether Validators should throw an exception when the Pipeline Builder detects an incorrectly implemented decorator:
 
-When false, when Pipeline Builder will found out incorrect Decorator implementaiton, it will skip this decorator and it will be not applied on handlers, without throwing an exception.
-
-
+- **When true**: If the Pipeline Builder detects an incorrect Decorator implementation, it will throw an exception.
+- **When false**: If the Pipeline Builder detects an incorrect Decorator implementation, it will skip this decorator. The decorator will not be applied to handlers, and no exception will be thrown.
