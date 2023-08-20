@@ -1,7 +1,9 @@
-using Pipelines.Tests.UseCases.HandlerWithResult.Sample;
-using Pipelines.Tests.UseCases.HandlerWithResult.Types;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResult;
+
+using Types;
+using Sample;
 
 public class Tests
 {
@@ -35,5 +37,18 @@ public class Tests
 
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request"));
+    }
+
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _dispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }

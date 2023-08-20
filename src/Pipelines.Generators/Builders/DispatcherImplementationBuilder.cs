@@ -221,31 +221,50 @@ internal class DispatcherImplementationBuilder
     {
         if (hasResponse && !hasMultipleResults)
         {
-            return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
-            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
-            {GenerateSingleArgumentReturn(resultName, handlerResults)}";
+            return CaseBodyForSingleResponse(resultName, @await, handlerType, handlerMethod, dispatcherMethod, handlerResults);
         }
 
         if (hasResponse && hasMultipleResults)
         {
-            return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
-            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
-            {GenerateMultipleArgumentReturn(resultName, handlerResults)}";
+            return CaseBodyForMultipleResponses(resultName, @await, handlerType, handlerMethod, dispatcherMethod, handlerResults);
         }
 
         if (!hasResponse)
         {
-            return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>();
+            return CaseBodyWithoutResult(resultName, @await, handlerType, handlerMethod, dispatcherMethod);
+        }
+
+        return "";
+    }
+
+    private string CaseBodyWithoutResult(string resultName, string await, string handlerType, IMethodSymbol handlerMethod,
+        IMethodSymbol dispatcherMethod)
+    {
+        return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>().ToList();
+            if ({resultName}Handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerType}));
             foreach (var {resultName}Handler in {resultName}Handlers)
                 {{
                     {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
                 }}
             break;";
-        }
+    }
 
-        return "";
+    private string CaseBodyForMultipleResponses(string resultName, string await, string handlerType,
+        IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod, List<ITypeSymbol> handlerResults)
+    {
+        return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
+            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
+            {GenerateMultipleArgumentReturn(resultName, handlerResults)}";
+    }
+
+    private string CaseBodyForSingleResponse(string resultName, string await, string handlerType,
+        IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod, List<ITypeSymbol> handlerResults)
+    {
+        return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
+            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
+            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
+            {GenerateSingleArgumentReturn(resultName, handlerResults)}";
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>

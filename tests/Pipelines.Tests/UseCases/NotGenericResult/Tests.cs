@@ -1,4 +1,7 @@
+using Pipelines.Exceptions;
+
 namespace Pipelines.Tests.UseCases.NotGenericResult;
+
 using Types;
 using Sample;
 
@@ -45,5 +48,18 @@ public class Tests
             nameof(ExampleHandler),
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);
+    }
+
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request", 5);
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
+            await _dispatcher.SendAsync(request, new CancellationToken()));
+
+        return Task.CompletedTask;
     }
 }

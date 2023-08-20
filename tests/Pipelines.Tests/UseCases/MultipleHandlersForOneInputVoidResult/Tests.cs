@@ -1,3 +1,5 @@
+using Pipelines.Exceptions;
+
 namespace Pipelines.Tests.UseCases.MultipleHandlersForOneInputVoidResult;
 using Types;
 using Sample;
@@ -45,5 +47,16 @@ public class Tests
             nameof(ExampleCommandHandlerTwo),
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);
+    }
+    
+    [Test]
+    public void HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.Throws<HandlerNotRegisteredException>(() =>
+            _commandDispatcher.SendAsync(request, new CancellationToken()));
     }
 }

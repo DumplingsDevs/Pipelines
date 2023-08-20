@@ -1,3 +1,4 @@
+using Pipelines.Exceptions;
 using Pipelines.Tests.UseCases.HandlerWithMultipleParameters.Sample;
 using Pipelines.Tests.UseCases.HandlerWithMultipleParameters.Types;
 
@@ -36,5 +37,19 @@ public class Tests
 
         //Assert
         Assert.That(result.Value, Is.EqualTo("My test request"));
+    }
+
+    [Test]
+    public Task HandlerNotFound()
+    {
+        //Arrange
+        var request = new ExampleCommand2("My test request");
+
+        //Act & Assert
+        Assert.ThrowsAsync<HandlerNotRegisteredException>(async () => await _dispatcher.SendAsync(request,
+            new CancellationToken(), true,
+            new Dictionary<string, string>()));
+        
+        return Task.CompletedTask;
     }
 }
