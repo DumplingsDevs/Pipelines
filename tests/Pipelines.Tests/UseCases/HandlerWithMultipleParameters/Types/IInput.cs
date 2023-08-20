@@ -1,5 +1,3 @@
 namespace Pipelines.Tests.UseCases.HandlerWithMultipleParameters.Types;
 
-public interface ICommand<TResult> where TResult: class
-{
-}
+public interface IInput<TResult> where TResult: class { }
