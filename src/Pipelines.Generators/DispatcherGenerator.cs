@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Pipelines.Generators.Builders;
+using Pipelines.Generators.Exceptions;
 using Pipelines.Generators.Models;
 using Pipelines.Generators.Extensions;
 using Pipelines.Generators.Syntax;
@@ -25,15 +27,36 @@ public class DispatcherGenerator : ISourceGenerator
         {
             var interfaceName = config.DispatcherType.GetNameWithNamespace();
 
-            var builder = new DispatcherImplementationBuilder(config, context);
-            var classSourceCode = builder.Build();
-            var sourceText = SourceText.From(classSourceCode, Encoding.UTF8);
-            var sourceFileName = $"{interfaceName}Implementation.g.cs";
-            
-            context.AddSource(sourceFileName, sourceText);
+            var classSourceCode = BuildSourceCode(context, config);
+
+            if (!string.IsNullOrEmpty(classSourceCode))
+            {
+                var sourceText = SourceText.From(classSourceCode, Encoding.UTF8);
+                var sourceFileName = $"{interfaceName}Implementation.g.cs";
+
+                context.AddSource(sourceFileName, sourceText);
+            }
         }
     }
-    
+
+    private static string? BuildSourceCode(GeneratorExecutionContext context, PipelineConfig config)
+    {
+        try
+        {
+            var builder = new DispatcherImplementationBuilder(config, context);
+            return builder.Build();
+        }
+        catch (GeneratorException e)
+        {
+            var descriptor = new DiagnosticDescriptor(e.GetType().Name, e.GetType().Name, e.Message, "",
+                DiagnosticSeverity.Warning, true);
+
+            context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None));
+
+            return null;
+        }
+    }
+
     private IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
@@ -61,7 +84,8 @@ public class DispatcherGenerator : ISourceGenerator
         }
     }
 
-    private INamedTypeSymbol GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, string methodName)
+    private INamedTypeSymbol GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+        string methodName)
     {
         var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
         var genericSyntax = invocationSyntax.DescendantNodes().OfType<GenericNameSyntax>().ToList();
@@ -81,10 +105,11 @@ public class DispatcherGenerator : ISourceGenerator
         return null;
     }
 
-    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax, int skip)
+    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+        int skip)
     {
-
-        var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip).FirstOrDefault();
+        var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip)
+            .FirstOrDefault();
         if (typeOfSyntax is not null)
         {
             var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
@@ -97,7 +122,7 @@ public class DispatcherGenerator : ISourceGenerator
                 var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
                 return (INamedTypeSymbol)typeInfo.Type!;
             }
-            
+
             var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
                 .FirstOrDefault();
 
