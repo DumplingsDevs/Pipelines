@@ -1,5 +1,4 @@
-using Pipelines.Tests.UseCases.HandlerWithResult.Sample;
-using Pipelines.Tests.UseCases.HandlerWithResult.Types;
+using Pipelines.Exceptions;
 
 namespace Pipelines.Tests.UseCases.HandlerWithResult;
 
@@ -48,7 +47,7 @@ public class Tests
 
         //Act & Assert
         Assert.ThrowsAsync<HandlerNotRegisteredException>(async () =>
-            await _commandDispatcher.SendAsync(request, new CancellationToken()));
+            await _dispatcher.SendAsync(request, new CancellationToken()));
 
         return Task.CompletedTask;
     }
