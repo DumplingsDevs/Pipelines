@@ -45,7 +45,7 @@ public class Tests
         var request = new ExampleCommand2("My test request");
 
         //Act & Assert
-        Assert.Throws<HandlerNotRegisteredException>(async () =>
+        Assert.Throws<HandlerNotRegisteredException>(() =>
             _dispatcher.Send(request));
     }
 }
