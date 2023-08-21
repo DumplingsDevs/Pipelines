@@ -121,11 +121,11 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ```cs
 // Input Interface
-public interface IInput<TResult>{ }
+public interface IInput<TResult> where TResult: class{ } 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
 {
     public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
 }
@@ -135,7 +135,7 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 // Dispatcher Interface
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
 
@@ -195,11 +195,12 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 
 ```cs
 // Input Interface
-public interface IInput<TResult, TResult2> { }
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+public interface IHandler<in TCommand, TResult, TResult2>
+    where TCommand : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
     public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
 }
@@ -209,7 +210,7 @@ public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInpu
 public interface IDispatcher
 {
     public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
-        CancellationToken token);
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
@@ -229,7 +230,7 @@ public record ExampleCommandResultSecond(string Value);
 ```cs
 // Open Type Decorator Implementation
 public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult,TResult2>
+    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2 : class
 {
     private readonly IHandler<TCommand, TResult, TResult2> _handler;
     private readonly DecoratorsState _state;
@@ -260,11 +261,11 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 
 ```cs
 // Input Interface
-public interface IInput<TResult> { }
+public interface IInput<TResult> where TResult: class { }
 ```
 ```cs
 // Handler Interface
-public interface IInputHandler<in TCommand, TResult> 
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
 {
     public Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> fancyDictionary);
@@ -275,7 +276,7 @@ public interface IInputHandler<in TCommand, TResult>
 public interface IDispatcher
 {
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken t, bool canDoSomething,
-        Dictionary<string, string> dictionary);
+        Dictionary<string, string> dictionary) where TResult : class;
 }
 ```
 

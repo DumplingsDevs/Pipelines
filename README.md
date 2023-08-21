@@ -136,6 +136,13 @@ public static void CreateExampleEndpoint(this WebApplication app)
     }
 ```
 
+# Conventions
+- Generic result types must have a `class` constraint.
+- Result types for the Dispatcher and Handler must match.
+- Method parameters for the Dispatcher and Handler must match.
+- Input Generic Arguments indicate the result type.
+- If the Dispatcher/Handler returns a non-generic type, then the Input will not have any Generic Arguments.
+
 
 # Detailed documentation
 ------
