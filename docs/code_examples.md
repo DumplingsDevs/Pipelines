@@ -475,33 +475,72 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ```cs
 // Input Interface
+public interface IInput<TResult> where TResult: class{ } 
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public TResult Handle(TCommand command);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public TResult Send<TResult>(IInput<TResult> input) where TResult : class;
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleCommandResult>;
 ```
 
 ```cs
 // Result Implementation
+public record ExampleCommandResult(string Value);
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
+{
+    public ExampleCommandResult Handle(ExampleInput input)
+    {
+        return new ExampleCommandResult(input.Value);
+    }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
+    where TCommand : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+
+    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public TResult Handle(TCommand request)
+    {
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        var result = _handler.Handle(request);
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+
+        return result;
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/SyncGenericResult/)
 
 ----
 ### 3.3 Generic Tuple result
