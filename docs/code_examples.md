@@ -416,14 +416,14 @@ public interface IInput { }
 // Handler Interface
 public interface IHandler<in TCommand> where TCommand : IInput
 {
-    public void HandleAsync(TCommand command, CancellationToken token);
+    public void Handle(TCommand command);
 }
 ```
 ```cs
 // Dispatcher Interface
 public interface IDispatcher
 {
-    public void SendAsync(IInput input, CancellationToken token);
+    public void Send(IInput input);
 }
 ```
 
@@ -438,7 +438,7 @@ public record ExampleInput(string Value) : IInput;
 // Handler Implementation
 public class ExampleHandler : IHandler<ExampleInput>
 {
-    public void HandleAsync(ExampleInput input, CancellationToken token)
+    public void Handle(ExampleInput input)
     { }
 }
 ```
@@ -455,11 +455,11 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
         _handler = handler;
     }
 
-    public void HandleAsync(TCommand request, CancellationToken token)
+    public void Handle(TCommand request)
     {
         //Add Logic there
 
-        _handler.HandleAsync(request, token);
+        _handler.Handle(request);
 
         //Add Logic there
     }

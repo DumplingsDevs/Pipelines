@@ -35,7 +35,7 @@ public class Tests
         var request = new ExampleInput("My test request");
 
         //Act & Assert
-        Assert.DoesNotThrow(() => _dispatcher.SendAsync(request, new CancellationToken()));
+        Assert.DoesNotThrow(() => _dispatcher.Send(request));
 
         CollectionAssert.AreEqual(new List<string>
         {
@@ -53,6 +53,6 @@ public class Tests
 
         //Act & Assert
         Assert.Throws<HandlerNotRegisteredException>(() =>
-            _dispatcher.SendAsync(request, new CancellationToken()));
+            _dispatcher.Send(request));
     }
 }

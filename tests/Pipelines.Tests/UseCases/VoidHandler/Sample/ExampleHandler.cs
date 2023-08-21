@@ -11,7 +11,7 @@ public class ExampleHandler : IHandler<ExampleInput>
         _decoratorsState = decoratorsState;
     }
 
-    public void HandleAsync(ExampleInput input, CancellationToken token)
+    public void Handle(ExampleInput input)
     {
         _decoratorsState.Status.Add(nameof(ExampleHandler));
     }

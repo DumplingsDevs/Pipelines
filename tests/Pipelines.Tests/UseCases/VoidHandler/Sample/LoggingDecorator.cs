@@ -13,11 +13,11 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
         _state = state;
     }
 
-    public void HandleAsync(TCommand request, CancellationToken token)
+    public void Handle(TCommand request)
     {
         _state.Status.Add(typeof(LoggingDecorator<>).Name);
 
-        _handler.HandleAsync(request, token);
+        _handler.Handle(request);
 
         _state.Status.Add(typeof(LoggingDecorator<>).Name);
     }
