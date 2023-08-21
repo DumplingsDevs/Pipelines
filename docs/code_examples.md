@@ -410,33 +410,63 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ```cs
 // Input Interface
+public interface IInput { }
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public void HandleAsync(TCommand command, CancellationToken token);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public void SendAsync(IInput input, CancellationToken token);
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
-```
-
-```cs
-// Result Implementation
+public record ExampleInput(string Value) : IInput;
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public void HandleAsync(ExampleInput input, CancellationToken token)
+    { }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public void HandleAsync(TCommand request, CancellationToken token)
+    {
+        //Add Logic there
+
+        _handler.HandleAsync(request, token);
+
+        //Add Logic there
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/VoidHandler/)
 
 ----
 ### 3.2 Generic result
