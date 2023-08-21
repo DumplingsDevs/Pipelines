@@ -598,31 +598,67 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 
 ```cs
 // Input Interface
+public interface IInput { }
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public string Handle(TCommand command);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public string Send(IInput inputWithResult);
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
-```
-
-```cs
-// Result Implementation
+public record ExampleInput(string Name, int Value) : IInput;
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public string Handle(ExampleInput input)
+    {
+        return $"It's working!, {input.Name}, {input.Value}";
+    }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public string Handle(TCommand request)
+    {
+        //Add logic there
+
+        var result = _handler.Handle(request);
+
+        //Add logic there
+
+        return result;
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/SyncNotGenericResult/)
+
+-----
 
