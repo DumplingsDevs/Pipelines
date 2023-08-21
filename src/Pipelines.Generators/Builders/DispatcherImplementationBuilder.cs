@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Pipelines.Generators.Models;
 using Pipelines.Generators.Extensions;
+using Pipelines.Generators.Validators.CrossValidation;
 using Pipelines.Generators.Validators.Dispatcher;
 
 namespace Pipelines.Generators.Builders;
@@ -21,6 +22,7 @@ internal class DispatcherImplementationBuilder
         _context = context;
 
         DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
+        CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
     }
 
     public string Build()

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Pipelines.Generators.Extensions;
@@ -8,20 +7,18 @@ namespace Pipelines.Generators.Validators.Dispatcher;
 
 internal static class DispatcherParameterConstraintValidator
 {
-    internal static void Validate(INamedTypeSymbol dispatcher)
+    internal static void Validate(INamedTypeSymbol dispatcherType)
     {
-        var dispatcherMethods = dispatcher.GetMembers().OfType<IMethodSymbol>();
-        foreach (var dispatcherMethod in dispatcherMethods)
+        var dispatcherMethod = dispatcherType.GetFirstMethod();
+        
+        if (!dispatcherMethod.TypeParameters.Any())
         {
-            if (!dispatcherMethod.TypeParameters.Any())
-            {
-                continue;
-            }
-            
-            if (dispatcherMethod.GetTypeParametersConstraints().Count == 0)
-            {
-                throw new ConstraintOnTypeParameterNotFoundException(dispatcherMethod.TypeParameters.ToList());
-            }
+            return;
+        }
+
+        if (dispatcherMethod.GetTypeParametersConstraints().Count == 0)
+        {
+            throw new ConstraintOnTypeParameterNotFoundException(dispatcherMethod.TypeParameters.ToList());
         }
     }
 }
