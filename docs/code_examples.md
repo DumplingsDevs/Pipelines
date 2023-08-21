@@ -510,33 +510,85 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ```cs
 // Input Interface
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class
+{ }
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+    where TResult : class where TResult2 : class
+{
+    public (TResult, TResult2) HandleAsync(TCommand command, CancellationToken token);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public (TResult, TResult2) SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleRecordCommandResult, ExampleCommandClassResult>;
 ```
 
 ```cs
 // Result Implementation
+public record ExampleRecordCommandResult(string Value);
+
+public class ExampleCommandClassResult
+{
+    public ExampleCommandClassResult(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+}
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput, ExampleRecordCommandResult, ExampleCommandClassResult>
+{
+    public (ExampleRecordCommandResult, ExampleCommandClassResult) HandleAsync(ExampleInput input, CancellationToken token)
+    {
+        return (new ExampleRecordCommandResult(input.Value), new ExampleCommandClassResult("Value"));
+    }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
+    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2: class
+{
+    private readonly IHandler<TCommand, TResult, TResult2> _handler;
+
+    public LoggingDecorator(IHandler<TCommand, TResult, TResult2> handler)
+    {
+        _handler = handler;
+    }
+
+    public (TResult,TResult2) HandleAsync(TCommand request, CancellationToken token)
+    {
+        //Add logic there 
+
+        var result = _handler.HandleAsync(request, token);
+
+        //Add logic there 
+
+        return result;
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithTupleResult/)
 
 
 ----
