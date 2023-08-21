@@ -13,6 +13,10 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
   - [2.4 Multiple method parameters](#24-multiple-method-parameters)
   - [2.5 No generic result](#25-no-generic-result)
 - [3. Sync pipelines](#3-sync-pipelines)
+  - [3.1 Void Result](#31-void-result)
+  - [3.2 Generic result](#32-generic-result)
+  - [3.3 Generic Tuple result](#33-generic-tuple-result)
+  - [3.4 No generic result](#34-no-generic-result)
 
 ------
 
@@ -396,8 +400,11 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 [Unit tests](../tests/Pipelines.Tests/UseCases/NotGenericResult/)
 
 
+## 3. Sync Pipelines
+
+
 ----
-### Template for next examples
+### 3.1 Void Result
 
 <b> Interfaces </b>
 
@@ -430,3 +437,110 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 ```
 
 [Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
+----
+### 3.2 Generic result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+```
+```cs
+// Handler Interface
+```
+```cs
+// Dispatcher Interface
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+```
+
+```cs
+// Result Implementation
+```
+
+```cs
+// Handler Implementation
+```
+
+```cs
+// Open Type Decorator Implementation
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
+----
+### 3.3 Generic Tuple result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+```
+```cs
+// Handler Interface
+```
+```cs
+// Dispatcher Interface
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+```
+
+```cs
+// Result Implementation
+```
+
+```cs
+// Handler Implementation
+```
+
+```cs
+// Open Type Decorator Implementation
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
+
+----
+### 3.4 No generic result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+```
+```cs
+// Handler Interface
+```
+```cs
+// Dispatcher Interface
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+```
+
+```cs
+// Result Implementation
+```
+
+```cs
+// Handler Implementation
+```
+
+```cs
+// Open Type Decorator Implementation
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+
