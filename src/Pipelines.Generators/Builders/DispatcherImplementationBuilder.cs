@@ -200,7 +200,7 @@ internal class DispatcherImplementationBuilder
 
         var namedSymbol = ((INamedTypeSymbol)methodSymbol.ReturnType);
 
-        if (namedSymbol.ToString() == "System.Threading.Tasks.Task")
+        if (namedSymbol.IsVoidTask())
         {
             return new List<ITypeSymbol>();
         }
