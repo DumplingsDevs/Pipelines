@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.VoidHandler.Sample;
+namespace Pipelines.Tests.UseCases.SyncNotGenericResult.Sample;
 using Types;
 
 public class LoggingDecorator<TCommand> : IHandler<TCommand>
@@ -13,12 +13,14 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
         _state = state;
     }
 
-    public void Handle(TCommand request)
+    public string Handle(TCommand request)
     {
         _state.Status.Add(typeof(LoggingDecorator<>).Name);
 
-        _handler.Handle(request);
+        var result = _handler.Handle(request);
 
         _state.Status.Add(typeof(LoggingDecorator<>).Name);
+
+        return result;
     }
 }

@@ -13,6 +13,10 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
   - [2.4 Multiple method parameters](#24-multiple-method-parameters)
   - [2.5 No generic result](#25-no-generic-result)
 - [3. Sync pipelines](#3-sync-pipelines)
+  - [3.1 Void Result](#31-void-result)
+  - [3.2 Generic result](#32-generic-result)
+  - [3.3 Generic Tuple result](#33-generic-tuple-result)
+  - [3.4 No generic result](#34-no-generic-result)
 
 ------
 
@@ -121,11 +125,11 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 
 ```cs
 // Input Interface
-public interface IInput<TResult>{ }
+public interface IInput<TResult> where TResult: class{ } 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
 {
     public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
 }
@@ -135,7 +139,7 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 // Dispatcher Interface
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
 
@@ -195,11 +199,12 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
 
 ```cs
 // Input Interface
-public interface IInput<TResult, TResult2> { }
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+public interface IHandler<in TCommand, TResult, TResult2>
+    where TCommand : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
     public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
 }
@@ -209,7 +214,7 @@ public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInpu
 public interface IDispatcher
 {
     public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
-        CancellationToken token);
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
@@ -229,7 +234,7 @@ public record ExampleCommandResultSecond(string Value);
 ```cs
 // Open Type Decorator Implementation
 public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult,TResult2>
+    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2 : class
 {
     private readonly IHandler<TCommand, TResult, TResult2> _handler;
     private readonly DecoratorsState _state;
@@ -260,11 +265,11 @@ public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, 
 
 ```cs
 // Input Interface
-public interface IInput<TResult> { }
+public interface IInput<TResult> where TResult: class { }
 ```
 ```cs
 // Handler Interface
-public interface IInputHandler<in TCommand, TResult> 
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
 {
     public Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> fancyDictionary);
@@ -275,7 +280,7 @@ public interface IInputHandler<in TCommand, TResult>
 public interface IDispatcher
 {
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken t, bool canDoSomething,
-        Dictionary<string, string> dictionary);
+        Dictionary<string, string> dictionary) where TResult : class;
 }
 ```
 
@@ -395,37 +400,304 @@ public class LoggingDecorator<TCommand> : IHandler<TCommand>
 [Unit tests](../tests/Pipelines.Tests/UseCases/NotGenericResult/)
 
 
+## 3. Sync Pipelines
+
+
 ----
-### Template for next examples
+### 3.1 Void Result
 
 <b> Interfaces </b>
 
 ```cs
 // Input Interface
+public interface IInput { }
 ```
 ```cs
 // Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public void Handle(TCommand command);
+}
 ```
 ```cs
 // Dispatcher Interface
+public interface IDispatcher
+{
+    public void Send(IInput input);
+}
 ```
 
 <b> Example implementation </b>
 
 ```cs
 // Input Implementation
-```
-
-```cs
-// Result Implementation
+public record ExampleInput(string Value) : IInput;
 ```
 
 ```cs
 // Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public void Handle(ExampleInput input)
+    { }
+}
 ```
 
 ```cs
 // Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public void Handle(TCommand request)
+    {
+        //Add Logic there
+
+        _handler.Handle(request);
+
+        //Add Logic there
+    }
+}
 ```
 
-[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithResult/)
+[Unit tests](../tests/Pipelines.Tests/UseCases/VoidHandler/)
+
+----
+### 3.2 Generic result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput<TResult> where TResult: class{ } 
+```
+```cs
+// Handler Interface
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public TResult Handle(TCommand command);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public TResult Send<TResult>(IInput<TResult> input) where TResult : class;
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleCommandResult>;
+```
+
+```cs
+// Result Implementation
+public record ExampleCommandResult(string Value);
+```
+
+```cs
+// Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
+{
+    public ExampleCommandResult Handle(ExampleInput input)
+    {
+        return new ExampleCommandResult(input.Value);
+    }
+}
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
+    where TCommand : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+
+    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public TResult Handle(TCommand request)
+    {
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        var result = _handler.Handle(request);
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+
+        return result;
+    }
+}
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/SyncGenericResult/)
+
+----
+### 3.3 Generic Tuple result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class
+{ }
+```
+```cs
+// Handler Interface
+public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+    where TResult : class where TResult2 : class
+{
+    public (TResult, TResult2) HandleAsync(TCommand command, CancellationToken token);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public (TResult, TResult2) SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Value) : IInput<ExampleRecordCommandResult, ExampleCommandClassResult>;
+```
+
+```cs
+// Result Implementation
+public record ExampleRecordCommandResult(string Value);
+
+public class ExampleCommandClassResult
+{
+    public ExampleCommandClassResult(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+}
+```
+
+```cs
+// Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput, ExampleRecordCommandResult, ExampleCommandClassResult>
+{
+    public (ExampleRecordCommandResult, ExampleCommandClassResult) HandleAsync(ExampleInput input, CancellationToken token)
+    {
+        return (new ExampleRecordCommandResult(input.Value), new ExampleCommandClassResult("Value"));
+    }
+}
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
+    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2: class
+{
+    private readonly IHandler<TCommand, TResult, TResult2> _handler;
+
+    public LoggingDecorator(IHandler<TCommand, TResult, TResult2> handler)
+    {
+        _handler = handler;
+    }
+
+    public (TResult,TResult2) HandleAsync(TCommand request, CancellationToken token)
+    {
+        //Add logic there 
+
+        var result = _handler.HandleAsync(request, token);
+
+        //Add logic there 
+
+        return result;
+    }
+}
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/HandlerWithTupleResult/)
+
+
+----
+### 3.4 No generic result
+
+<b> Interfaces </b>
+
+```cs
+// Input Interface
+public interface IInput { }
+```
+```cs
+// Handler Interface
+public interface IHandler<in TCommand> where TCommand : IInput
+{
+    public string Handle(TCommand command);
+}
+```
+```cs
+// Dispatcher Interface
+public interface IDispatcher
+{
+    public string Send(IInput inputWithResult);
+}
+```
+
+<b> Example implementation </b>
+
+```cs
+// Input Implementation
+public record ExampleInput(string Name, int Value) : IInput;
+```
+
+```cs
+// Handler Implementation
+public class ExampleHandler : IHandler<ExampleInput>
+{
+    public string Handle(ExampleInput input)
+    {
+        return $"It's working!, {input.Name}, {input.Value}";
+    }
+}
+```
+
+```cs
+// Open Type Decorator Implementation
+public class LoggingDecorator<TCommand> : IHandler<TCommand>
+    where TCommand : IInput
+{
+    private readonly IHandler<TCommand> _handler;
+
+    public LoggingDecorator(IHandler<TCommand> handler)
+    {
+        _handler = handler;
+    }
+
+    public string Handle(TCommand request)
+    {
+        //Add logic there
+
+        var result = _handler.Handle(request);
+
+        //Add logic there
+
+        return result;
+    }
+}
+```
+
+[Unit tests](../tests/Pipelines.Tests/UseCases/SyncNotGenericResult/)
+
+-----
+

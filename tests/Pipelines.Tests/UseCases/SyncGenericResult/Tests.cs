@@ -1,31 +1,28 @@
 using Pipelines.Exceptions;
-using Pipelines.Tests.UseCases.VoidHandler.Sample;
-using Pipelines.Tests.UseCases.VoidHandler.Types;
 
-namespace Pipelines.Tests.UseCases.VoidHandler;
+namespace Pipelines.Tests.UseCases.SyncGenericResult;
+using Types;
+using Sample;
 
 public class Tests
 {
     private readonly IDispatcher _dispatcher;
     private readonly DependencyContainer _dependencyContainer;
-    private readonly DecoratorsState _state;
 
     public Tests()
     {
         _dependencyContainer = new DependencyContainer();
+        
         var assembly = typeof(DependencyContainer).Assembly;
 
-        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput))
-            .AddHandler(typeof(IHandler<>), assembly)
+        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<>))
+            .AddHandler(typeof(IHandler<,>), assembly)
             .AddDispatcher<IDispatcher>(
                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<>)));
-
-        _dependencyContainer.RegisterSingleton<DecoratorsState>();
-
+            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>)));
+        
         _dependencyContainer.BuildContainer();
         _dispatcher = _dependencyContainer.GetService<IDispatcher>();
-        _state = _dependencyContainer.GetService<DecoratorsState>();
     }
 
     [Test]
@@ -34,17 +31,13 @@ public class Tests
         //Arrange
         var request = new ExampleInput("My test request");
 
-        //Act & Assert
-        Assert.DoesNotThrow(() => _dispatcher.Send(request));
+        //Act
+        var result = _dispatcher.Send(request);
 
-        CollectionAssert.AreEqual(new List<string>
-        {
-            typeof(LoggingDecorator<>).Name,
-            nameof(ExampleHandler),
-            typeof(LoggingDecorator<>).Name,
-        }, _state.Status);
+        //Assert
+        Assert.That(result.Value, Is.EqualTo("My test request"));
     }
-    
+
     [Test]
     public void HandlerNotFound()
     {
