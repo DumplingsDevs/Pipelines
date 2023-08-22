@@ -139,7 +139,7 @@ internal class DispatcherImplementationBuilder
             var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
             var resultName = $"result{inputClass.GetFormattedFullname()}";
 
-            AddInLine("case ");
+            AddLine("case ");
             AddInLine(inputClass.ToString());
             AddInLine(" i: ");
             AddLine(GetCaseTemplate(hasResponse,
@@ -156,10 +156,10 @@ internal class DispatcherImplementationBuilder
     private List<INamedTypeSymbol> GetInputImplementations()
     {
         var allTypes = new List<INamedTypeSymbol>();
-        
+
         List<IAssemblySymbol> assemblySymbol = _context.Compilation.SourceModule.ReferencedAssemblySymbols.ToList();
         assemblySymbol.Add(_context.Compilation.Assembly);
-        
+
         foreach (var assembly in assemblySymbol)
         {
             ProcessNamespace(assembly.GlobalNamespace, allTypes);
@@ -188,7 +188,29 @@ internal class DispatcherImplementationBuilder
 
     private List<ITypeSymbol> GetHandlerArgumentResults(IMethodSymbol methodSymbol)
     {
-        var handlerResultTypeArguments = ((INamedTypeSymbol)methodSymbol.ReturnType).TypeArguments.ToList();
+        if (methodSymbol.ReturnsVoid)
+        {
+            return new List<ITypeSymbol>();
+        }
+
+        if (methodSymbol.ReturnType is ITypeParameterSymbol typeParameterSymbol)
+        {
+            return new List<ITypeSymbol>() { typeParameterSymbol };
+        }
+
+        var namedSymbol = ((INamedTypeSymbol)methodSymbol.ReturnType);
+
+        if (namedSymbol.ToString() == "System.Threading.Tasks.Task")
+        {
+            return new List<ITypeSymbol>();
+        }
+
+        if (!namedSymbol.IsGenericType)
+        {
+            return new List<ITypeSymbol>() { namedSymbol };
+        }
+
+        var handlerResultTypeArguments = namedSymbol.TypeArguments.ToList();
 
         if (handlerResultTypeArguments.Count > 1)
         {
@@ -221,12 +243,14 @@ internal class DispatcherImplementationBuilder
     {
         if (hasResponse && !hasMultipleResults)
         {
-            return CaseBodyForSingleResponse(resultName, @await, handlerType, handlerMethod, dispatcherMethod, handlerResults);
+            return CaseBodyForSingleResponse(resultName, @await, handlerType, handlerMethod, dispatcherMethod,
+                handlerResults);
         }
 
         if (hasResponse && hasMultipleResults)
         {
-            return CaseBodyForMultipleResponses(resultName, @await, handlerType, handlerMethod, dispatcherMethod, handlerResults);
+            return CaseBodyForMultipleResponses(resultName, @await, handlerType, handlerMethod, dispatcherMethod,
+                handlerResults);
         }
 
         if (!hasResponse)
@@ -237,7 +261,8 @@ internal class DispatcherImplementationBuilder
         return "";
     }
 
-    private string CaseBodyWithoutResult(string resultName, string await, string handlerType, IMethodSymbol handlerMethod,
+    private string CaseBodyWithoutResult(string resultName, string await, string handlerType,
+        IMethodSymbol handlerMethod,
         IMethodSymbol dispatcherMethod)
     {
         return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>().ToList();
