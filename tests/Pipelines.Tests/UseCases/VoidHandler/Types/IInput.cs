@@ -1,5 +1,3 @@
 namespace Pipelines.Tests.UseCases.VoidHandler.Types;
 
-public interface ICommand
-{
-}
+public interface IInput { }

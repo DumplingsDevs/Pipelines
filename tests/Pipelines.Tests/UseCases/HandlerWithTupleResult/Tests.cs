@@ -7,7 +7,7 @@ using Sample;
 
 public class Tests
 {
-    private readonly ICommandDispatcher _commandDispatcher;
+    private readonly IDispatcher _dispatcher;
     private readonly DependencyContainer _dependencyContainer;
     private readonly DecoratorsState _state;
 
@@ -16,16 +16,16 @@ public class Tests
         _dependencyContainer = new DependencyContainer();
         var assembly = typeof(DependencyContainer).Assembly;
 
-        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand<,>))
-            .AddHandler(typeof(ICommandHandler<,,>), assembly)
-            .AddDispatcher<ICommandDispatcher>(
+        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<,>))
+            .AddHandler(typeof(IHandler<,,>), assembly)
+            .AddDispatcher<IDispatcher>(
                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,,>)));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
 
         _dependencyContainer.BuildContainer();
-        _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();
+        _dispatcher = _dependencyContainer.GetService<IDispatcher>();
         _state = _dependencyContainer.GetService<DecoratorsState>();
     }
 
@@ -33,10 +33,10 @@ public class Tests
     public void HappyPath()
     {
         //Arrange
-        var request = new ExampleCommand("My test request");
+        var request = new ExampleInput("My test request");
 
         //Act
-        var result = _commandDispatcher.SendAsync(request, new CancellationToken());
+        var result = _dispatcher.SendAsync(request, new CancellationToken());
 
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
@@ -57,6 +57,6 @@ public class Tests
 
         //Act & Assert
         Assert.Throws<HandlerNotRegisteredException>(() =>
-            _commandDispatcher.SendAsync(request, new CancellationToken()));
+            _dispatcher.SendAsync(request, new CancellationToken()));
     }
 }

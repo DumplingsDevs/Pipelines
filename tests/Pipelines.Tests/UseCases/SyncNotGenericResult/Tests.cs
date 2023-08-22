@@ -1,8 +1,9 @@
 using Pipelines.Exceptions;
-using Pipelines.Tests.UseCases.VoidHandler.Sample;
-using Pipelines.Tests.UseCases.VoidHandler.Types;
 
-namespace Pipelines.Tests.UseCases.VoidHandler;
+namespace Pipelines.Tests.UseCases.SyncNotGenericResult;
+using Types;
+using Sample;
+
 
 public class Tests
 {
@@ -32,11 +33,12 @@ public class Tests
     public void HappyPath()
     {
         //Arrange
-        var request = new ExampleInput("My test request");
+        var request = new ExampleInput("My test request", 5);
 
-        //Act & Assert
-        Assert.DoesNotThrow(() => _dispatcher.Send(request));
+        //Act
+        var result = _dispatcher.Send(request);
 
+        //Assert
         CollectionAssert.AreEqual(new List<string>
         {
             typeof(LoggingDecorator<>).Name,
@@ -44,12 +46,12 @@ public class Tests
             typeof(LoggingDecorator<>).Name,
         }, _state.Status);
     }
-    
+
     [Test]
     public void HandlerNotFound()
     {
         //Arrange
-        var request = new ExampleCommand2("My test request");
+        var request = new ExampleCommand2("My test request", 5);
 
         //Act & Assert
         Assert.Throws<HandlerNotRegisteredException>(() =>
