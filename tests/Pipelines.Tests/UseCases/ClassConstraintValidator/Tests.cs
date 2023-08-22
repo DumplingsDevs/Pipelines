@@ -1,3 +1,4 @@
+using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint.Exceptions;
 using Pipelines.Tests.UseCases.ClassConstraintValidator.Sample;
 using Pipelines.Tests.UseCases.ClassConstraintValidator.Types;
 
@@ -5,34 +6,22 @@ namespace Pipelines.Tests.UseCases.ClassConstraintValidator;
 
 public class Tests
 {
-    private readonly IDispatcher _dispatcher;
-    private readonly DependencyContainer _dependencyContainer;
-
-    public Tests()
-    {
-        _dependencyContainer = new DependencyContainer();
-        
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<>))
-            .AddHandler(typeof(IHandler<,>), assembly)
-            .AddDispatcher<IDispatcher>(
-                new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        
-        _dependencyContainer.BuildContainer();
-        _dispatcher = _dependencyContainer.GetService<IDispatcher>();
-    }
 
     [Test]
-    public async Task HappyPath()
+    public void ItShouldThrowExceptionThatClassConstraintIsMissing()
     {
-        //Arrange
-        var request = new ExampleInput("My test request");
+        Assert.Throws<ReturnTypesShouldHaveClassConstraintException>( () =>
+        {
+            var dependencyContainer = new DependencyContainer();
 
-        //Act
-        var result = await _dispatcher.SendAsync(request, new CancellationToken());
+            var assembly = typeof(DependencyContainer).Assembly;
 
-        //Assert
-        Assert.That(result.Value, Is.EqualTo("My test request"));
+            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<>))
+                .AddHandler(typeof(IHandler<,>), assembly)
+                .AddDispatcher<IDispatcher>(
+                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+
+            dependencyContainer.BuildContainer();
+        });
     }
 }

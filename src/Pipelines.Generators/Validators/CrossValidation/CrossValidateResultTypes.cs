@@ -41,12 +41,12 @@ internal static class CrossValidateResultTypes
 
     private static bool IsGenericReturnType(this IMethodSymbol typeSymbol)
     {
-        return typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType;
+        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType;
     }
 
     private static bool IsTaskReturnType(this IMethodSymbol typeSymbol)
     {
-        return typeSymbol is INamedTypeSymbol namedTypeSymbol &&
+        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol &&
                namedTypeSymbol.OriginalDefinition.ToString() == "System.Threading.Tasks.Task<>" &&
                namedTypeSymbol.ContainingNamespace.ToString() == "System.Threading.Tasks";
     }
