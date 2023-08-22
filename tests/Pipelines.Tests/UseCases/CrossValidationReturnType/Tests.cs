@@ -41,7 +41,7 @@ public class Tests
     }
     
     [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherWithConstrainedResult_ThrowsParameterCountMismatchException()
+    public void Validate_WithMatchingHandlerAndDispatcherWithConstrainedResult_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
 
@@ -57,7 +57,23 @@ public class Tests
     }
     
     [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstrainedResults_ThrowsParameterCountMismatchException()
+    public void Validate_WithMatchingHandlerAndDispatcherAndGenericInputResult_DoesNotThrowException()
+    {
+        var dependencyContainer = new DependencyContainer();
+
+        var assembly = typeof(DependencyContainer).Assembly;
+
+        Assert.DoesNotThrow(() =>
+        {
+            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputGenericType<>))
+                .AddHandler(typeof(IHandlerTaskInputGenericResult<,>), assembly)
+                .AddDispatcher<IDispatcherTaskInputGenericResult>(
+                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+        });
+    }
+    
+    [Test]
+    public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstrainedResults_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
 
