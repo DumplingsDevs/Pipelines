@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Pipelines.Generators.Models;
 using Pipelines.Generators.Extensions;
+using Pipelines.Generators.Validators.CrossValidation;
+using Pipelines.Generators.Validators.Dispatcher;
 
 namespace Pipelines.Generators.Builders;
 
@@ -18,6 +20,9 @@ internal class DispatcherImplementationBuilder
     {
         _pipelineConfig = pipelineConfig;
         _context = context;
+
+        DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
+        CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
     }
 
     public string Build()
@@ -355,7 +360,7 @@ internal class DispatcherImplementationBuilder
 
     private string GetConstraints(IMethodSymbol methodSymbol)
     {
-        var typeParameterConstraints = methodSymbol.TypeParameters.Select(GetTypeParameterConstraints).ToList();
+        var typeParameterConstraints = methodSymbol.GetTypeParametersConstraints();
         if (typeParameterConstraints.Any())
         {
             return "where " + string.Join(" where ", typeParameterConstraints);
@@ -364,28 +369,7 @@ internal class DispatcherImplementationBuilder
         return "";
     }
 
-    private string GetTypeParameterConstraints(ITypeParameterSymbol typeParameter)
-    {
-        var constraints = typeParameter.ConstraintTypes.Select(constraint => constraint.ToDisplayString());
-        if (typeParameter.HasReferenceTypeConstraint)
-        {
-            constraints = constraints.Append("class");
-        }
 
-        if (typeParameter.HasValueTypeConstraint)
-        {
-            constraints = constraints.Append("struct");
-        }
-
-        if (typeParameter.HasConstructorConstraint)
-        {
-            constraints = constraints.Append("new()");
-        }
-
-        //TO DO - other constraints ? Or maybe different approach
-
-        return $"{typeParameter.Name} : {string.Join(", ", constraints)}";
-    }
 
     private string GetParametersString(IMethodSymbol method, int skip)
     {

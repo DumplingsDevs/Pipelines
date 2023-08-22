@@ -1,6 +1,7 @@
 using Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
+using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint.Exceptions;
 using Pipelines.Tests.Builder.Validators.Dispatcher.ResultTypes.Types;
 
 namespace Pipelines.Tests.Builder.Validators.Dispatcher.ResultTypes;
@@ -8,14 +9,14 @@ namespace Pipelines.Tests.Builder.Validators.Dispatcher.ResultTypes;
 public class ValidateResultTypesWithDispatcherInputResultTypesTests
 {
     [Test]
-    public void Validate_GivenIIDispatcherGenericReturnTypeICommandWithoutResultType_DoesNotThrowException()
+    public void Validate_GivenIIDispatcherGenericReturnTypeICommandWithoutResultType_GenericWithoutClassConstraint_ThrowsException()
     {
         // Arrange
         var dispatcherType = typeof(IDispatcherGenericReturnTypeICommandWithoutResultType);
         var commandType = typeof(ICommand);
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        Assert.Throws<ReturnTypesShouldHaveClassConstraintException>(() =>
             ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType));
     }
 
@@ -40,7 +41,7 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
         var commandType = typeof(ICommandWithResult<int>); // Use a concrete type here
 
         // Act & Assert
-        Assert.Throws<IsGenericMismatchException>(() =>
+        Assert.Throws<ReturnTypesShouldHaveClassConstraintException>(() =>
             ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType));
     }
 
