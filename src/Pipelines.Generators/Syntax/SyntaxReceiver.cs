@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,9 +14,11 @@ internal class SyntaxReceiver : CSharpSyntaxWalker
         _compilation = compilation;
     }
 
-    public InvocationExpressionSyntax AddInputInvocation { get; private set; }
-    public InvocationExpressionSyntax AddHandlerInvocation { get; private set; }
-    public InvocationExpressionSyntax AddDispatcherInvocation { get; private set; }
+    private InvocationExpressionSyntax? AddInputInvocation { get; set; }
+    private InvocationExpressionSyntax? AddHandlerInvocation { get; set; }
+    private InvocationExpressionSyntax? AddDispatcherInvocation { get; set; }
+
+    public List<BuilderMethodsHolder> BuilderInvocations { get; private set; } = new();
 
     public override void VisitInvocationExpression(InvocationExpressionSyntax node)
     {
@@ -34,6 +37,14 @@ internal class SyntaxReceiver : CSharpSyntaxWalker
         else if (methodSymbol?.Name == "AddDispatcher" && methodSymbol.IsGenericMethod)
         {
             AddDispatcherInvocation = node;
+        }
+
+        if (AddInputInvocation is not null && AddHandlerInvocation is not null && AddDispatcherInvocation is not null)
+        {
+            BuilderInvocations.Add(new BuilderMethodsHolder(AddInputInvocation, AddHandlerInvocation, AddDispatcherInvocation));
+            AddInputInvocation = null;
+            AddHandlerInvocation = null;
+            AddDispatcherInvocation = null;
         }
 
         base.VisitInvocationExpression(node);

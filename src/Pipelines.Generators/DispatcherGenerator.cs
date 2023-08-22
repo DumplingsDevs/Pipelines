@@ -71,13 +71,15 @@ public class DispatcherGenerator : ISourceGenerator
             syntaxReceiver.Visit(root);
 
             // Check if we have found all necessary method invocations
-            if (syntaxReceiver is
-                { AddInputInvocation: not null, AddHandlerInvocation: not null, AddDispatcherInvocation: not null })
+            if (!syntaxReceiver.BuilderInvocations.Any()) continue;
+
+            foreach (var (addInputInvocation, addHandlerInvocation, addDispatcherInvocation) in syntaxReceiver
+                         .BuilderInvocations)
             {
-                var inputType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddInputInvocation, 0);
-                var handlerType = GetTypeOfSymbol(context.Compilation, syntaxReceiver.AddHandlerInvocation, 1);
+                var inputType = GetTypeOfSymbol(context.Compilation, addInputInvocation, 0);
+                var handlerType = GetTypeOfSymbol(context.Compilation, addHandlerInvocation, 1);
                 var dispatcherType =
-                    GetGenericSymbol(context.Compilation, syntaxReceiver.AddDispatcherInvocation, "AddDispatcher");
+                    GetGenericSymbol(context.Compilation, addDispatcherInvocation, "AddDispatcher");
 
                 yield return new PipelineConfig(dispatcherType, handlerType, inputType);
             }

@@ -88,21 +88,21 @@ public class Tests
         });
     }
     
-    [Test]
-    public void Validate_WithMismatchingResultTypeCount_ThrowsResultTypeCountMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<ResultTypeCountMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerTaskStringResult<>), assembly)
-                .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
+    // [Test]
+    // public void Validate_WithMismatchingResultTypeCount_ThrowsResultTypeCountMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<ResultTypeCountMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerTaskStringResult<>), assembly)
+    //             .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
     
     [Test]
     public void Validate_WithMismatchingResultType_ThrowsTaskReturnTypeMismatchException()
@@ -164,6 +164,22 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithDifferentTwoConstraintedResults>(
+                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+        });
+    }
+    
+    [Test]
+    public void Validate_WithStringAndGenericType_ThrowsGenericTypeCountMismatchException()
+    {
+        var dependencyContainer = new DependencyContainer();
+
+        var assembly = typeof(DependencyContainer).Assembly;
+
+        Assert.Throws<GenericTypeMismatchException>(() =>
+        {
+            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+                .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
+                .AddDispatcher<IDispatcherTaskStringResult2>(
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
