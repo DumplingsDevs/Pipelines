@@ -13,7 +13,22 @@ internal static class CrossValidateResultTypes
         var dispatcherMethod = dispatcherType.GetFirstMethod();
         var handlerMethod = handlerType.GetFirstMethod();
 
-        if (dispatcherMethod.ReturnType.ToString() != handlerMethod.ReturnType.ToString())
+        if (dispatcherMethod.ReturnsVoid != handlerMethod.ReturnsVoid)
+        {
+            ThrowMismatchException();
+        }
+
+        if (dispatcherMethod.IsGenericReturnType() != handlerMethod.IsGenericReturnType())
+        {
+            ThrowMismatchException();
+        }
+
+        if (dispatcherMethod.IsTaskReturnType() != handlerMethod.IsTaskReturnType())
+        {
+            ThrowMismatchException();
+        }
+
+        if (dispatcherMethod.ReturnType.IsValueType != handlerMethod.ReturnType.IsValueType)
         {
             ThrowMismatchException();
         }
@@ -22,5 +37,17 @@ internal static class CrossValidateResultTypes
         {
             throw new ReturnTypeMismatchException(dispatcherType, dispatcherMethod, handlerType, handlerMethod);
         }
+    }
+
+    private static bool IsGenericReturnType(this IMethodSymbol typeSymbol)
+    {
+        return typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType;
+    }
+
+    private static bool IsTaskReturnType(this IMethodSymbol typeSymbol)
+    {
+        return typeSymbol is INamedTypeSymbol namedTypeSymbol &&
+               namedTypeSymbol.OriginalDefinition.ToString() == "System.Threading.Tasks.Task<>" &&
+               namedTypeSymbol.ContainingNamespace.ToString() == "System.Threading.Tasks";
     }
 }
