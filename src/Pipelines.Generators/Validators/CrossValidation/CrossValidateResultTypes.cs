@@ -36,11 +36,6 @@ internal static class CrossValidateResultTypes
                     var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
                     var handlerArgument = handlerNamedType.TypeArguments[index];
 
-                    if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
-                    {
-                        ThrowMismatchException();
-                    }
-
                     ValidateTypeSymbols(dispatcherArgument, handlerArgument);
                 }
             }

@@ -18,15 +18,15 @@ internal static class CrossValidateParameters
                 dispatcherMethod.Parameters.Length);
         }
 
-        for (int i = 0; i < handlerMethod.Parameters.Length; i++)
+        for (int i = 1; i < handlerMethod.Parameters.Length; i++)
         {
             var handlerParam = handlerMethod.Parameters[i];
             var dispatcherParam = dispatcherMethod.Parameters[i];
 
-            // if (!SymbolEqualityComparer.Default.Equals(handlerParam, dispatcherParam))
-            // {
-            //     throw new ParameterTypeMismatchException(handlerMethod, dispatcherMethod, i);
-            // }
+            if (!SymbolEqualityComparer.Default.Equals(handlerParam.Type, dispatcherParam.Type))
+            {
+                throw new ParameterTypeMismatchException(handlerMethod, dispatcherMethod, i);
+            }
         }
     }
 }

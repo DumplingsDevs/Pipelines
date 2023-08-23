@@ -48,11 +48,7 @@ public class DispatcherGenerator : ISourceGenerator
         }
         catch (GeneratorException e)
         {
-            var descriptor = new DiagnosticDescriptor(e.GetType().Name, e.GetType().Name, e.Message, "",
-                DiagnosticSeverity.Warning, true);
-
-            context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None));
-
+            //TO DO: Report diagnostics using context.ReportDiagnostic
             return null;
         }
     }
@@ -81,12 +77,18 @@ public class DispatcherGenerator : ISourceGenerator
                 var dispatcherType =
                     GetGenericSymbol(context.Compilation, addDispatcherInvocation, "AddDispatcher");
 
+                if (inputType is null || handlerType is null || dispatcherType is null)
+                {
+                    //TO DO: Throws exception, but should should we show error message?
+                    continue;
+                }
+
                 yield return new PipelineConfig(dispatcherType, handlerType, inputType);
             }
         }
     }
 
-    private INamedTypeSymbol GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+    private INamedTypeSymbol? GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
         string methodName)
     {
         var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
@@ -107,40 +109,39 @@ public class DispatcherGenerator : ISourceGenerator
         return null;
     }
 
-    private INamedTypeSymbol GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+    private INamedTypeSymbol? GetTypeOfSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
         int skip)
     {
         var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip)
             .FirstOrDefault();
-        if (typeOfSyntax is not null)
+        if (typeOfSyntax is null) return null;
+        
+        var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
+
+        var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
+            .FirstOrDefault();
+
+        if (identifierSyntax != null)
         {
-            var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
+            var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
+            return (INamedTypeSymbol)typeInfo.Type!;
+        }
 
-            var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
-                .FirstOrDefault();
+        var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
+            .FirstOrDefault();
 
-            if (identifierSyntax != null)
-            {
-                var typeInfo = semanticModel.GetTypeInfo(identifierSyntax);
-                return (INamedTypeSymbol)typeInfo.Type!;
-            }
+        if (generic != null)
+        {
+            var typeInfo = semanticModel.GetSymbolInfo(generic);
+            return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
+        }
 
-            var generic = typeOfSyntax.ChildNodes().OfType<GenericNameSyntax>()
-                .FirstOrDefault();
+        var childSyntaxType = typeOfSyntax.ChildNodes().FirstOrDefault();
 
-            if (generic != null)
-            {
-                var typeInfo = semanticModel.GetSymbolInfo(generic);
-                return ((INamedTypeSymbol)typeInfo.Symbol).ConstructedFrom;
-            }
-
-            var childSyntaxType = typeOfSyntax.ChildNodes().FirstOrDefault();
-
-            if (childSyntaxType != null)
-            {
-                var typeInfo = semanticModel.GetTypeInfo(childSyntaxType);
-                return (INamedTypeSymbol)typeInfo.Type!;
-            }
+        if (childSyntaxType != null)
+        {
+            var typeInfo = semanticModel.GetTypeInfo(childSyntaxType);
+            return (INamedTypeSymbol)typeInfo.Type!;
         }
 
         return null;
