@@ -13,22 +13,7 @@ internal static class CrossValidateResultTypes
         var dispatcherMethod = dispatcherType.GetFirstMethod();
         var handlerMethod = handlerType.GetFirstMethod();
 
-        if (dispatcherMethod.ReturnsVoid != handlerMethod.ReturnsVoid)
-        {
-            ThrowMismatchException();
-        }
-
-        if (dispatcherMethod.IsGenericReturnType() != handlerMethod.IsGenericReturnType())
-        {
-            ThrowMismatchException();
-        }
-
-        if (dispatcherMethod.IsTaskReturnType() != handlerMethod.IsTaskReturnType())
-        {
-            ThrowMismatchException();
-        }
-
-        if (dispatcherMethod.ReturnType.IsValueType != handlerMethod.ReturnType.IsValueType)
+        if (dispatcherMethod.ReturnType.TypeKind != handlerMethod.ReturnType.TypeKind)
         {
             ThrowMismatchException();
         }
@@ -45,12 +30,14 @@ internal static class CrossValidateResultTypes
             {
                 var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
                 var handlerArgument = handlerNamedType.TypeArguments[index];
+
                 if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
                 {
                     ThrowMismatchException();
                 }
 
-                if (dispatcherArgument.TypeKind != TypeKind.TypeParameter && handlerArgument.TypeKind != TypeKind.TypeParameter)
+                if (dispatcherArgument.TypeKind != TypeKind.TypeParameter &&
+                    handlerArgument.TypeKind != TypeKind.TypeParameter)
                 {
                     if (dispatcherArgument.ToDisplayString() != handlerArgument.ToDisplayString())
                     {
