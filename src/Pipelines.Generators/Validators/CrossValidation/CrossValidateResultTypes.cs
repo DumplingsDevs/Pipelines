@@ -33,6 +33,33 @@ internal static class CrossValidateResultTypes
             ThrowMismatchException();
         }
 
+        if (dispatcherMethod.ReturnType is INamedTypeSymbol dispatcherNamedType &&
+            handlerMethod.ReturnType is INamedTypeSymbol handlerNamedType)
+        {
+            if (dispatcherNamedType.TypeArguments.Length != handlerNamedType.TypeArguments.Length)
+            {
+                ThrowMismatchException();
+            }
+
+            for (var index = 0; index < dispatcherNamedType.TypeArguments.Length; index++)
+            {
+                var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
+                var handlerArgument = handlerNamedType.TypeArguments[index];
+                if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
+                {
+                    ThrowMismatchException();
+                }
+
+                if (dispatcherArgument.TypeKind != TypeKind.TypeParameter && handlerArgument.TypeKind != TypeKind.TypeParameter)
+                {
+                    if (dispatcherArgument.ToDisplayString() != handlerArgument.ToDisplayString())
+                    {
+                        ThrowMismatchException();
+                    }
+                }
+            }
+        }
+
         void ThrowMismatchException()
         {
             throw new ReturnTypeMismatchException(dispatcherType, dispatcherMethod, handlerType, handlerMethod);

@@ -159,7 +159,7 @@ public class Tests
     
         var assembly = typeof(DependencyContainer).Assembly;
     
-        Assert.Throws<GenericTypeMismatchException>(() =>
+        Assert.Throws<IsGenericMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)

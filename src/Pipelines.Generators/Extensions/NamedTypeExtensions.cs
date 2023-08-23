@@ -17,4 +17,9 @@ internal static class NamedTypeExtensions
 
         return method!;
     }
+    
+    public static bool IsVoidTask(this INamedTypeSymbol symbol)
+    {
+        return symbol.ToString() == "System.Threading.Tasks.Task";
+    }
 }
