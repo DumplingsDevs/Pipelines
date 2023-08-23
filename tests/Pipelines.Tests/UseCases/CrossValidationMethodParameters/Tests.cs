@@ -1,4 +1,3 @@
-
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions;
 using Pipelines.Tests.UseCases.CrossValidationMethodParameters.Types;
 
@@ -10,9 +9,9 @@ public class Tests
     public void Validate_WithMatchingHandlerAndDispatcher_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -21,14 +20,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
+
     [Test]
     public void Validate_WithMismatchingNumberOfParameters_ThrowsParameterCountMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.Throws<ParameterCountMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -37,14 +36,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
+
     [Test]
     public void Validate_WithMismatchingParameterTypes_ThrowsParameterTypeMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.Throws<ParameterTypeMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -53,14 +52,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
+
     [Test]
     public void Validate_WithMatchingHandlerAndDispatcherWithOneParam_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -69,14 +68,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
+
     [Test]
     public void Validate_WithMatchingHandlerAndDispatcherWithTwoParams_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -90,9 +89,9 @@ public class Tests
     public void Validate_WithMatchingHandlerAndDispatcherWithThreeParams_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -101,14 +100,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
+
     [Test]
     public void Validate_WithHandlerHavingMoreParameters_ThrowsParameterCountMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.Throws<ParameterCountMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -117,15 +116,14 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
-    
-        
+
     [Test]
     public void Validate_WithDispatcherHavingMoreParameters_ThrowsParameterCountMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
-    
+
         var assembly = typeof(DependencyContainer).Assembly;
-    
+
         Assert.Throws<ParameterCountMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
