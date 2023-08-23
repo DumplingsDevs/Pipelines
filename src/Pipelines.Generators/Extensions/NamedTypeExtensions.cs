@@ -8,7 +8,7 @@ internal static class NamedTypeExtensions
 {
     internal static IMethodSymbol GetFirstMethod(this INamedTypeSymbol typeSymbol)
     {
-        var method = typeSymbol.GetMembers().OfType<IMethodSymbol>().FirstOrDefault();
+        var method = typeSymbol.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().FirstOrDefault();
 
         if (method is null)
         {
@@ -16,5 +16,10 @@ internal static class NamedTypeExtensions
         }
 
         return method!;
+    }
+    
+    public static bool IsVoidTask(this INamedTypeSymbol symbol)
+    {
+        return symbol.ToString() == "System.Threading.Tasks.Task";
     }
 }

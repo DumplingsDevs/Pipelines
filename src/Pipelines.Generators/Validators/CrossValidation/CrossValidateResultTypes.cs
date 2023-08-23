@@ -12,42 +12,43 @@ internal static class CrossValidateResultTypes
     {
         var dispatcherMethod = dispatcherType.GetFirstMethod();
         var handlerMethod = handlerType.GetFirstMethod();
+        
+        ValidateTypeSymbols(dispatcherMethod.ReturnType, handlerMethod.ReturnType);
 
-        if (dispatcherMethod.ReturnsVoid != handlerMethod.ReturnsVoid)
+        void ValidateTypeSymbols(ITypeSymbol typeSymbol1, ITypeSymbol typeSymbol2)
         {
-            ThrowMismatchException();
-        }
+            
+            if (typeSymbol1.TypeKind != typeSymbol2.TypeKind)
+            {
+                ThrowMismatchException();
+            }
+            
+            if (typeSymbol1 is INamedTypeSymbol dispatcherNamedType &&
+                typeSymbol2 is INamedTypeSymbol handlerNamedType)
+            {
+                if (dispatcherNamedType.TypeArguments.Length != handlerNamedType.TypeArguments.Length)
+                {
+                    ThrowMismatchException();
+                }
 
-        if (dispatcherMethod.IsGenericReturnType() != handlerMethod.IsGenericReturnType())
-        {
-            ThrowMismatchException();
-        }
+                for (var index = 0; index < dispatcherNamedType.TypeArguments.Length; index++)
+                {
+                    var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
+                    var handlerArgument = handlerNamedType.TypeArguments[index];
 
-        if (dispatcherMethod.IsTaskReturnType() != handlerMethod.IsTaskReturnType())
-        {
-            ThrowMismatchException();
-        }
+                    if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
+                    {
+                        ThrowMismatchException();
+                    }
 
-        if (dispatcherMethod.ReturnType.IsValueType != handlerMethod.ReturnType.IsValueType)
-        {
-            ThrowMismatchException();
+                    ValidateTypeSymbols(dispatcherArgument, handlerArgument);
+                }
+            }
         }
 
         void ThrowMismatchException()
         {
             throw new ReturnTypeMismatchException(dispatcherType, dispatcherMethod, handlerType, handlerMethod);
         }
-    }
-
-    private static bool IsGenericReturnType(this IMethodSymbol typeSymbol)
-    {
-        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType;
-    }
-
-    private static bool IsTaskReturnType(this IMethodSymbol typeSymbol)
-    {
-        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol &&
-               namedTypeSymbol.OriginalDefinition.ToString() == "System.Threading.Tasks.Task<>" &&
-               namedTypeSymbol.ContainingNamespace.ToString() == "System.Threading.Tasks";
     }
 }
