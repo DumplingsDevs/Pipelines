@@ -24,7 +24,6 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [DispatcherMethodInputTypeMismatchException](#dispatchermethodinputtypemismatchexception)
   - [ParameterCountMismatchException](#parametercountmismatchexception)
   - [ParameterTypeMismatchException](#parametertypemismatchexception)
-  - [ResultTypeCountMismatchException](#resulttypecountmismatchexception)
   - [TaskReturnTypeMismatchException](#taskreturntypemismatchexception)
   - [VoidAndValueMethodMismatchException](#voidandvaluemethodmismatchexception)
   - [ConstructorValidationException](#constructorvalidationexception)
@@ -44,35 +43,61 @@ In this section, you'll find descriptions of exceptions that may arise while usi
 ### ProvidedTypeIsNotInterfaceException
 
 #### What happened?
-
-...
+One of the types provided to the pipeline is not an interface.
 
 #### Bad example
 
 ```csharp
+public class SampleClass{}
+
+services
+    .AddPipeline()
+    .AddInput(typeof(SampleClass))
+            .AddHandler(typeof(IHandler<>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
 ...
 ```
 
 #### How to fix
+1. Ensure all provided types are interfaces.
+2. Always use typeof when providing types.
 
+```cs
+public interface IInput{}
+
+services
+    .AddPipeline()
+    .AddInput(typeof(IInput))
+            .AddHandler(typeof(IHandler<>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
 ...
-
+```
 ---
 
 ### HandlerMethodNotFoundException
 
 #### What happened?
-
-...
+A provided type doesn't define a handle method.
 
 #### Bad example
 
 ```csharp
+
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{}
+
 ...
 ```
 
 #### How to fix
+Define a Handle method in the handler.
 
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+``` 
 ...
 
 ---
@@ -80,21 +105,295 @@ In this section, you'll find descriptions of exceptions that may arise while usi
 ### MultipleHandlerMethodsException
 
 #### What happened?
-
-...
+Multiple methods were defined in the provided type. Each interface must contain only a single method.
 
 #### Bad example
 
-```csharp
-...
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TCommand command);
+}
+```
+
+#### How to fix
+Remove extra methods from the interface.
+
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+```
+---
+
+### MethodShouldHaveAtLeastOneParameterException
+
+#### What happened?
+The defined Handle method does not have any parameters.
+
+#### Bad example
+
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync();
+}
+```
+
+#### How to fix
+Ensure the method has at least one parameter, which should be of the Input Type.
+
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+```
+---
+
+### GenericArgumentsLengthMismatchException
+
+#### What happened?
+
+
+#### Bad example
+
+```cs
+
 ```
 
 #### How to fix
 
-...
+```cs
 
+```
 ---
 
+### GenericArgumentsNotFoundException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### HandlerInputTypeMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### InvalidConstraintLengthException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ExpectedMethodWithResultException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ExpectedVoidMethodException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ResultTypeCountMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### GenericTypeCountMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### IsGenericMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### TypeMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### DispatcherMethodInputTypeMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ParameterCountMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ParameterTypeMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### TaskReturnTypeMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### VoidAndValueMethodMismatchException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### ConstructorValidationException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
+
+### InterfaceImplementationException
+
+#### What happened?
+
+#### Bad example
+
+```cs
+```
+
+#### How to fix
+```cs
+```
+---
 
 ## 2. Runtime Exceptions
 
