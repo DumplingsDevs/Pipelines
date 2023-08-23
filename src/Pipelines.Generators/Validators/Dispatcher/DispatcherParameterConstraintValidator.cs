@@ -16,7 +16,7 @@ internal static class DispatcherParameterConstraintValidator
             return;
         }
 
-        if (!dispatcherMethod.TypeParameters.Any(x => x.HasReferenceTypeConstraint))
+        if (dispatcherMethod.TypeParameters.Count(x => x.HasReferenceTypeConstraint) != dispatcherMethod.TypeParameters.Length)
         {
             throw new ConstraintOnTypeParameterNotFoundException(dispatcherMethod.TypeParameters.ToList());
         }
