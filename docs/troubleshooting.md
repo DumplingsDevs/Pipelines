@@ -44,35 +44,61 @@ In this section, you'll find descriptions of exceptions that may arise while usi
 ### ProvidedTypeIsNotInterfaceException
 
 #### What happened?
-
-...
+One of the types provided to the pipeline is not an interface.
 
 #### Bad example
 
 ```csharp
+public class SampleClass{}
+
+services
+    .AddPipeline()
+    .AddInput(typeof(SampleClass))
+            .AddHandler(typeof(IHandler<>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
 ...
 ```
 
 #### How to fix
+1. Ensure all provided types are interfaces.
+2. Always use typeof when providing types.
 
+```cs
+public interface IInput{}
+
+services
+    .AddPipeline()
+    .AddInput(typeof(IInput))
+            .AddHandler(typeof(IHandler<>), handlersAssembly)
+            .AddDispatcher<IDispatcher>(dispatcherAssembly)
 ...
-
+```
 ---
 
 ### HandlerMethodNotFoundException
 
 #### What happened?
-
-...
+A provided type doesn't define a handle method.
 
 #### Bad example
 
 ```csharp
+
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{}
+
 ...
 ```
 
 #### How to fix
+Define a Handle method in the handler.
 
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+``` 
 ...
 
 ---
@@ -80,19 +106,27 @@ In this section, you'll find descriptions of exceptions that may arise while usi
 ### MultipleHandlerMethodsException
 
 #### What happened?
-
-...
+Multiple methods were defined in the provided type. Each interface must contain only a single method.
 
 #### Bad example
 
-```csharp
-...
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TCommand command);
+}
 ```
 
 #### How to fix
+Remove extra methods from the interface.
 
-...
-
+```cs
+public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+{
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+}
+```
 ---
 
 
