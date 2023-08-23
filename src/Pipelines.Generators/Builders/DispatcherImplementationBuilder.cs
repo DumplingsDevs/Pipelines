@@ -23,6 +23,7 @@ internal class DispatcherImplementationBuilder
 
         DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
         CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
+        CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
     }
 
     public string Build()
@@ -129,18 +130,18 @@ internal class DispatcherImplementationBuilder
         var inputImplementations = GetInputImplementations();
         foreach (var inputClass in inputImplementations)
         {
-            var interfaces = inputClass.AllInterfaces.ToList();
-            var implementedInputInterface = interfaces.FirstOrDefault(x =>
-                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
+            // var interfaces = inputClass.AllInterfaces.ToList();
+            // var implementedInputInterface = interfaces.FirstOrDefault(x =>
+            //     SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
 
             var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
                 .First();
-            var handlerResults = GetHandlerArgumentResults(handlerMethod);
-            var hasMultipleResults = handlerResults.Count > 1;
-            var inputResults = implementedInputInterface.TypeArguments.ToList();
-            var hasResponse = handlerResults.Count > 0;
             var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
-            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, inputResults);
+            var dispatcherResults = GetHandlerArgumentResults(dispatcherMethod); //TODO - probably get argument results from dispatcher
+            var hasMultipleResults = dispatcherResults.Count > 1;
+            var resultTypes = dispatcherMethod.TypeArguments.ToList();
+            var hasResponse = dispatcherResults.Count > 0;
+            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, resultTypes);
             var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
             var resultName = $"result{inputClass.GetFormattedFullname()}";
 
@@ -154,7 +155,7 @@ internal class DispatcherImplementationBuilder
                 $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
                 handlerMethod,
                 dispatcherMethod,
-                handlerResults));
+                dispatcherResults));
         }
     }
 

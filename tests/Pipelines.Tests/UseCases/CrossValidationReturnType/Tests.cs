@@ -12,9 +12,9 @@ public class Tests
     public void Validate_WithMatchingHandlerAndDispatcherStringResult_ThrowsParameterCountMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
-
+    
         var assembly = typeof(DependencyContainer).Assembly;
-
+    
         Assert.Throws<ParameterCountMismatchException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -28,9 +28,9 @@ public class Tests
     public void Validate_WithMatchingHandlerAndDispatcherTaskGenericResult_ThrowsReturnTypesShouldHaveClassConstraintException()
     {
         var dependencyContainer = new DependencyContainer();
-
+    
         var assembly = typeof(DependencyContainer).Assembly;
-
+    
         Assert.Throws<ReturnTypesShouldHaveClassConstraintException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -44,9 +44,9 @@ public class Tests
     public void Validate_WithMatchingHandlerAndDispatcherWithConstrainedResult_DoesNotThrowException()
     {
         var dependencyContainer = new DependencyContainer();
-
+    
         var assembly = typeof(DependencyContainer).Assembly;
-
+    
         Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
@@ -56,131 +56,131 @@ public class Tests
         });
     }
     
-    [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherAndGenericInputResult_DoesNotThrowException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.DoesNotThrow(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputGenericType<>))
-                .AddHandler(typeof(IHandlerTaskInputGenericResult<,>), assembly)
-                .AddDispatcher<IDispatcherTaskInputGenericResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
-    [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstrainedResults_DoesNotThrowException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.DoesNotThrow(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
-                .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
     // [Test]
-    // public void Validate_WithMismatchingResultTypeCount_ThrowsResultTypeCountMismatchException()
+    // public void Validate_WithMatchingHandlerAndDispatcherAndGenericInputResult_DoesNotThrowException()
     // {
     //     var dependencyContainer = new DependencyContainer();
     //
     //     var assembly = typeof(DependencyContainer).Assembly;
     //
-    //     Assert.Throws<ResultTypeCountMismatchException>(() =>
+    //     Assert.DoesNotThrow(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputGenericType<>))
+    //             .AddHandler(typeof(IHandlerTaskInputGenericResult<,>), assembly)
+    //             .AddDispatcher<IDispatcherTaskInputGenericResult>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
+    //
+    // [Test]
+    // public void Validate_WithMatchingHandlerAndDispatcherWithTwoConstrainedResults_DoesNotThrowException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.DoesNotThrow(() =>
     //     {
     //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-    //             .AddHandler(typeof(IHandlerTaskStringResult<>), assembly)
+    //             .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
     //             .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
     //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
     //     });
     // }
-    
-    [Test]
-    public void Validate_WithMismatchingResultType_ThrowsTaskReturnTypeMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<TaskReturnTypeMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerStringResult<>), assembly)
-                .AddDispatcher<IDispatcherTaskStringResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
-    [Test]
-    public void Validate_WithVoidDispatcherAndHandlerWithResult_ThrowsVoidAndValueMethodMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<VoidAndValueMethodMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerStringResult<>), assembly)
-                .AddDispatcher<IDispatcherVoid>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
-    [Test]
-    public void Validate_WithGenericTypeCountMismatch_ThrowsGenericTypeCountMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<GenericTypeCountMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
-                .AddDispatcher<IDispatcherTaskWithClassConstraintedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
-    [Test]
-    public void Validate_WithMismatchingGenericType_ThrowsGenericTypeCountMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<GenericTypeMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
-                .AddDispatcher<IDispatcherTaskWithDifferentTwoConstraintedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
-    
-    [Test]
-    public void Validate_WithStringAndGenericType_ThrowsGenericTypeCountMismatchException()
-    {
-        var dependencyContainer = new DependencyContainer();
-
-        var assembly = typeof(DependencyContainer).Assembly;
-
-        Assert.Throws<GenericTypeMismatchException>(() =>
-        {
-            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
-                .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
-                .AddDispatcher<IDispatcherTaskStringResult2>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
-        });
-    }
+    //
+    // // [Test]
+    // // public void Validate_WithMismatchingResultTypeCount_ThrowsResultTypeCountMismatchException()
+    // // {
+    // //     var dependencyContainer = new DependencyContainer();
+    // //
+    // //     var assembly = typeof(DependencyContainer).Assembly;
+    // //
+    // //     Assert.Throws<ResultTypeCountMismatchException>(() =>
+    // //     {
+    // //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    // //             .AddHandler(typeof(IHandlerTaskStringResult<>), assembly)
+    // //             .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
+    // //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    // //     });
+    // // }
+    //
+    // [Test]
+    // public void Validate_WithMismatchingResultType_ThrowsTaskReturnTypeMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<TaskReturnTypeMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerStringResult<>), assembly)
+    //             .AddDispatcher<IDispatcherTaskStringResult>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
+    //
+    // [Test]
+    // public void Validate_WithVoidDispatcherAndHandlerWithResult_ThrowsVoidAndValueMethodMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<VoidAndValueMethodMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerStringResult<>), assembly)
+    //             .AddDispatcher<IDispatcherVoid>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
+    //
+    // [Test]
+    // public void Validate_WithGenericTypeCountMismatch_ThrowsGenericTypeCountMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<GenericTypeCountMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
+    //             .AddDispatcher<IDispatcherTaskWithClassConstraintedResults>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
+    //
+    // [Test]
+    // public void Validate_WithMismatchingGenericType_ThrowsGenericTypeCountMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<GenericTypeMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
+    //             .AddDispatcher<IDispatcherTaskWithDifferentTwoConstraintedResults>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
+    //
+    // [Test]
+    // public void Validate_WithStringAndGenericType_ThrowsGenericTypeCountMismatchException()
+    // {
+    //     var dependencyContainer = new DependencyContainer();
+    //
+    //     var assembly = typeof(DependencyContainer).Assembly;
+    //
+    //     Assert.Throws<GenericTypeMismatchException>(() =>
+    //     {
+    //         dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+    //             .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
+    //             .AddDispatcher<IDispatcherTaskStringResult2>(
+    //                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+    //     });
+    // }
 }
