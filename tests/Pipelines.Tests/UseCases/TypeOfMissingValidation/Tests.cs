@@ -10,6 +10,12 @@ public class Tests
     [Test]
     public void Validate_HandlerWithoutTypeOfStructure_ThrowsException()
     {
+        if (EnvVariables.UseReflectionProxyImplementation)
+        {
+            // skip - we don't have that problem on proxy
+            return;
+        }
+        
         var dependencyContainer = new DependencyContainer();
 
         var assembly = typeof(DependencyContainer).Assembly;
@@ -28,12 +34,18 @@ public class Tests
     [Test]
     public void Validate_AddInputWithoutTypeOfStructure_ThrowsException()
     {
+        if (EnvVariables.UseReflectionProxyImplementation)
+        {
+            // skip - we don't have that problem on proxy
+            return;
+        }
+        
         var dependencyContainer = new DependencyContainer();
 
         var assembly = typeof(DependencyContainer).Assembly;
         
         var inputType = typeof(IInputType);
-        
+
         Assert.Throws<DispatcherNotRegisteredException>(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(inputType)
