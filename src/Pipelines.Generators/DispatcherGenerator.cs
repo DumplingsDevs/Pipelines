@@ -48,11 +48,7 @@ public class DispatcherGenerator : ISourceGenerator
         }
         catch (GeneratorException e)
         {
-            var descriptor = new DiagnosticDescriptor(e.GetType().Name, e.GetType().Name, e.Message, "",
-                DiagnosticSeverity.Warning, true);
-
-            context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None));
-
+            //TODO: Report diagnostics using context.ReportDiagnostic
             return null;
         }
     }
