@@ -7,7 +7,7 @@ namespace Pipelines.Tests.UseCases.InputValidation;
 public class Tests
 {
     [Test]
-    public void Validate_WithMatchingHandlerAndDispatcher_DoesNotThrowException()
+    public void Validate_WithWrongInputPosition_ThrowsDispatcherMethodInputTypeMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
 
