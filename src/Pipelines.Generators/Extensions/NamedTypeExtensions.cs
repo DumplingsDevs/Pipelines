@@ -8,7 +8,7 @@ internal static class NamedTypeExtensions
 {
     internal static IMethodSymbol GetFirstMethod(this INamedTypeSymbol typeSymbol)
     {
-        var method = typeSymbol.GetMembers().OfType<IMethodSymbol>().FirstOrDefault();
+        var method = typeSymbol.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().FirstOrDefault();
 
         if (method is null)
         {

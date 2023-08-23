@@ -12,37 +12,36 @@ internal static class CrossValidateResultTypes
     {
         var dispatcherMethod = dispatcherType.GetFirstMethod();
         var handlerMethod = handlerType.GetFirstMethod();
+        
+        ValidateTypeSymbols(dispatcherMethod.ReturnType, handlerMethod.ReturnType);
 
-        if (dispatcherMethod.ReturnType.TypeKind != handlerMethod.ReturnType.TypeKind)
+        void ValidateTypeSymbols(ITypeSymbol typeSymbol1, ITypeSymbol typeSymbol2)
         {
-            ThrowMismatchException();
-        }
-
-        if (dispatcherMethod.ReturnType is INamedTypeSymbol dispatcherNamedType &&
-            handlerMethod.ReturnType is INamedTypeSymbol handlerNamedType)
-        {
-            if (dispatcherNamedType.TypeArguments.Length != handlerNamedType.TypeArguments.Length)
+            
+            if (typeSymbol1.TypeKind != typeSymbol2.TypeKind)
             {
                 ThrowMismatchException();
             }
-
-            for (var index = 0; index < dispatcherNamedType.TypeArguments.Length; index++)
+            
+            if (typeSymbol1 is INamedTypeSymbol dispatcherNamedType &&
+                typeSymbol2 is INamedTypeSymbol handlerNamedType)
             {
-                var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
-                var handlerArgument = handlerNamedType.TypeArguments[index];
-
-                if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
+                if (dispatcherNamedType.TypeArguments.Length != handlerNamedType.TypeArguments.Length)
                 {
                     ThrowMismatchException();
                 }
 
-                if (dispatcherArgument.TypeKind != TypeKind.TypeParameter &&
-                    handlerArgument.TypeKind != TypeKind.TypeParameter)
+                for (var index = 0; index < dispatcherNamedType.TypeArguments.Length; index++)
                 {
-                    if (dispatcherArgument.ToDisplayString() != handlerArgument.ToDisplayString())
+                    var dispatcherArgument = dispatcherNamedType.TypeArguments[index];
+                    var handlerArgument = handlerNamedType.TypeArguments[index];
+
+                    if (dispatcherArgument.TypeKind != handlerArgument.TypeKind)
                     {
                         ThrowMismatchException();
                     }
+
+                    ValidateTypeSymbols(dispatcherArgument, handlerArgument);
                 }
             }
         }
@@ -51,17 +50,5 @@ internal static class CrossValidateResultTypes
         {
             throw new ReturnTypeMismatchException(dispatcherType, dispatcherMethod, handlerType, handlerMethod);
         }
-    }
-
-    private static bool IsGenericReturnType(this IMethodSymbol typeSymbol)
-    {
-        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType;
-    }
-
-    private static bool IsTaskReturnType(this IMethodSymbol typeSymbol)
-    {
-        return typeSymbol.ReturnType is INamedTypeSymbol namedTypeSymbol &&
-               namedTypeSymbol.OriginalDefinition.ToString() == "System.Threading.Tasks.Task<>" &&
-               namedTypeSymbol.ContainingNamespace.ToString() == "System.Threading.Tasks";
     }
 }
