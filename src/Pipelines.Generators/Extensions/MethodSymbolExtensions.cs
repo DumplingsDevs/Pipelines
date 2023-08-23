@@ -18,7 +18,7 @@ internal static class MethodSymbolExtensions
 
         string GetTypeParameterConstraints(ITypeParameterSymbol typeParameter)
         {
-            var constraints = typeParameter.ConstraintTypes.Select(constraint => constraint.ToDisplayString()).ToList();
+            var constraints = new List<string>();
             if (typeParameter.HasReferenceTypeConstraint)
             {
                 constraints.Add("class");
@@ -33,6 +33,8 @@ internal static class MethodSymbolExtensions
             {
                 constraints.Add("new()");
             }
+            
+            constraints.AddRange(typeParameter.ConstraintTypes.Select(constraint => constraint.ToDisplayString()).ToList());
 
             //TO DO - other constraints ? Or maybe different approach
 

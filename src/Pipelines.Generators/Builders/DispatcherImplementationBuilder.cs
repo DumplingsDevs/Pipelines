@@ -130,18 +130,19 @@ internal class DispatcherImplementationBuilder
         var inputImplementations = GetInputImplementations();
         foreach (var inputClass in inputImplementations)
         {
-            // var interfaces = inputClass.AllInterfaces.ToList();
-            // var implementedInputInterface = interfaces.FirstOrDefault(x =>
-            //     SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
+            var interfaces = inputClass.AllInterfaces.ToList();
+            var implementedInputInterface = interfaces.FirstOrDefault(x =>
+                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
 
             var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
                 .First();
             var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
-            var dispatcherResults = GetHandlerArgumentResults(dispatcherMethod); //TODO - probably get argument results from dispatcher
+            var dispatcherResults = GetHandlerArgumentResults(dispatcherMethod);
+            var inputResults = implementedInputInterface.TypeArguments.ToList();
             var hasMultipleResults = dispatcherResults.Count > 1;
-            var resultTypes = dispatcherMethod.TypeArguments.ToList();
+            var dispatcherArgumentResults = dispatcherMethod.TypeArguments.ToList();
             var hasResponse = dispatcherResults.Count > 0;
-            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, resultTypes);
+            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, dispatcherArgumentResults, inputResults);
             var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
             var resultName = $"result{inputClass.GetFormattedFullname()}";
 
@@ -299,7 +300,7 @@ internal class DispatcherImplementationBuilder
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
-    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> results)
+    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> results, List<ITypeSymbol> inputResults)
     {
         if (!hasResponse)
         {
@@ -309,9 +310,21 @@ internal class DispatcherImplementationBuilder
         var builder = new StringBuilder();
 
         builder.Append($"<{inputClass}");
-        foreach (var response in results)
+        
+        // If input has generic response defined, then we need to use it, otherwise, use dispatcher results.
+        if (inputResults.Count > 0)
         {
-            builder.Append($", {response}");
+            foreach (var response in inputResults)
+            {
+                builder.Append($", {response}");
+            }
+        }
+        else
+        {
+            foreach (var response in results)
+            {
+                builder.Append($", {response}");
+            }
         }
 
         builder.Append(">");
