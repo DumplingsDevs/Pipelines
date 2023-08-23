@@ -167,4 +167,20 @@ public class Tests
                     new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
         });
     }
+    
+    [Test]
+    public void Validate_WithMismatchTuple_ThrowsGenericTypeCountMismatchException()
+    {
+        var dependencyContainer = new DependencyContainer();
+    
+        var assembly = typeof(DependencyContainer).Assembly;
+    
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
+        {
+            dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
+                .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
+                .AddDispatcher<IDispatcherTaskWithMultipleResults>(
+                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+        });
+    }
 }
