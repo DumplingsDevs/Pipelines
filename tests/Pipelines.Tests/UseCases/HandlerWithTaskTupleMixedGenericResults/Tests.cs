@@ -10,6 +10,7 @@ public class Tests
     private readonly DependencyContainer _dependencyContainer;
     private readonly DecoratorsState _state;
 
+    // Test is disabled - TBD how we want handle that scenario
     public Tests()
     {
         // _dependencyContainer = new DependencyContainer();
