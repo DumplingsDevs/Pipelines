@@ -1,0 +1,3 @@
+namespace Pipelines.Tests.UseCases.HandlerWithTaskTupleMixedGenericResults.Sample;
+
+public record ExampleRecordCommandResult(string Value);
