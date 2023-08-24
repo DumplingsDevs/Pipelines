@@ -43,6 +43,7 @@ internal class DispatcherImplementationBuilder
     private void BuildNamespaces()
     {
         AddLine("using System;");
+        AddLine("using System.Linq;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
         AddLine("using Pipelines.Exceptions;");
     }
