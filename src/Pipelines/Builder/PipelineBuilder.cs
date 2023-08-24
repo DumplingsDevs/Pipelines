@@ -188,7 +188,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         {
             foreach (var dispatcherImplementation in dispatcherImplementations)
             {
-                _serviceCollection.AddScoped(_dispatcherInterfaceType, dispatcherImplementation);
+                _serviceCollection.AddSingleton(_dispatcherInterfaceType, dispatcherImplementation);
             }
         }
         else
