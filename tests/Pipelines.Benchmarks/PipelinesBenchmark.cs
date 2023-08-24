@@ -16,7 +16,7 @@ namespace Pipelines.Benchmarks;
 [RankColumn]
 public class PipelinesBenchmark
 {
-    private const bool UseReflectionProxyImplementation = false;
+    private const bool UseReflectionProxyImplementation = true;
 
     private IServiceProvider _pipelinesProvider = null!;
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
@@ -112,7 +112,7 @@ public class PipelinesBenchmark
     {
         var dispatcher = _pipelinesProvider.GetRequiredService<IRequestDispatcher>();
 
-        var request = new ExampleRequest("My test request");
+        var request = new ExampleRequest199("My test request");
 
         var result = await dispatcher.SendAsync(request, new CancellationToken());
 
@@ -124,7 +124,7 @@ public class PipelinesBenchmark
     {
         var mediator = _mediatorProvider.GetRequiredService<IMediator>();
 
-        var request = new MediatorExampleRequest("My test request");
+        var request = new MediatorExampleRequest199("My test request");
 
         var result = await mediator.Send(request, new CancellationToken());
 
