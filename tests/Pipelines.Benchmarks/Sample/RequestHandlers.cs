@@ -1801,3 +1801,10 @@ public class ExampleRequestHandler199 : IRequestHandler<ExampleRequest199, Examp
     }
 }
 
+public class ExampleRequestHandler200 : IRequestHandler<ExampleRequest200, ExampleCommandResult>
+{
+    public Task<ExampleCommandResult> HandleAsync(ExampleRequest200 request, CancellationToken token)
+    {
+        return Task.FromResult(new ExampleCommandResult(request.Value + " Changed"));
+    }
+}

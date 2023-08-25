@@ -202,3 +202,4 @@ public record MediatorExampleRequest196(string Value) : IRequest<ExampleCommandR
 public record MediatorExampleRequest197(string Value) : IRequest<ExampleCommandResult>;
 public record MediatorExampleRequest198(string Value) : IRequest<ExampleCommandResult>;
 public record MediatorExampleRequest199(string Value) : IRequest<ExampleCommandResult>;
+public record MediatorExampleRequest200(string Value) : IRequest<ExampleCommandResult>;

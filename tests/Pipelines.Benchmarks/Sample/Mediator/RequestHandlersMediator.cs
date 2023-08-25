@@ -1800,3 +1800,11 @@ public class MediatorExampleRequestHandler199 : IRequestHandler<MediatorExampleR
     }
 }
 
+
+public class MediatorExampleRequestHandler200 : IRequestHandler<MediatorExampleRequest200, ExampleCommandResult>
+{
+    public Task<ExampleCommandResult> Handle(MediatorExampleRequest200 request, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new ExampleCommandResult(request.Value + " Changed"));
+    }
+}
