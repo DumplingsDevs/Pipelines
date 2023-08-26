@@ -41,14 +41,13 @@ internal class DispatcherProxyImplementation : IRequestDispatcher
 
         foreach (var handlerType in handlerTypes)
         {
-            Type[] genericArguments = handlerType.GetInterfaces()
+            var genericArguments = handlerType.GetInterfaces()
                 .Single(i => i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
                 .GetGenericArguments();
 
             var requestType = genericArguments[0];
             var wrapperType = typeof(RequestHandlerWrapperImpl<,>).MakeGenericType(genericArguments);
-            var wrapper = Activator.CreateInstance(wrapperType) ??
-                          throw new InvalidOperationException($"Could not create wrapper type for {requestType}");
+            var wrapper = Activator.CreateInstance(wrapperType) ?? throw new InvalidOperationException($"Could not create wrapper type for {requestType}");
 
             _handlers[requestType] = (RequestHandlerBase)wrapper;
         }

@@ -1,28 +1,31 @@
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Pipelines.Generators.Builders;
 using Pipelines.Generators.Exceptions;
-using Pipelines.Generators.Models;
 using Pipelines.Generators.Extensions;
+using Pipelines.Generators.Models;
 using Pipelines.Generators.Syntax;
 
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
 namespace Pipelines.Generators;
 
-// [Generator]
-public class DispatcherGenerator : ISourceGenerator
+[Generator]
+public class DispatcherGeneratorWithoutInputs : ISourceGenerator
 {
+    public void Initialize(GeneratorInitializationContext context)
+    {
+
+    }
+
     public void Execute(GeneratorExecutionContext context)
     {
         var configs = GetPipelineConfigs(context).Distinct();
-
+        
         foreach (var config in configs)
         {
             var interfaceName = config.DispatcherType.GetNameWithNamespace();
@@ -38,12 +41,12 @@ public class DispatcherGenerator : ISourceGenerator
             }
         }
     }
-
+    
     private static string? BuildSourceCode(GeneratorExecutionContext context, PipelineConfig config)
     {
         try
         {
-            var builder = new DispatcherImplementationBuilder(config, context);
+            var builder = new DispatcherBuilder(config, context);
             return builder.Build();
         }
         catch (GeneratorException e)
@@ -52,7 +55,7 @@ public class DispatcherGenerator : ISourceGenerator
             return null;
         }
     }
-
+    
     private IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
@@ -87,8 +90,8 @@ public class DispatcherGenerator : ISourceGenerator
             }
         }
     }
-
-    private INamedTypeSymbol? GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+    
+        private INamedTypeSymbol? GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
         string methodName)
     {
         var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
@@ -145,10 +148,5 @@ public class DispatcherGenerator : ISourceGenerator
         }
 
         return null;
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // Tutaj można zarejestrować wszelkie niezbędne metadane
     }
 }
