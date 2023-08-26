@@ -4,6 +4,21 @@ namespace Pipelines.Benchmarks;
 
 internal class Samples
 {
+    internal static void GenerateRegistrations()
+    {
+        var count = 200;
+        var rootPath =
+            Path.GetDirectoryName(
+                Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())));
+
+        using var writer = new StreamWriter($"{rootPath}/Registrations.cs");
+        for (int i = 1; i <= count; i++)
+        {
+            writer.WriteLine($"RegisterHandler<ExampleRequest{i}, ExampleCommandResult>(serviceProvider);");
+
+        }
+    }
+
     internal static void GeneratePipelinesSamples()
     {
         var count = 200;
