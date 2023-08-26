@@ -1,36 +1,55 @@
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Benchmarks.Types;
+using Pipelines.Builder.HandlerWrappers;
 using Pipelines.Exceptions;
-using Pipelines.Utils;
 
 namespace Pipelines.Benchmarks;
+
+internal abstract class RequestHandlerBase
+{
+    internal abstract Task<object> Handle(object request, IServiceProvider serviceProvider,
+        CancellationToken cancellationToken);
+}
+
+internal class RequestHandlerWrapperImpl<TRequest, TResponse> : RequestHandlerBase
+    where TRequest : IRequest<TResponse> where TResponse : class
+//TO DO: Probably TResponse don't need to be class constraint
+{
+    internal override async Task<object> Handle(object request, IServiceProvider serviceProvider,
+        CancellationToken cancellationToken) =>
+        await Handle((IRequest<TResponse>)request, serviceProvider, cancellationToken).ConfigureAwait(false);
+
+    private async Task<TResponse> Handle(IRequest<TResponse> request, IServiceProvider serviceProvider,
+        CancellationToken cancellationToken)
+    {
+        var handler = serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
+
+        return await handler.HandleAsync((TRequest)request, cancellationToken);
+    }
+}
 
 internal class DispatcherProxyImplementation : IRequestDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly Dictionary<Type, RequestHandlerBase> _handlers = new();
 
-    private readonly Dictionary<Type, RequestHandlerBase> _handlers = new Dictionary<Type, RequestHandlerBase>();
-
-    public DispatcherProxyImplementation(IServiceProvider serviceProvider)
+    public DispatcherProxyImplementation(IServiceProvider serviceProvider, IHandlersRepository handlersRepository)
     {
         _serviceProvider = serviceProvider;
 
-        var handlerTypes = AssemblyScanner
-            .GetTypesBasedOnGenericType(AppDomain.CurrentDomain.GetAssemblies(), typeof(IRequestHandler<,>))
-            .WhereConstructorDoesNotHaveGenericParameter(typeof(IRequestHandler<,>));
+        var handlerTypes = handlersRepository.GetHandlers();
 
         foreach (var handlerType in handlerTypes)
         {
             Type[] genericArguments = handlerType.GetInterfaces()
-                .Single(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
+                .Single(i => i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
                 .GetGenericArguments();
 
-            Type requestType = genericArguments[0];
-            Type interfaceType = requestType.GetInterfaces().First();
-            Type responseType = interfaceType.GetGenericArguments()[0];
-            var wrapperType = typeof(RequestHandlerWrapperImpl<,>).MakeGenericType(requestType, responseType);
+            var requestType = genericArguments[0];
+            var wrapperType = typeof(RequestHandlerWrapperImpl<,>).MakeGenericType(genericArguments);
             var wrapper = Activator.CreateInstance(wrapperType) ??
                           throw new InvalidOperationException($"Could not create wrapper type for {requestType}");
+
             _handlers[requestType] = (RequestHandlerBase)wrapper;
         }
     }
@@ -47,28 +66,5 @@ internal class DispatcherProxyImplementation : IRequestDispatcher
         }
 
         return await handlerWrapper.Handle(request, _serviceProvider, token) as TResult;
-    }
-}
-
-public abstract class RequestHandlerBase
-{
-    public abstract Task<object> Handle(object request, IServiceProvider serviceProvider,
-        CancellationToken cancellationToken);
-}
-
-public class RequestHandlerWrapperImpl<TRequest, TResponse> : RequestHandlerBase
-    where TRequest : IRequest<TResponse> where TResponse : class
-//TO DO: Probably TResponse don't need to be class constraint
-{
-    public override async Task<object> Handle(object request, IServiceProvider serviceProvider,
-        CancellationToken cancellationToken) =>
-        await Handle((IRequest<TResponse>)request, serviceProvider, cancellationToken).ConfigureAwait(false);
-
-    public async Task<TResponse> Handle(IRequest<TResponse> request, IServiceProvider serviceProvider,
-        CancellationToken cancellationToken)
-    {
-        var handler = serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
-
-        return await handler.HandleAsync((TRequest)request, cancellationToken);
     }
 }
