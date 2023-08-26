@@ -24,32 +24,32 @@ public class PipelinesBenchmark
     private IServiceProvider _mediatorWithBehavioursProvider = null!;
     private readonly List<Types.IRequest<ExampleCommandResult>> _pipelinesRequests = new()
     {
-        // new ExampleRequest("My test request"),
-        // new ExampleRequest20("My test request"),
-        // new ExampleRequest40("My test request"),
-        // new ExampleRequest60("My test request"),
-        // new ExampleRequest80("My test request"),
-        // new ExampleRequest100("My test request"),
-        // new ExampleRequest120("My test request"),
-        // new ExampleRequest140("My test request"),
-        // new ExampleRequest160("My test request"),
-        // new ExampleRequest180("My test request"),
-        new ExampleRequest200("My test request"),
+        new ExampleRequest("My test request"),
+        new ExampleRequest20("My test request 20"),
+        new ExampleRequest40("My test request 40"),
+        new ExampleRequest60("My test request 60"),
+        new ExampleRequest80("My test request 80"),
+        new ExampleRequest100("My test request 100"),
+        new ExampleRequest120("My test request 120"),
+        new ExampleRequest140("My test request 140"),
+        new ExampleRequest160("My test request 160"),
+        new ExampleRequest180("My test request 180"),
+        new ExampleRequest200("My test request 200"),
     };
     
     private readonly List<MediatR.IRequest<ExampleCommandResult>> _mediatorRequests = new()
     {
-        // new MediatorExampleRequest("My test request"),
-        // new MediatorExampleRequest20("My test request"),
-        // new MediatorExampleRequest40("My test request"),
-        // new MediatorExampleRequest60("My test request"),
-        // new MediatorExampleRequest80("My test request"),
-        // new MediatorExampleRequest100("My test request"),
-        // new MediatorExampleRequest120("My test request"),
-        // new MediatorExampleRequest140("My test request"),
-        // new MediatorExampleRequest160("My test request"),
-        // new MediatorExampleRequest180("My test request"),
-        new MediatorExampleRequest200("My test request"),
+        new MediatorExampleRequest("My test request"),
+        new MediatorExampleRequest20("My test request 20"),
+        new MediatorExampleRequest40("My test request 40"),
+        new MediatorExampleRequest60("My test request 60"),
+        new MediatorExampleRequest80("My test request 80"),
+        new MediatorExampleRequest100("My test request 100"),
+        new MediatorExampleRequest120("My test request 120"),
+        new MediatorExampleRequest140("My test request 140"),
+        new MediatorExampleRequest160("My test request 160"),
+        new MediatorExampleRequest180("My test request 180"),
+        new MediatorExampleRequest200("My test request 200"),
     };
 
     [GlobalSetup(Target = nameof(Pipelines))]

@@ -10,7 +10,7 @@ public interface IRequestHandlerFunc<TResult> where TResult : class
     Task<TResult> HandleAsync(IRequest<TResult> request, CancellationToken token);
 }
 
-internal class DispatcherImplementation : IRequestDispatcher
+internal class DispatcherImplementation
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -226,8 +226,7 @@ internal class DispatcherImplementation : IRequestDispatcher
         where TRequest : IRequest<TResult>
         where TResult : class
     {
-        var type = typeof(TRequest);
-        _handlers[type.Namespace + type.Name] = new Func<IRequest<TResult>, CancellationToken, Task<TResult>>(
+        _handlers[GetFullName(typeof(TRequest))] = new Func<IRequest<TResult>, CancellationToken, Task<TResult>>(
             async (request, token) =>
             {
                 var handler = serviceProvider.GetService<IRequestHandler<TRequest, TResult>>();
@@ -241,8 +240,7 @@ internal class DispatcherImplementation : IRequestDispatcher
     public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token)
         where TResult : class
     {
-        var type = request.GetType();
-        if (_handlers.TryGetValue(type.Namespace + type.Name, out var handlerObj) &&
+        if (_handlers.TryGetValue(GetFullName(request.GetType()), out var handlerObj) &&
             handlerObj is Func<IRequest<TResult>, CancellationToken, Task<TResult>> handler)
         {
             return await handler(request, token);
@@ -274,4 +272,6 @@ internal class DispatcherImplementation : IRequestDispatcher
     //
     //     return await handlers[typeof(ExampleRequest)](request);
     // }
+
+    private string GetFullName(Type type) => type.FullName ?? type.Namespace + type.Name;
 }
