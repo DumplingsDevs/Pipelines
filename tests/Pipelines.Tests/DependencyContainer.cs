@@ -8,6 +8,7 @@ public class DependencyContainer
 {
     private IServiceProvider _provider;
     private readonly IServiceCollection _services;
+    public IServiceCollection Services => _services;
 
     public DependencyContainer()
     {
