@@ -32,6 +32,9 @@ internal class DispatcherProxyBuilder
         _dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
         _handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().First();
         _dispatcherInterfaceName = _pipelineConfig.DispatcherType.GetFormattedFullname();
+        
+        CrossValidateGenericParameters.Validate(_dispatcherMethod, _pipelineConfig.HandlerType, _pipelineConfig.InputType);
+
     }
 
     public string Build()
@@ -76,7 +79,7 @@ internal class DispatcherProxyBuilder
             wrapperReturnType = _handlerMethod.IsAsync() ? "Task" : "void";    
         }        
         AddLine(@$"
-    internal abstract class {_dispatcherInterfaceName}RequestHandlerBase
+    private abstract class {_dispatcherInterfaceName}RequestHandlerBase
     {{
         internal abstract {wrapperReturnType} Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
     }}");
