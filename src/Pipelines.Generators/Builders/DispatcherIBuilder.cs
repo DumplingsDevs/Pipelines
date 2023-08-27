@@ -17,6 +17,7 @@ internal class DispatcherBuilder
     private readonly GeneratorExecutionContext _context;
 
     private readonly IMethodSymbol _dispatcherMethod;
+    private readonly IMethodSymbol _handlerMethod;
     private readonly string _dispatcherInterfaceName;
 
     public DispatcherBuilder(PipelineConfig pipelineConfig, GeneratorExecutionContext context)
@@ -28,6 +29,7 @@ internal class DispatcherBuilder
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         
         _dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
+        _handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().First();
         _dispatcherInterfaceName = _pipelineConfig.DispatcherType.GetFormattedFullname();
     }
 
@@ -40,7 +42,7 @@ internal class DispatcherBuilder
         BuildRequestHandlerBase();
         BuildRequestHandlerWrapper();
         AddLine("   private readonly IServiceProvider _serviceProvider;");
-        AddLine("   private readonly Dictionary<Type, PipelinesRequestHandlerBase> _handlers = new();");
+        AddLine($"   private readonly Dictionary<Type, {_dispatcherInterfaceName}RequestHandlerBase> _handlers = new();");
         BuildConstructor();
         BuildDispatcherHandlerMethod(_dispatcherMethod);
         AddLine("}");
@@ -59,37 +61,53 @@ internal class DispatcherBuilder
 
     private void BuildRequestHandlerBase()
     {
+        var methodParameters = GetDispatcherMethodParametersTypeName();
+        var comma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
+        
         AddLine(@$"
     internal abstract class {_dispatcherInterfaceName}RequestHandlerBase
     {{
-        internal abstract Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider);
+        internal abstract Task<object> Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
     }}");
     }
 
     private void BuildRequestHandlerWrapper()
     {
-        var dispatcherResults = _dispatcherMethod.GetMethodResults();
-        var input = _pipelineConfig.InputType.ConstructedFrom.ToString();
-        var bracket = GenerateGenericParameters(dispatcherResults);
+        var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
+        var bracket = GenerateGenericParameters(methodGenericResults);
         var handlerReturnType = _dispatcherMethod.ReturnType;
         var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
-            
+        var methodParameters = GetDispatcherMethodParametersTypeName();
+        var wrapperMethodDefinitionComma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
+        var parameterNames = GetParametersString(_dispatcherMethod, 1);
+        var handlerCallComma = string.IsNullOrEmpty(parameterNames) ? "" : ", ";
+        var inputInterfaceWithDispatchersGeneric = _pipelineConfig.InputType.ConstructedFrom.IsGenericType
+            ? _pipelineConfig.InputType.GetNameWithNamespace() + $"<{string.Join(", ", methodGenericResults)}>"
+            : _pipelineConfig.InputType.GetNameWithNamespace();
+        
+        var constrains = GetConstraints(_dispatcherMethod);
+        
         AddLine(@$"
     private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
-        where TRequest : {input}
-    //TO DO: Probably TResponse don't need to be class constraint
+        where TRequest : {inputInterfaceWithDispatchersGeneric} {constrains}
+        
     {{
-        internal override async Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider) =>
-            await Handle(({input})request, serviceProvider, cancellationToken).ConfigureAwait(false);
+        internal override async Task<object> Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
+            await Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider{handlerCallComma} {parameterNames}).ConfigureAwait(false);
 
-        private async {handlerReturnType} Handle({input} request, IServiceProvider serviceProvider,
-            CancellationToken cancellationToken)
+        private async {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
+            {methodParameters})
         {{
             var handler = serviceProvider.GetRequiredService<{handlerTypeName}{bracket}>();
 
-            return await handler.HandleAsync((TRequest)request, cancellationToken);
+            return await handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
         }}
     }}");
+    }
+
+    private string GetDispatcherMethodParametersTypeName()
+    {
+        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} {p.Name}"));
     }
 
     private void BuildClassDefinition()
@@ -100,8 +118,8 @@ internal class DispatcherBuilder
     private void BuildConstructor()
     {
         var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
-        var dispatcherResults = _dispatcherMethod.GetMethodResults();
-        var wrapperGenericString = GenerateCommasForGenericParameters(dispatcherResults.Count);
+        var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
+        var wrapperGenericString = GenerateCommasForGenericParameters(methodGenericResults.Count);
             
         AddLine($@"
     public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
@@ -115,7 +133,7 @@ internal class DispatcherBuilder
                 .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType.GetNameWithNamespace()}<{wrapperGenericString}>))
                 .GetGenericArguments();
             var requestType = genericArguments[0];
-            var wrapperType = typeof(PipelinesRequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
+            var wrapperType = typeof({_dispatcherInterfaceName}RequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
             var wrapper = Activator.CreateInstance(wrapperType) ??
                           throw new InvalidOperationException($""Could not create wrapper type for {{requestType}}"");
             _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;

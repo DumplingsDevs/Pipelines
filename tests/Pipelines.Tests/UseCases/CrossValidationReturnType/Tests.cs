@@ -31,7 +31,7 @@ public class Tests
     
         var assembly = typeof(DependencyContainer).Assembly;
     
-        Assert.Throws<ReturnTypesShouldHaveClassConstraintException>(() =>
+        Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskGenericResult<,>), assembly)
