@@ -27,8 +27,6 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 
 # Quick Start
 ---- 
-<button id="expandAll">Expand All code samples</button>
-<button id="collapseAll">Collapse All code samples</button>
 
 ## 1. Define your own types
 
@@ -202,25 +200,3 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 # Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
-
-<!-- 
-
-<script>
-document.getElementById("expandAll").addEventListener("click", function() {
-    var detailsElements = document.querySelectorAll("details");
-    detailsElements.forEach(function(element) {
-        element.setAttribute("open", true);
-    });
-});
-
-document.getElementById("collapseAll").addEventListener("click", function() {
-    var detailsElements = document.querySelectorAll("details");
-    detailsElements.forEach(function(element) {
-        element.removeAttribute("open");
-    });
-});
-</script>
-
--->
-
-
