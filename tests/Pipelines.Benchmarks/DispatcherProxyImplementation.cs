@@ -55,7 +55,6 @@ internal class DispatcherProxyImplementation : IRequestDispatcher
 
 
     public async Task<TResult> SendAsync<TResult>(IRequest<TResult> request, CancellationToken token)
-        where TResult : class
     {
         Type requestType = request.GetType();
 
@@ -64,6 +63,6 @@ internal class DispatcherProxyImplementation : IRequestDispatcher
             throw new HandlerNotRegisteredException(requestType);
         }
 
-        return await handlerWrapper.Handle(request, _serviceProvider, token) as TResult;
+        return (TResult)await handlerWrapper.Handle(request, _serviceProvider, token);
     }
 }

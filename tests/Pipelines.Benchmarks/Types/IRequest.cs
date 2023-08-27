@@ -1,5 +1,4 @@
 namespace Pipelines.Benchmarks.Types;
 
-public interface IRequest<TResult> where TResult : class
-{
-}
+public interface IRequest<TResult>
+{}

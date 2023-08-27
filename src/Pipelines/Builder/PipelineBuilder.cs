@@ -41,7 +41,6 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     public IHandlerBuilder AddInput(Type type)
     {
         ProvidedTypeShouldBeInterface.Validate(type);
-        ValidateInputReturnTypes.Validate(type);
 
         _inputInterfaceType = type;
         return this;

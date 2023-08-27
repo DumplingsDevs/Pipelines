@@ -23,7 +23,6 @@ internal class DispatcherBuilder
         _pipelineConfig = pipelineConfig;
         _context = context;
 
-        DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
         CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         
@@ -38,8 +37,8 @@ internal class DispatcherBuilder
         AddLine("{");
         BuildRequestHandlerBase();
         BuildRequestHandlerWrapper();
-        AddLine("private readonly IServiceProvider _serviceProvider;");
-        AddLine("private readonly Dictionary<Type, PipelinesRequestHandlerBase> _handlers = new();");
+        AddLine("   private readonly IServiceProvider _serviceProvider;");
+        AddLine("   private readonly Dictionary<Type, PipelinesRequestHandlerBase> _handlers = new();");
         BuildConstructor();
         BuildDispatcherHandlerMethod(_dispatcherMethod);
         AddLine("}");
@@ -59,30 +58,36 @@ internal class DispatcherBuilder
     private void BuildRequestHandlerBase()
     {
         AddLine(@"
-private abstract class PipelinesRequestHandlerBase
-{
-    internal abstract Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider);
-}");
+    private abstract class PipelinesRequestHandlerBase
+    {
+        internal abstract Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider);
+    }");
     }
 
     private void BuildRequestHandlerWrapper()
     {
-        AddLine(@"
-private class PipelinesRequestHandlerWrapperImpl<TRequest, TResponse> : PipelinesRequestHandlerBase
-    where TRequest : IRequest<TResponse> where TResponse : class
-//TO DO: Probably TResponse don't need to be class constraint
-{
-    internal override async Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider) =>
-        await Handle((IRequest<TResponse>)request, serviceProvider, cancellationToken).ConfigureAwait(false);
+        var dispatcherResults = _dispatcherMethod.GetMethodResults();
+        var input = _pipelineConfig.InputType.ConstructedFrom.ToString();
+        var bracket = GenerateGenericParameters(dispatcherResults);
+        var handlerReturnType = _dispatcherMethod.ReturnType;
+        var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
+            
+        AddLine(@$"
+    private class PipelinesRequestHandlerWrapperImpl{bracket} : PipelinesRequestHandlerBase
+        where TRequest : {input}
+    //TO DO: Probably TResponse don't need to be class constraint
+    {{
+        internal override async Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider) =>
+            await Handle(({input})request, serviceProvider, cancellationToken).ConfigureAwait(false);
 
-    private async Task<TResponse> Handle(IRequest<TResponse> request, IServiceProvider serviceProvider,
-        CancellationToken cancellationToken)
-    {
-        var handler = serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
+        private async {handlerReturnType} Handle({input} request, IServiceProvider serviceProvider,
+            CancellationToken cancellationToken)
+        {{
+            var handler = serviceProvider.GetRequiredService<{handlerTypeName}{bracket}>();
 
-        return await handler.HandleAsync((TRequest)request, cancellationToken);
-    }
-}");
+            return await handler.HandleAsync((TRequest)request, cancellationToken);
+        }}
+    }}");
     }
 
     private void BuildClassDefinition()
@@ -234,34 +239,22 @@ private class PipelinesRequestHandlerWrapperImpl<TRequest, TResponse> : Pipeline
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
-    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> results,
-        List<ITypeSymbol> inputResults)
+    private static string GenerateGenericParameters(List<ITypeSymbol> results)
     {
-        if (!hasResponse)
+        if (results.Count == 0)
         {
-            return $"<{inputClass}>";
+            return $"<TRequest>";
         }
 
         var builder = new StringBuilder();
-
-        builder.Append($"<{inputClass}");
-
-        // If input has generic response defined, then we need to use it, otherwise, use dispatcher results.
-        if (inputResults.Count > 0)
+        
+        builder.Append($"<TRequest");
+        
+        foreach (var response in results)
         {
-            foreach (var response in inputResults)
-            {
-                builder.Append($", {response}");
-            }
+            builder.Append($", {response}");
         }
-        else
-        {
-            foreach (var response in results)
-            {
-                builder.Append($", {response}");
-            }
-        }
-
+        
         builder.Append(">");
 
         return builder.ToString();
