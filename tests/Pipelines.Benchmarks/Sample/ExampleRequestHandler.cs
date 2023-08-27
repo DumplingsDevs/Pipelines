@@ -1,4 +1,3 @@
-using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
 
 namespace Pipelines.Benchmarks.Sample;

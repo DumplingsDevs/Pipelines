@@ -22,7 +22,36 @@ public class PipelinesBenchmark
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
     private IServiceProvider _mediatorWithBehavioursProvider = null!;
+    private readonly List<Types.IRequest<ExampleCommandResult>> _pipelinesRequests = new()
+    {
+        new ExampleRequest("My test request"),
+        new ExampleRequest20("My test request 20"),
+        new ExampleRequest40("My test request 40"),
+        new ExampleRequest60("My test request 60"),
+        new ExampleRequest80("My test request 80"),
+        new ExampleRequest100("My test request 100"),
+        new ExampleRequest120("My test request 120"),
+        new ExampleRequest140("My test request 140"),
+        new ExampleRequest160("My test request 160"),
+        new ExampleRequest180("My test request 180"),
+        new ExampleRequest200("My test request 200"),
+    };
     
+    private readonly List<MediatR.IRequest<ExampleCommandResult>> _mediatorRequests = new()
+    {
+        new MediatorExampleRequest("My test request"),
+        new MediatorExampleRequest20("My test request 20"),
+        new MediatorExampleRequest40("My test request 40"),
+        new MediatorExampleRequest60("My test request 60"),
+        new MediatorExampleRequest80("My test request 80"),
+        new MediatorExampleRequest100("My test request 100"),
+        new MediatorExampleRequest120("My test request 120"),
+        new MediatorExampleRequest140("My test request 140"),
+        new MediatorExampleRequest160("My test request 160"),
+        new MediatorExampleRequest180("My test request 180"),
+        new MediatorExampleRequest200("My test request 200"),
+    };
+
     [GlobalSetup(Target = nameof(Pipelines))]
     public void SetupPipelines()
     {
@@ -94,52 +123,68 @@ public class PipelinesBenchmark
 
         _mediatorWithBehavioursProvider = services.BuildServiceProvider();
     }
-
+    
     [Benchmark]
-    public async Task<ExampleCommandResult> PipelinesWithDecorators()
+    public async Task<List<ExampleCommandResult>> PipelinesWithDecorators()
     {
         var dispatcher = _pipelinesWithDecoratorsProvider.GetRequiredService<IRequestDispatcher>();
 
-        var request = new ExampleRequest("My test request");
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _pipelinesRequests)
+        {
+            var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
 
-        var result = await dispatcher.SendAsync(request, new CancellationToken());
-
-        return result;
+        return responses;
     }
 
     [Benchmark(Baseline = true)]
-    public async Task<ExampleCommandResult> Pipelines()
+    public async Task<List<ExampleCommandResult>> Pipelines()
     {
         var dispatcher = _pipelinesProvider.GetRequiredService<IRequestDispatcher>();
 
-        var request = new ExampleRequest("My test request");
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _pipelinesRequests)
+        {
+            var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
 
-        var result = await dispatcher.SendAsync(request, new CancellationToken());
-
-        return result;
+        return responses;
     }
 
     [Benchmark()]
-    public async Task<ExampleCommandResult> MediatR()
+    public async Task<List<ExampleCommandResult>> MediatR()
     {
         var mediator = _mediatorProvider.GetRequiredService<IMediator>();
 
-        var request = new MediatorExampleRequest("My test request");
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _mediatorRequests)
+        {
+            var response = await mediator.Send(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
 
-        var result = await mediator.Send(request, new CancellationToken());
-
-        return result;
+        return responses;
     }
 
     [Benchmark()]
-    public async Task<ExampleCommandResult> MediatRWithBehaviours()
+    public async Task<List<ExampleCommandResult>> MediatRWithBehaviours()
     {
         var mediator = _mediatorWithBehavioursProvider.GetRequiredService<IMediator>();
 
-        var request = new MediatorExampleRequest("My test request");
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _mediatorRequests)
+        {
+            var response = await mediator.Send(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
 
-        var result = await mediator.Send(request, new CancellationToken());
-
-        return result;
+        return responses;
     }
 }

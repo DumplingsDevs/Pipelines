@@ -9,7 +9,7 @@ using Pipelines.Benchmarks;
 using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
-
+// Samples.GenerateRegistrations();
 BenchmarkRunner.Run(typeof(Program).Assembly);
 
 // var benchmark = new PipelinesBenchmark();

@@ -22,7 +22,7 @@ internal static class MethodResultTypesValidator
             expectedResultSourceType);
         
         ReturnTypesShouldBeClassOrHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
-       
+
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes, handlerType,
             expectedResultSourceType);
     }

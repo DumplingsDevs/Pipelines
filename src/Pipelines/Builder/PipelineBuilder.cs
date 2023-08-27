@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Exceptions;
+using Pipelines.Builder.HandlerWrappers;
 using Pipelines.Builder.Interfaces;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
@@ -41,7 +42,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     {
         ProvidedTypeShouldBeInterface.Validate(type);
         ValidateInputReturnTypes.Validate(type);
-
+        
         _inputInterfaceType = type;
         return this;
     }
@@ -159,11 +160,13 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
     private void RegisterHandlersWithDecorators()
     {
         var handlers = AssemblyScanner.GetTypesBasedOnGenericType(_handlerAssemblies, _handlerInterfaceType)
-            .WhereConstructorDoesNotHaveGenericParameter(_handlerInterfaceType);
+            .WhereConstructorDoesNotHaveGenericParameter(_handlerInterfaceType)
+            .ToList();
 
         _decoratorTypes.Reverse();
 
         _serviceCollection.AddHandlersWithDecorators(_decoratorTypes, handlers);
+        _serviceCollection.AddHandlersRepository(handlers);
     }
 
     private void RegisterDispatcher()
