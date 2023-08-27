@@ -26,6 +26,7 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 ```
 
 # Quick Start
+
 ---- 
 
 ## 1. Define your own types
@@ -179,18 +180,11 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 </details>
 
-# Conventions
-- Generic result types must have a `class` constraint.
-- The `Input` must be the first parameter of the Dispatcher and Handler methods.
-- Result types for the `Dispatcher` and `Handler` must match.
-- Method parameters for the `Dispatcher` and `Handler` must match.
-- `Input` Generic Arguments indicate the result type.
-- If the `Dispatcher/Handler` returns a non-generic type, then the `Input` will not have any Generic Arguments.
-- The `Decorator` must implement the Handler interface and accept Handler as a constructor parameter.
-
+---- 
 
 # Detailed documentation
 ------
+- [Conventions](docs/conventions.md)
 - [Key Concepts](docs/key_concepts.md)
 - [Source generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Code examples](docs/code_examples.md)
@@ -198,5 +192,8 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [Troubleshooting](docs/troubleshooting.md)
 - [ADR](docs/adr.md)
 
+---- 
+
 # Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
+- Cannot create a Pipeline that returns both generic and non-generic types.
