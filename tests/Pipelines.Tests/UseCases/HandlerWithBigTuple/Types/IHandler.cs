@@ -1,7 +1,7 @@
 namespace Pipelines.Tests.UseCases.HandlerWithBigTuple.Types;
 
 public interface IHandler<in TCommand,TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
-    where TCommand : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
+    where TCommand : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
     where TResult : class
     where TResult2 : class
     where TResult3 : class
