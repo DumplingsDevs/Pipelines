@@ -154,7 +154,7 @@ internal class DispatcherProxyBuilder
     {
         return @$"
             var handlers = serviceProvider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
-            if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}));
+            if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
             foreach (var handler in handlers)
                 {{
                     {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});;
