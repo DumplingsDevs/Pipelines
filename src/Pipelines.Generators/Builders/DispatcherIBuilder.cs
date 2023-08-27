@@ -17,6 +17,7 @@ internal class DispatcherBuilder
     private readonly GeneratorExecutionContext _context;
 
     private readonly IMethodSymbol _dispatcherMethod;
+    private readonly string _dispatcherInterfaceName;
 
     public DispatcherBuilder(PipelineConfig pipelineConfig, GeneratorExecutionContext context)
     {
@@ -27,6 +28,7 @@ internal class DispatcherBuilder
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         
         _dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
+        _dispatcherInterfaceName = _pipelineConfig.DispatcherType.GetFormattedFullname();
     }
 
     public string Build()
@@ -57,11 +59,11 @@ internal class DispatcherBuilder
 
     private void BuildRequestHandlerBase()
     {
-        AddLine(@"
-    private abstract class PipelinesRequestHandlerBase
-    {
+        AddLine(@$"
+    internal abstract class {_dispatcherInterfaceName}RequestHandlerBase
+    {{
         internal abstract Task<object> Handle(object request, CancellationToken cancellationToken, IServiceProvider serviceProvider);
-    }");
+    }}");
     }
 
     private void BuildRequestHandlerWrapper()
@@ -73,7 +75,7 @@ internal class DispatcherBuilder
         var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
             
         AddLine(@$"
-    private class PipelinesRequestHandlerWrapperImpl{bracket} : PipelinesRequestHandlerBase
+    private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
         where TRequest : {input}
     //TO DO: Probably TResponse don't need to be class constraint
     {{
@@ -92,9 +94,7 @@ internal class DispatcherBuilder
 
     private void BuildClassDefinition()
     {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
-
-        AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
+        AddLine($"public class {_dispatcherInterfaceName}Implementation : {_pipelineConfig.DispatcherType}");
     }
 
     private void BuildConstructor()
@@ -112,13 +112,13 @@ internal class DispatcherBuilder
         foreach (var handlerType in handlerTypes)
         {{
             var genericArguments = handlerType.GetInterfaces()
-                .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType}))
+                .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType.GetNameWithNamespace()}<{wrapperGenericString}>))
                 .GetGenericArguments();
             var requestType = genericArguments[0];
             var wrapperType = typeof(PipelinesRequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
             var wrapper = Activator.CreateInstance(wrapperType) ??
                           throw new InvalidOperationException($""Could not create wrapper type for {{requestType}}"");
-            _handlers[requestType] = (PipelinesRequestHandlerBase)wrapper;
+            _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;
         }}
     }}
 ");
@@ -132,6 +132,7 @@ internal class DispatcherBuilder
         var hasMultipleResults = dispatcherResults.Count > 1;
         var hasResponse = dispatcherResults.Count > 0;
         var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
+        var inputParameterName = _dispatcherMethod.Parameters.First().Name;
         
         AddLine("public",
             AsyncModified(dispatcherHandlerMethod),
@@ -142,7 +143,7 @@ internal class DispatcherBuilder
             GetConstraints(dispatcherHandlerMethod));
 
         AddLine("{");
-        AddLine("var requestType = request.GetType();");
+        AddLine($"var requestType = {inputParameterName}.GetType();");
         AddLine("if (!_handlers.TryGetValue(requestType, out var handlerWrapper))");
         AddLine("{");
         AddLine("throw new HandlerNotRegisteredException(requestType);");
