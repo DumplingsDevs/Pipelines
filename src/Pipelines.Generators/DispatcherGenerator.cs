@@ -17,7 +17,7 @@ using Pipelines.Generators.Syntax;
 namespace Pipelines.Generators;
 
 // [Generator]
-public class DispatcherGenerator : ISourceGenerator
+public class DispatcherGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {

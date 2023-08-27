@@ -10,7 +10,7 @@ using Pipelines.Generators.Validators.Dispatcher;
 
 namespace Pipelines.Generators.Builders;
 
-internal class DispatcherBuilder
+internal class DispatcherProxyBuilder
 {
     private readonly StringBuilder _builder = new();
     private readonly PipelineConfig _pipelineConfig;
@@ -20,7 +20,7 @@ internal class DispatcherBuilder
     private readonly IMethodSymbol _handlerMethod;
     private readonly string _dispatcherInterfaceName;
 
-    public DispatcherBuilder(PipelineConfig pipelineConfig, GeneratorExecutionContext context)
+    public DispatcherProxyBuilder(PipelineConfig pipelineConfig, GeneratorExecutionContext context)
     {
         _pipelineConfig = pipelineConfig;
         _context = context;
@@ -248,39 +248,6 @@ internal class DispatcherBuilder
     {
         return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
     }
-    
-    private List<INamedTypeSymbol> GetInputImplementations()
-    {
-        var allTypes = new List<INamedTypeSymbol>();
-
-        List<IAssemblySymbol> assemblySymbol = _context.Compilation.SourceModule.ReferencedAssemblySymbols.ToList();
-        assemblySymbol.Add(_context.Compilation.Assembly);
-
-        foreach (var assembly in assemblySymbol)
-        {
-            ProcessNamespace(assembly.GlobalNamespace, allTypes);
-        }
-
-        return allTypes;
-    }
-
-    private void ProcessNamespace(INamespaceSymbol namespaceSymbol, List<INamedTypeSymbol> allTypes)
-    {
-        foreach (var typeSymbol in namespaceSymbol.GetTypeMembers())
-        {
-            var implementsInputInterface = typeSymbol.AllInterfaces.Any(x =>
-                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
-            if (implementsInputInterface)
-            {
-                allTypes.Add(typeSymbol);
-            }
-        }
-
-        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
-        {
-            ProcessNamespace(nestedNamespace, allTypes);
-        }
-    }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
     private static string GenerateGenericParameters(List<ITypeSymbol> results)
@@ -338,11 +305,6 @@ internal class DispatcherBuilder
         builder.Append(";");
 
         return builder.ToString();
-    }
-
-    private string GenerateSingleCastExpression()
-    {
-        return _pipelineConfig.HandlerType.TypeArguments.Skip(1).First().Name;
     }
 
     private string GetConstraints(IMethodSymbol methodSymbol)

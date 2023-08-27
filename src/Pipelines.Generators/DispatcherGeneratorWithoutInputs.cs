@@ -46,7 +46,7 @@ public class DispatcherGeneratorWithoutInputs : ISourceGenerator
     {
         try
         {
-            var builder = new DispatcherBuilder(config, context);
+            var builder = new DispatcherProxyBuilder(config, context);
             return builder.Build();
         }
         catch (GeneratorException e)
