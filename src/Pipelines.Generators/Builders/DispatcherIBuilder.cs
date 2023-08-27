@@ -63,11 +63,21 @@ internal class DispatcherBuilder
     {
         var methodParameters = GetDispatcherMethodParametersTypeName();
         var comma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
-        
+        var dispatcherResults = _dispatcherMethod.GetMethodResults();
+        var hasResponse = dispatcherResults.Count > 0;
+        string wrapperReturnType;
+        if (hasResponse)
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task<object>" : "object";    
+        }
+        else
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task" : "void";    
+        }        
         AddLine(@$"
     internal abstract class {_dispatcherInterfaceName}RequestHandlerBase
     {{
-        internal abstract Task<object> Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
+        internal abstract {wrapperReturnType} Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
     }}");
     }
 
@@ -75,6 +85,8 @@ internal class DispatcherBuilder
     {
         var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
         var bracket = GenerateGenericParameters(methodGenericResults);
+        var dispatcherResults = _dispatcherMethod.GetMethodResults();
+        var hasResponse = dispatcherResults.Count > 0;
         var handlerReturnType = _dispatcherMethod.ReturnType;
         var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
         var methodParameters = GetDispatcherMethodParametersTypeName();
@@ -84,23 +96,36 @@ internal class DispatcherBuilder
         var inputInterfaceWithDispatchersGeneric = _pipelineConfig.InputType.ConstructedFrom.IsGenericType
             ? _pipelineConfig.InputType.GetNameWithNamespace() + $"<{string.Join(", ", methodGenericResults)}>"
             : _pipelineConfig.InputType.GetNameWithNamespace();
-        
         var constrains = GetConstraints(_dispatcherMethod);
+        var awaitOperator = _handlerMethod.IsAsync() ? "await" : "";
+        var asyncModifier = _handlerMethod.IsAsync() ? "async" : "";
+        var configureAwait = _handlerMethod.IsAsync() ? ".ConfigureAwait(false)" : "";
+        string wrapperReturnType;
+        if (hasResponse)
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task<object>" : "object";    
+        }
+        else
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task" : "void";    
+        }
+        
+        var returnStatement = hasResponse ? "return" : "";
         
         AddLine(@$"
     private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
         where TRequest : {inputInterfaceWithDispatchersGeneric} {constrains}
         
     {{
-        internal override async Task<object> Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
-            await Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider{handlerCallComma} {parameterNames}).ConfigureAwait(false);
+        internal override {wrapperReturnType} Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
+            {awaitOperator} Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider{handlerCallComma} {parameterNames}){configureAwait};
 
-        private async {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
+        private {asyncModifier} {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
             {methodParameters})
         {{
             var handler = serviceProvider.GetRequiredService<{handlerTypeName}{bracket}>();
 
-            return await handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
+            {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
         }}
     }}");
     }
@@ -189,19 +214,19 @@ internal class DispatcherBuilder
 
     private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
     {
-        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider)";
+        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);";
     }
 
     private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
     {
         return $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
-{GenerateMultipleArgumentReturn(dispatcherResults)}";
+{GenerateMultipleArgumentReturn(dispatcherResults)};";
     }
 
     private string SingleResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
     {
         return $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
-{GenerateSingleArgumentReturn(dispatcherResults)}";
+{GenerateSingleArgumentReturn(dispatcherResults)};";
     }
 
     private static string AsyncModified(IMethodSymbol methodSymbol)

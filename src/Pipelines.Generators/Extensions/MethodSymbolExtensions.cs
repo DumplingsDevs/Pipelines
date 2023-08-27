@@ -56,7 +56,7 @@ internal static class MethodSymbolExtensions
 
         if (methodSymbol.ReturnType is ITypeParameterSymbol typeParameterSymbol)
         {
-            return new List<ITypeSymbol>();
+            return new List<ITypeSymbol>() { typeParameterSymbol };
         }
 
         var namedSymbol = ((INamedTypeSymbol)methodSymbol.ReturnType);
