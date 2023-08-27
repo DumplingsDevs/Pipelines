@@ -27,18 +27,30 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 
 # Quick Start
 ---- 
+<button id="expandAll">Expand All code samples</button>
+<button id="collapseAll">Collapse All code samples</button>
+
 ## 1. Define your own types
 
 ### 1.1 Input 
 
 The "Input" acts as the initial parameter for Handler and Dispatcher methods, guiding the search for the relevant Handler.
 
+<details>
+<summary style="color: green">📜 Show me code </summary>
+
 ```cs
 public interface IInput<TResult>{ }
 ```
 
+</details>
+
 ### 1.2 Handler
+
 Handlers house the application logic and can generate both synchronous and asynchronous results.
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
 
 ```cs
 public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
@@ -47,8 +59,14 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 }
 ```
 
+</details>
+
 ### 1.3 Dispatcher
+
 Serving as a bridge between inputs and their respective handlers, the Dispatcher ensures the appropriate Handler is triggered for a given Input.
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
 
 ```cs
 public interface IDispatcher
@@ -57,9 +75,14 @@ public interface IDispatcher
 }
 ```
 
+</details>
 
 ## 2. Implement first decorator (optional step)
+
 Analogous to Middlewares in .NET. Think of them as layers of logic that execute before or after the handler.
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
 
 ```cs
 public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
@@ -84,17 +107,27 @@ public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> w
 }
 ```
 
+</details>
+
 ## 3. Implement first handler
 
 ### 3.1 Input and Result
 
+<details>
+<summary style="color: green">📜 Show me code </summary>
+
 ```cs
 public record ExampleInput(string Value) : IInput<ExampleCommandResult>;
-
 public record ExampleCommandResult(string Value);
 ```
 
+</details>
+
 ### 3.2 Handler 
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
+
 ```cs
 public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 {
@@ -104,10 +137,17 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
     }
 }
 ```
+
+</details>
+
 ## 4. Register pipeline
+
 In your application's initialization, such as `Startup.cs`:
 
 <b> IMPORTANT! All provided types must be specified using the typeof() method! </b>
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
 
 ```cs
 var handlersAssembly = //Assembly where handlers assembly are implemented
@@ -119,10 +159,14 @@ _services
             .AddHandler(typeof(IHandler<,>), handlersAssembly)
             .AddDispatcher<IDispatcher>(dispatcherAssembly)
               .WithOpenTypeDecorator(typeof(LoggingDecorator<,>));
-
 ```
 
-## 5. Example Usege (Fluent API .NET)
+</details>
+
+## 5. Example Usage (Fluent API .NET)
+
+<details>
+<summary style="color: green">📜 Show me code </summary>
 
 ```cs
 public static void CreateExampleEndpoint(this WebApplication app)
@@ -130,11 +174,12 @@ public static void CreateExampleEndpoint(this WebApplication app)
         app.MapPost("/example", async (ExampleInput request, IDispatcher dispatcher, CancellationToken token) =>
         {
             var result = await dispatcher.SendAsync(command,token);
-
             return Results.Ok();
         });
     }
 ```
+
+</details>
 
 # Conventions
 - Generic result types must have a `class` constraint.
@@ -158,5 +203,24 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
 
+<!-- 
+
+<script>
+document.getElementById("expandAll").addEventListener("click", function() {
+    var detailsElements = document.querySelectorAll("details");
+    detailsElements.forEach(function(element) {
+        element.setAttribute("open", true);
+    });
+});
+
+document.getElementById("collapseAll").addEventListener("click", function() {
+    var detailsElements = document.querySelectorAll("details");
+    detailsElements.forEach(function(element) {
+        element.removeAttribute("open");
+    });
+});
+</script>
+
+-->
 
 
