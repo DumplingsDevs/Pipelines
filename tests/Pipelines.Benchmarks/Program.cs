@@ -10,11 +10,11 @@ using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
 // Samples.GenerateRegistrations();
-// BenchmarkRunner.Run(typeof(Program).Assembly);
+BenchmarkRunner.Run(typeof(Program).Assembly);
 
-var benchmark = new PipelinesBenchmark();
-benchmark.SetupPipelines();
-await benchmark.Pipelines();
+// var benchmark = new PipelinesBenchmark();
+// benchmark.SetupPipelines();
+// await benchmark.Pipelines();
 // for (int i = 0; i < 10000; i++)
 // {
 //     
