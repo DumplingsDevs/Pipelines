@@ -16,10 +16,10 @@ namespace Pipelines.Benchmarks;
 [RankColumn]
 public class PipelinesBenchmark
 {
-    private const bool UseReflectionProxyImplementation = false;
-
     private IServiceProvider _pipelinesProvider = null!;
     private IServiceProvider _pipelinesWithDecoratorsProvider = null!;
+    private IServiceProvider _pipelinesReflectionProvider = null!;
+    private IServiceProvider _pipelinesReflectionWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
     private IServiceProvider _mediatorWithBehavioursProvider = null!;
     private readonly List<Types.IRequest<ExampleCommandResult>> _pipelinesRequests = new()
@@ -72,7 +72,7 @@ public class PipelinesBenchmark
         new MediatorExampleRequest200("My test request 200"),
     };
 
-    [GlobalSetup(Target = nameof(Pipelines))]
+    [GlobalSetup(Targets = new string[] {nameof(Pipelines), nameof(DirectHandlerCall)})]
     public void SetupPipelines()
     {
         var services = new ServiceCollection();
@@ -81,7 +81,7 @@ public class PipelinesBenchmark
         services.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(UseReflectionProxyImplementation),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
                 executingAssembly)
             .Build();
         _pipelinesProvider = services.BuildServiceProvider();
@@ -97,7 +97,7 @@ public class PipelinesBenchmark
         servicesWithDecorators.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(UseReflectionProxyImplementation),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
                 assembly)
             .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
@@ -111,6 +111,47 @@ public class PipelinesBenchmark
             .Build();
         servicesWithDecorators.AddSingleton<DecoratorsState>();
         _pipelinesWithDecoratorsProvider = servicesWithDecorators.BuildServiceProvider();
+    }
+    
+    [GlobalSetup(Target = nameof(PipelinesReflection))]
+    public void SetupPipelinesReflection()
+    {
+        var services = new ServiceCollection();
+
+        var executingAssembly = Assembly.GetExecutingAssembly();
+        services.AddPipeline()
+            .AddInput(typeof(Types.IRequest<>))
+            .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
+                executingAssembly)
+            .Build();
+        _pipelinesReflectionProvider = services.BuildServiceProvider();
+    }
+
+    [GlobalSetup(Target = nameof(PipelinesReflectionWithDecorators))]
+    public void SetupPipelinesReflectionWithDecorators()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var servicesWithDecorators = new ServiceCollection();
+
+        servicesWithDecorators.AddPipeline()
+            .AddInput(typeof(Types.IRequest<>))
+            .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
+                assembly)
+            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+            .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
+            .WithClosedTypeDecorators(x =>
+            {
+                x.WithImplementedInterface<IDecorator>();
+                x.WithInheritedClass<BaseDecorator>();
+                x.WithAttribute<DecoratorAttribute>();
+                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+            }, assembly)
+            .Build();
+        servicesWithDecorators.AddSingleton<DecoratorsState>();
+        _pipelinesReflectionWithDecoratorsProvider = servicesWithDecorators.BuildServiceProvider();
     }
 
     [GlobalSetup(Target = nameof(MediatR))]
@@ -175,6 +216,38 @@ public class PipelinesBenchmark
 
         return responses;
     }
+    
+    [Benchmark]
+    public async Task<List<ExampleCommandResult>> PipelinesReflectionWithDecorators()
+    {
+        var dispatcher = _pipelinesReflectionWithDecoratorsProvider.GetRequiredService<IRequestDispatcher>();
+
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _pipelinesRequests)
+        {
+            var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
+
+        return responses;
+    }
+
+    [Benchmark]
+    public async Task<List<ExampleCommandResult>> PipelinesReflection()
+    {
+        var dispatcher = _pipelinesReflectionProvider.GetRequiredService<IRequestDispatcher>();
+
+        var responses = new List<ExampleCommandResult>();
+        
+        foreach (var pipelinesRequest in _pipelinesRequests)
+        {
+            var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
+            responses.Add(response);
+        }
+
+        return responses;
+    }
 
     [Benchmark()]
     public async Task<List<ExampleCommandResult>> MediatR()
@@ -205,6 +278,58 @@ public class PipelinesBenchmark
             responses.Add(response);
         }
 
+        return responses;
+    }
+    
+    [Benchmark]
+    public async Task<List<ExampleCommandResult>> DirectHandlerCall()
+    {
+        var handler = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest, ExampleCommandResult>>();
+        var handler10 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest10, ExampleCommandResult>>();
+        var handler20 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest20, ExampleCommandResult>>();
+        var handler30 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest30, ExampleCommandResult>>();
+        var handler40 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest40, ExampleCommandResult>>();
+        var handler50 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest50, ExampleCommandResult>>();
+        var handler60 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest60, ExampleCommandResult>>();
+        var handler70 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest70, ExampleCommandResult>>();
+        var handler80 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest80, ExampleCommandResult>>();
+        var handler90 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest90, ExampleCommandResult>>();
+        var handler100 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest100, ExampleCommandResult>>();
+        var handler110 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest110, ExampleCommandResult>>();
+        var handler120 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest120, ExampleCommandResult>>();
+        var handler130 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest130, ExampleCommandResult>>();
+        var handler140 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest140, ExampleCommandResult>>();
+        var handler150 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest150, ExampleCommandResult>>();
+        var handler160 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest160, ExampleCommandResult>>();
+        var handler170 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest170, ExampleCommandResult>>();
+        var handler180 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest180, ExampleCommandResult>>();
+        var handler190 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest190, ExampleCommandResult>>();
+        var handler200 = _pipelinesProvider.GetRequiredService<Types.IRequestHandler<ExampleRequest200, ExampleCommandResult>>();
+
+        var responses = new List<ExampleCommandResult>();
+        
+        responses.Add(await handler.HandleAsync(new ExampleRequest("My test request"), new CancellationToken()));
+        responses.Add(await handler10.HandleAsync(new ExampleRequest10("My test request 10"), new CancellationToken()));
+        responses.Add(await handler20.HandleAsync(new ExampleRequest20("My test request 20"), new CancellationToken()));
+        responses.Add(await handler30.HandleAsync(new ExampleRequest30("My test request 30"), new CancellationToken()));
+        responses.Add(await handler40.HandleAsync(new ExampleRequest40("My test request 40"), new CancellationToken()));
+        responses.Add(await handler50.HandleAsync(new ExampleRequest50("My test request 50"), new CancellationToken()));
+        responses.Add(await handler60.HandleAsync(new ExampleRequest60("My test request 60"), new CancellationToken()));
+        responses.Add(await handler70.HandleAsync(new ExampleRequest70("My test request 70"), new CancellationToken()));
+        responses.Add(await handler80.HandleAsync(new ExampleRequest80("My test request 80"), new CancellationToken()));
+        responses.Add(await handler90.HandleAsync(new ExampleRequest90("My test request 90"), new CancellationToken()));
+        responses.Add(await handler100.HandleAsync(new ExampleRequest100("My test request 100"), new CancellationToken()));
+        responses.Add(await handler110.HandleAsync(new ExampleRequest110("My test request 110"), new CancellationToken()));
+        responses.Add(await handler120.HandleAsync(new ExampleRequest120("My test request 120"), new CancellationToken()));
+        responses.Add(await handler130.HandleAsync(new ExampleRequest130("My test request 130"), new CancellationToken()));
+        responses.Add(await handler140.HandleAsync(new ExampleRequest140("My test request 140"), new CancellationToken()));
+        responses.Add(await handler150.HandleAsync(new ExampleRequest150("My test request 150"), new CancellationToken()));
+        responses.Add(await handler160.HandleAsync(new ExampleRequest160("My test request 160"), new CancellationToken()));
+        responses.Add(await handler170.HandleAsync(new ExampleRequest170("My test request 170"), new CancellationToken()));
+        responses.Add(await handler180.HandleAsync(new ExampleRequest180("My test request 180"), new CancellationToken()));
+        responses.Add(await handler190.HandleAsync(new ExampleRequest190("My test request 190"), new CancellationToken()));
+        responses.Add(await handler200.HandleAsync(new ExampleRequest200("My test request 200"), new CancellationToken()));
+        
         return responses;
     }
 }
