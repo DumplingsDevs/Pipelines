@@ -98,21 +98,25 @@ private class PipelinesRequestHandlerWrapperImpl<TRequest, TResponse> : Pipeline
         var dispatcherResults = _dispatcherMethod.GetMethodResults();
         var wrapperGenericString = GenerateCommasForGenericParameters(dispatcherResults.Count);
             
-        AddLine($"public {dispatcherInterface}Implementation(IServiceProvider serviceProvider, IHandlersRepository handlersRepository)");
-        AddLine("{");
-        AddLine("_serviceProvider = serviceProvider;");
-        AddLine("var handlerTypes = handlersRepository.GetHandlers();");
-        AddLine("foreach (var handlerType in handlerTypes)");
-        AddLine("{");
-        AddLine("var genericArguments = handlerType.GetInterfaces()");
-        AddLine($".Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType}))");
-        AddLine(".GetGenericArguments();");
-        AddLine("var requestType = genericArguments[0];");
-        AddLine($"var wrapperType = typeof(PipelinesRequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);");
-        AddLine(@"var wrapper = Activator.CreateInstance(wrapperType) ?? throw new InvalidOperationException($""Could not create wrapper type for {requestType}"");");
-        AddLine("_handlers[requestType] = (PipelinesRequestHandlerBase)wrapper;");
-        AddLine("}");
-        AddLine("}");
+        AddLine($@"
+    public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
+        IHandlersRepository handlersRepository)
+    {{
+        _serviceProvider = serviceProvider;
+        var handlerTypes = handlersRepository.GetHandlers();
+        foreach (var handlerType in handlerTypes)
+        {{
+            var genericArguments = handlerType.GetInterfaces()
+                .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType}))
+                .GetGenericArguments();
+            var requestType = genericArguments[0];
+            var wrapperType = typeof(PipelinesRequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
+            var wrapper = Activator.CreateInstance(wrapperType) ??
+                          throw new InvalidOperationException($""Could not create wrapper type for {{requestType}}"");
+            _handlers[requestType] = (PipelinesRequestHandlerBase)wrapper;
+        }}
+    }}
+");
     }
 
     private void BuildDispatcherHandlerMethod(IMethodSymbol dispatcherHandlerMethod)
@@ -138,8 +142,6 @@ private class PipelinesRequestHandlerWrapperImpl<TRequest, TResponse> : Pipeline
         AddLine("{");
         AddLine("throw new HandlerNotRegisteredException(requestType);");
         AddLine("}");
-        AddLine("var result = await handlerWrapper.Handle(request, token, _serviceProvider);");
-        AddLine("return result as TResult;");
         AddLine(CallHandlerWrapperTemplate(hasResponse, hasMultipleResults, asyncModifier, dispatcherHandlerMethod, dispatcherResults));
         AddLine("}");
     }
@@ -320,8 +322,7 @@ private class PipelinesRequestHandlerWrapperImpl<TRequest, TResponse> : Pipeline
 
     private string GetParametersString(IMethodSymbol method, int skip)
     {
-        var parameters = string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
-        return string.IsNullOrEmpty(parameters) ? "" : ", " + parameters;
+        return string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
     }
 
     static string GenerateCommasForGenericParameters(int n)
