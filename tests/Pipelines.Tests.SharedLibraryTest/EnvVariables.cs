@@ -1,4 +1,4 @@
-namespace Pipelines.Tests;
+namespace Pipelines.Tests.SharedLibraryTest;
 
 public static class EnvVariables
 {

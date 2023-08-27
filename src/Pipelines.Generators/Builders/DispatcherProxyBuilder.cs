@@ -24,17 +24,17 @@ internal class DispatcherProxyBuilder
     {
         _pipelineConfig = pipelineConfig;
         _context = context;
-        
+
         DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
         CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
-        
+
         _dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
         _handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().First();
         _dispatcherInterfaceName = _pipelineConfig.DispatcherType.GetFormattedFullname();
-        
-        CrossValidateGenericParameters.Validate(_dispatcherMethod, _pipelineConfig.HandlerType, _pipelineConfig.InputType);
 
+        CrossValidateGenericParameters.Validate(_dispatcherMethod, _pipelineConfig.HandlerType,
+            _pipelineConfig.InputType);
     }
 
     public string Build()
@@ -46,7 +46,8 @@ internal class DispatcherProxyBuilder
         BuildRequestHandlerBase();
         BuildRequestHandlerWrapper();
         AddLine("   private readonly IServiceProvider _serviceProvider;");
-        AddLine($"   private readonly Dictionary<Type, {_dispatcherInterfaceName}RequestHandlerBase> _handlers = new();");
+        AddLine(
+            $"   private readonly Dictionary<Type, {_dispatcherInterfaceName}RequestHandlerBase> _handlers = new();");
         BuildConstructor();
         BuildDispatcherHandlerMethod(_dispatcherMethod);
         AddLine("}");
@@ -72,12 +73,13 @@ internal class DispatcherProxyBuilder
         string wrapperReturnType;
         if (hasResponse)
         {
-            wrapperReturnType = _handlerMethod.IsAsync() ? "Task<object>" : "object";    
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task<object>" : "object";
         }
         else
         {
-            wrapperReturnType = _handlerMethod.IsAsync() ? "Task" : "void";    
-        }        
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task" : "void";
+        }
+
         AddLine(@$"
     private abstract class {_dispatcherInterfaceName}RequestHandlerBase
     {{
@@ -107,15 +109,21 @@ internal class DispatcherProxyBuilder
         string wrapperReturnType;
         if (hasResponse)
         {
-            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task<object>" : "object";    
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task<object>" : "object";
         }
         else
         {
-            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task" : "void";    
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task" : "void";
         }
-        
+
         var returnStatement = hasResponse ? "return" : "";
-        
+        var handleBody = hasResponse
+            ? HandlerCallWithResult(handlerTypeName, bracket, returnStatement, awaitOperator, handlerCallComma,
+                parameterNames)
+            : HandlerCallWithoutResult(handlerTypeName, bracket, awaitOperator, handlerCallComma,
+                parameterNames);
+
+
         AddLine(@$"
     private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
         where TRequest : {inputInterfaceWithDispatchersGeneric} {constrains}
@@ -127,12 +135,32 @@ internal class DispatcherProxyBuilder
         private {asyncModifier} {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
             {methodParameters})
         {{
-            var handler = serviceProvider.GetRequiredService<{handlerTypeName}{bracket}>();
-
-            {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
+            {handleBody}
         }}
     }}");
     }
+
+    private string HandlerCallWithResult(string handlerTypeName, string handlerGenericParameters,
+        string returnStatement, string awaitOperator, string handlerCallComma, string parameterNames)
+    {
+        return @$"
+            var handler = serviceProvider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
+
+            {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
+    }
+
+    private string HandlerCallWithoutResult(string handlerTypeName, string handlerGenericParameters,
+        string awaitOperator, string handlerCallComma, string parameterNames)
+    {
+        return @$"
+            var handlers = serviceProvider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
+            foreach (var handler in handlers)
+                {{
+                    {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});;
+                }}";
+    }
+
 
     private string GetDispatcherMethodParametersTypeName()
     {
@@ -149,7 +177,7 @@ internal class DispatcherProxyBuilder
         var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
         var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
         var wrapperGenericString = GenerateCommasForGenericParameters(methodGenericResults.Count);
-            
+
         AddLine($@"
     public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
         IHandlersRepository handlersRepository)
@@ -180,7 +208,7 @@ internal class DispatcherProxyBuilder
         var hasResponse = dispatcherResults.Count > 0;
         var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
         var inputParameterName = _dispatcherMethod.Parameters.First().Name;
-        
+
         AddLine("public",
             AsyncModified(dispatcherHandlerMethod),
             GenerateMethodReturnType(dispatcherHandlerMethod),
@@ -195,11 +223,13 @@ internal class DispatcherProxyBuilder
         AddLine("{");
         AddLine("throw new HandlerNotRegisteredException(requestType);");
         AddLine("}");
-        AddLine(CallHandlerWrapperTemplate(hasResponse, hasMultipleResults, asyncModifier, dispatcherHandlerMethod, dispatcherResults));
+        AddLine(CallHandlerWrapperTemplate(hasResponse, hasMultipleResults, asyncModifier, dispatcherHandlerMethod,
+            dispatcherResults));
         AddLine("}");
     }
 
-    public string CallHandlerWrapperTemplate(bool hasResponse, bool hasMultipleResults, string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
+    public string CallHandlerWrapperTemplate(bool hasResponse, bool hasMultipleResults, string @await,
+        IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
     {
         if (hasResponse && !hasMultipleResults)
         {
@@ -216,20 +246,25 @@ internal class DispatcherProxyBuilder
         }
     }
 
-    private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
+    private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
     {
         return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);";
     }
 
-    private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
+    private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
     {
-        return $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+        return
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
 {GenerateMultipleArgumentReturn(dispatcherResults)};";
     }
 
-    private string SingleResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
+    private string SingleResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
     {
-        return $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+        return
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
 {GenerateSingleArgumentReturn(dispatcherResults)};";
     }
 
@@ -262,14 +297,14 @@ internal class DispatcherProxyBuilder
         }
 
         var builder = new StringBuilder();
-        
+
         builder.Append($"<TRequest");
-        
+
         foreach (var response in results)
         {
             builder.Append($", {response}");
         }
-        
+
         builder.Append(">");
 
         return builder.ToString();
@@ -334,7 +369,7 @@ internal class DispatcherProxyBuilder
         {
             return "";
         }
-        
+
         return string.Join("", Enumerable.Repeat(",", n));
     }
 
