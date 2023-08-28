@@ -15,10 +15,10 @@ public class LoggingDecorator<TInput, TResult, TResult2> : IHandler<TInput, TRes
         _state = state;
     }
 
-    public async Task<(TResult,TResult2)> HandleAsync(TInput request, CancellationToken token)
+    public async Task<(TResult,TResult2)> HandleAsync(TInput input, CancellationToken token)
     {
         _state.Status.Add(typeof(LoggingDecorator<,,>).Name);
-        var result = await _handler.HandleAsync(request, token);
+        var result = await _handler.HandleAsync(input, token);
         _state.Status.Add(typeof(LoggingDecorator<,,>).Name);
 
         return result;

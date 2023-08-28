@@ -46,8 +46,9 @@ public interface IHandler<in TInput> where TInput : IInput
 }
 
 public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
+    where TResult : class where TResult2 : class
 {
-    public (TResult, TResult2) Handle(TInput input, CancellationToken token);
+    public (TResult, TResult2) HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -62,12 +63,13 @@ public interface IHandler<in TInput> where TInput : IInput
     public Task<string> HandleAsync(TInput input, CancellationToken token);
 }
 
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
     public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 
-public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
+public interface IHandler<in TInput, TResult, TResult2>
+    where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
     public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
 }
