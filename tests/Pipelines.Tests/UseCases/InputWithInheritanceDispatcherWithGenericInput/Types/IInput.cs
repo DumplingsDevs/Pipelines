@@ -1,3 +1,4 @@
 namespace Pipelines.Tests.UseCases.InputWithInheritanceDispatcherWithGenericInput.Types;
 
-public interface IInput { }
+public interface IInput : IMessage
+{ }
