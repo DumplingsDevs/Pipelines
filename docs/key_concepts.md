@@ -84,39 +84,39 @@ Dispatcher is not resposible for apply Decorators by its own because Decorators 
 Examples:
 
 ```cs
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public void Send(IInput command);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public string Send(IInput command);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> command);
 }
 ```
 
 ```cs
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public Task SendAsync(IInput command, CancellationToken token);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public Task<string> SendAsync(IInput command, CancellationToken token);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public Task<TResult> SendAsync<TResult>(IInput<TResult> command, CancellationToken token);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
     public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> command,
         CancellationToken token);
@@ -165,7 +165,7 @@ When registering decorators, ensure the order of registration in the DI containe
 There is a lot of ways how to register Closed Types Decorators:
 
 ```cs
-.AddDispatcher<ICommandDispatcher>(dispatcherAssembly)
+.AddDispatcher<IDispatcher>(dispatcherAssembly)
     .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithClosedTypeDecorators(x =>
             {
