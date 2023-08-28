@@ -166,7 +166,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         _decoratorTypes.Reverse();
 
         _serviceCollection.AddHandlersWithDecorators(_decoratorTypes, handlers);
-        _serviceCollection.AddHandlersRepository(handlers);
+        _serviceCollection.AddHandlersRepository(_dispatcherInterfaceType, handlers);
     }
 
     private void RegisterDispatcher()
