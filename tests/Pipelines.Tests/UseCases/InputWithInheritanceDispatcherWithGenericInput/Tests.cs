@@ -12,20 +12,20 @@ public class Tests
 
     public Tests()
     {
-        // _dependencyContainer = new DependencyContainer();
-        // var assembly = typeof(DependencyContainer).Assembly;
-        //
-        // _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput))
-        //     .AddHandler(typeof(IHandler<>), assembly)
-        //     .AddDispatcher<IDispatcher>(
-        //         new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
-        //     .WithOpenTypeDecorator(typeof(LoggingDecorator<>)));
-        //
-        // _dependencyContainer.RegisterSingleton<DecoratorsState>();
-        //
-        // _dependencyContainer.BuildContainer();
-        // _dispatcher = _dependencyContainer.GetService<IDispatcher>();
-        // _state = _dependencyContainer.GetService<DecoratorsState>();
+        _dependencyContainer = new DependencyContainer();
+        var assembly = typeof(DependencyContainer).Assembly;
+        
+        _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput))
+            .AddHandler(typeof(IHandler<>), assembly)
+            .AddDispatcher<IDispatcher>(
+                new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
+            .WithOpenTypeDecorator(typeof(LoggingDecorator<>)));
+        
+        _dependencyContainer.RegisterSingleton<DecoratorsState>();
+        
+        _dependencyContainer.BuildContainer();
+        _dispatcher = _dependencyContainer.GetService<IDispatcher>();
+        _state = _dependencyContainer.GetService<DecoratorsState>();
     }
 
     [Test]

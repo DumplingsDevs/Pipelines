@@ -91,11 +91,11 @@ internal class DispatcherProxyBuilder
 
     private void BuildRequestHandlerWrapper()
     {
-        var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
+        var methodGenericResults = _handlerMethod.GetMethodGenericResults();
         var bracket = GenerateGenericParameters(methodGenericResults);
         var dispatcherResults = _dispatcherMethod.GetMethodResults();
         var hasResponse = dispatcherResults.Count > 0;
-        var handlerReturnType = _dispatcherMethod.ReturnType;
+        var handlerReturnType = _handlerMethod.ReturnType;
         var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
         var methodParameters = GetDispatcherMethodParametersTypeName();
         var wrapperMethodDefinitionComma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
@@ -104,7 +104,8 @@ internal class DispatcherProxyBuilder
         var inputInterfaceWithDispatchersGeneric = _pipelineConfig.InputType.ConstructedFrom.IsGenericType
             ? _pipelineConfig.InputType.GetNameWithNamespace() + $"<{string.Join(", ", methodGenericResults)}>"
             : _pipelineConfig.InputType.GetNameWithNamespace();
-        var constrains = GetConstraints(_dispatcherMethod);
+        var constrains =
+            GenerateWrapperConstraints(inputInterfaceWithDispatchersGeneric, GetConstraints(_dispatcherMethod));
         var awaitOperator = _handlerMethod.IsAsync() ? "await" : "";
         var asyncModifier = _handlerMethod.IsAsync() ? "async" : "";
         var configureAwait = _handlerMethod.IsAsync() ? ".ConfigureAwait(false)" : "";
@@ -128,7 +129,7 @@ internal class DispatcherProxyBuilder
 
         AddLine(@$"
     private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
-        where TRequest : {inputInterfaceWithDispatchersGeneric} {constrains}
+        {constrains}
         
     {{
         internal override {wrapperReturnType} Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
@@ -140,6 +141,23 @@ internal class DispatcherProxyBuilder
             {handleBody}
         }}
     }}");
+    }
+
+    private string GenerateWrapperConstraints(string inputInterfaceWithDispatchersGeneric, string constraints)
+    {
+        var constrains =
+            _pipelineConfig.HandlerType.GetTypeParametersConstraints();
+        var genericTypes = _pipelineConfig.HandlerType.TypeParameters.Select(x => x.Name).ToList();
+        var inputConstraint = $"where TRequest : {constrains[0].Item2}";
+        if (constrains.Count == genericTypes.Count)
+        {
+            for (int i = 1; i < genericTypes.Count; i++)
+            {
+                inputConstraint += $" where {genericTypes[i]} : {constrains[i].Item2}";
+            }
+        }
+
+        return inputConstraint;
     }
 
     private string HandlerCallWithResult(string handlerTypeName, string handlerGenericParameters,
