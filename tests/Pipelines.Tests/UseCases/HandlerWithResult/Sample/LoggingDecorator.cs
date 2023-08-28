@@ -16,10 +16,10 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
+    public async Task<TResult> HandleAsync(TInput input, CancellationToken token)
     {
         _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
-        var result = await _handler.HandleAsync(request, token);
+        var result = await _handler.HandleAsync(input, token);
         _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;

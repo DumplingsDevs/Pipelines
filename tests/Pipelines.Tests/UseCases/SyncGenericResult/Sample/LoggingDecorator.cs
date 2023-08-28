@@ -15,10 +15,10 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
         _logger = logger;
     }
 
-    public TResult Handle(TInput request)
+    public TResult Handle(TInput input)
     {
         _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
-        var result = _handler.Handle(request);
+        var result = _handler.Handle(input);
         _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;

@@ -23,9 +23,9 @@ Generic Arguments defines result types. `Pipelines` supports handling with both 
 
 Examples: 
 ```cs
-public interface ICommand {} 
-public interface ICommand<TResult>{}
-public interface ICommand<TResult,TResult2> {}
+public interface IInput {} 
+public interface IInput<TResult> where TResult: class{ } 
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
 ```
 
 ### 1.2 Handler
@@ -35,41 +35,48 @@ In case, when all handlers will return exactly same return type, you don't need 
 
 Examples: 
 ```cs
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public void Handle(TCommand command, CancellationToken token);
+    public void Handle(TInput input, CancellationToken token);
 }
 
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public string Handle(TCommand command, CancellationToken token);
+    public string Handle(TInput input, CancellationToken token);
 }
 
-public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand : ICommand<TResult, TResult2>
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public (TResult, TResult2) Handle(TCommand command, CancellationToken token);
+    public TResult Handle(TInput input);
+}
+
+public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
+    where TResult : class where TResult2 : class
+{
+    public (TResult, TResult2) Handle(TInput input, CancellationToken token);
 }
 ```
 
 ```cs
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TCommand command, CancellationToken token);
+    public Task HandleAsync(TInput input, CancellationToken token);
 }
 
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TCommand command, CancellationToken token);
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
 }
 
-public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand<TResult>
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 
-public interface ICommandHandler<in TCommand, TResult, TResult2> where TCommand : ICommand<TResult, TResult2>
+public interface IHandler<in TInput, TResult, TResult2>
+    where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
-    public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
+    public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -84,42 +91,48 @@ Dispatcher is not resposible for apply Decorators by its own because Decorators 
 Examples:
 
 ```cs
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public void Send(ICommand command);
+    public void Send(IInput input);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public string Send(ICommand command);
+    public string Send(IInput input);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public (TResult, TResult2) Send<TResult, TResult2>(ICommand<TResult, TResult2> command);
+    public TResult Send<TResult>(IInput<TResult> input) where TResult : class;
+}
+
+public interface IDispatcher
+{
+    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
 ```cs
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public Task SendAsync(ICommand command, CancellationToken token);
+    public Task SendAsync(IInput input, CancellationToken token);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public Task<string> SendAsync(ICommand command, CancellationToken token);
+    public Task<string> SendAsync(IInput input, CancellationToken token);
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 
-public interface ICommandDispatcher
+public interface IDispatcher
 {
-    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(ICommand<TResult, TResult2> command,
-        CancellationToken token);
+    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
@@ -165,7 +178,7 @@ When registering decorators, ensure the order of registration in the DI containe
 There is a lot of ways how to register Closed Types Decorators:
 
 ```cs
-.AddDispatcher<ICommandDispatcher>(dispatcherAssembly)
+.AddDispatcher<IDispatcher>(dispatcherAssembly)
     .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
             .WithClosedTypeDecorators(x =>
             {
@@ -178,21 +191,23 @@ There is a lot of ways how to register Closed Types Decorators:
 
 Open Type Decorator example:
 ```cs
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
 {
-    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly IHandler<TInput, TResult> _handler;
    
-    public LoggingDecorator(IHandler<TCommand, TResult> handler)
+    public LoggingDecorator(IHandler<TInput, TResult> handler)
     {
         _handler = handler;
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
+    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
     {
-
+        //Add logic here 
         var result = await _handler.HandleAsync(request, token);
-
+       
+        //Add logic here 
         return result;
     }
 }
@@ -215,7 +230,11 @@ public class
     public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
         CancellationToken token)
     {
+        //Add logic here 
         var result = await _handler.HandleAsync(request, token);
+
+        //Add logic here 
+
         return result;
     }
 ```
