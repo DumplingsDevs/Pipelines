@@ -26,6 +26,7 @@ dotnet add package DumplingsDevs.Pipelines.Generators
 ```
 
 # Quick Start
+
 ---- 
 
 ## 1. Define your own types
@@ -38,7 +39,7 @@ The "Input" acts as the initial parameter for Handler and Dispatcher methods, gu
 <summary style="color: green">📜 Show me code </summary>
 
 ```cs
-public interface IInput<TResult>{ }
+public interface IInput<TResult> where TResult: class{ } 
 ```
 
 </details>
@@ -51,9 +52,9 @@ Handlers house the application logic and can generate both synchronous and async
 <summary style="color: green">📜 Show me code </summary>
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -69,7 +70,7 @@ Serving as a bridge between inputs and their respective handlers, the Dispatcher
 ```cs
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
 
@@ -83,22 +84,22 @@ Analogous to Middlewares in .NET. Think of them as layers of logic that execute 
 <summary style="color: green">📜 Show me code </summary>
 
 ```cs
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult> where TCommand : IInput<TResult>
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
-    private readonly IHandler<TCommand, TResult> _handler;
+    private readonly IHandler<TInput, TResult> _handler;
     private readonly ILogger _logger;
     
-    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger logger)
+    public LoggingDecorator(IHandler<TInput, TResult> handler, ILogger logger)
     {
         _handler = handler;
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
+    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
     {
-        _logger.Log(LogLevel.Information,"Executing handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information,"Executing handler for input {0}", typeof(TInput));
         var result = await _handler.HandleAsync(request, token);
-        _logger.Log(LogLevel.Information,"Executed handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information,"Executed handler for input {0}", typeof(TInput));
 
         return result;
     }
@@ -171,7 +172,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
     {
         app.MapPost("/example", async (ExampleInput request, IDispatcher dispatcher, CancellationToken token) =>
         {
-            var result = await dispatcher.SendAsync(command,token);
+            var result = await dispatcher.SendAsync(input,token);
             return Results.Ok();
         });
     }
@@ -179,18 +180,11 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 </details>
 
-# Conventions
-- Generic result types must have a `class` constraint.
-- The `Input` must be the first parameter of the Dispatcher and Handler methods.
-- Result types for the `Dispatcher` and `Handler` must match.
-- Method parameters for the `Dispatcher` and `Handler` must match.
-- `Input` Generic Arguments indicate the result type.
-- If the `Dispatcher/Handler` returns a non-generic type, then the `Input` will not have any Generic Arguments.
-- The `Decorator` must implement the Handler interface and accept Handler as a constructor parameter.
-
+---- 
 
 # Detailed documentation
 ------
+- [Conventions](docs/conventions.md)
 - [Key Concepts](docs/key_concepts.md)
 - [Source generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Code examples](docs/code_examples.md)
@@ -198,5 +192,8 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [Troubleshooting](docs/troubleshooting.md)
 - [ADR](docs/adr.md)
 
+---- 
+
 # Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
+- Cannot create a Pipeline that returns both generic and non-generic types.

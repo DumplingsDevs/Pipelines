@@ -2,7 +2,7 @@ using MediatR;
 
 namespace Pipelines.Benchmarks.Sample.Mediator.Behaviours;
 
-public class LoggingBehaviour<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
+public class LoggingBehaviour<TInput, TResult> : IPipelineBehavior<TInput, TResult>
 {
     private readonly DecoratorsState _state;
 
@@ -11,7 +11,7 @@ public class LoggingBehaviour<TCommand, TResult> : IPipelineBehavior<TCommand, T
         _state = state;
     }
 
-    public async Task<TResult> Handle(TCommand request, RequestHandlerDelegate<TResult> next,
+    public async Task<TResult> Handle(TInput request, RequestHandlerDelegate<TResult> next,
         CancellationToken cancellationToken)
     {
         _state.Status.Add(typeof(LoggingBehaviour<,>).Name);

@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.NotGenericResult.Types;
 
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TCommand command, CancellationToken token);
+    public Task<string> HandleAsync(TInput command, CancellationToken token);
 }

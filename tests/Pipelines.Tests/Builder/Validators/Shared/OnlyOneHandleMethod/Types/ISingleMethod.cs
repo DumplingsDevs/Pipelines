@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.Builder.Validators.Shared.OnlyOneHandleMethod.Types;
 
-public interface ISingleMethod<in TCommand, TResult> where TCommand : ICommand<TResult>
+public interface ISingleMethod<in TInput, TResult> where TInput : ICommand<TResult>
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
 }

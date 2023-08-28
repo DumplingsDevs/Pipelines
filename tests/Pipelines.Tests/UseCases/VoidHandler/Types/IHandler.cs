@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.VoidHandler.Types;
 
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public void Handle(TCommand command);
+    public void Handle(TInput command);
 }

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Pipelines.Benchmarks.Sample.Mediator.Behaviours;
 
-public class ExampleRequestBehaviourTwo<TCommand, TResult> : IPipelineBehavior<TCommand, TResult> where TCommand : MediatorExampleRequest200
+public class ExampleRequestBehaviourTwo<TInput, TResult> : IPipelineBehavior<TInput, TResult> where TInput : MediatorExampleRequest200
 {
     private readonly DecoratorsState _state;
 
@@ -12,7 +12,7 @@ public class ExampleRequestBehaviourTwo<TCommand, TResult> : IPipelineBehavior<T
         _state = state;
     }
 
-    public async Task<TResult> Handle(TCommand request, RequestHandlerDelegate<TResult> next,
+    public async Task<TResult> Handle(TInput request, RequestHandlerDelegate<TResult> next,
         CancellationToken cancellationToken)
     {
         _state.Status.Add(typeof(ExampleRequestBehaviourTwo<,>).Name);
