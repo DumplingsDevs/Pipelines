@@ -59,6 +59,8 @@ internal class DispatcherProxyBuilder
     {
         AddLine("using System;");
         AddLine("using System.Linq;");
+        AddLine("using System.Collections.Generic;");
+        AddLine("using System.Threading.Tasks;");
         AddLine("using Pipelines.Builder.HandlerWrappers;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
         AddLine("using Pipelines.Exceptions;");
@@ -144,7 +146,10 @@ internal class DispatcherProxyBuilder
         string returnStatement, string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            var handler = serviceProvider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+            
+            var handler = provider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
 
             {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
     }
@@ -153,7 +158,10 @@ internal class DispatcherProxyBuilder
         string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            var handlers = serviceProvider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+
+            var handlers = provider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
             if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
             foreach (var handler in handlers)
                 {{
@@ -180,10 +188,10 @@ internal class DispatcherProxyBuilder
 
         AddLine($@"
     public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
-        IHandlersRepository handlersRepository)
+        IEnumerable<IHandlersRepository> handlerRepositories)
     {{
         _serviceProvider = serviceProvider;
-        var handlerTypes = handlersRepository.GetHandlers();
+        var handlerTypes = handlerRepositories.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).GetHandlers();
         foreach (var handlerType in handlerTypes)
         {{
             var genericArguments = handlerType.GetInterfaces()
