@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.Builder.Validators.Handler.InputType.Types;
 
-public interface ICommandHandler<in TInput> where TInput : ICommand
+public interface IHandler<in TInput> where TInput : IInput
 {
     public Task HandleAsync(TInput command, CancellationToken token);
 }

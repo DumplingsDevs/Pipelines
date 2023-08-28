@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.Builder.Validators.Handler.InputType.Types;
 
-public interface ICommandHandlerWithTwoResults<in TInput, TResult, TSecondResult> where TInput : ICommandWithTwoResults<TResult, TSecondResult>
+public interface IHandlerWithTwoResults<in TInput, TResult, TSecondResult> where TInput : IInputWithTwoResults<TResult, TSecondResult>
 {
     public Task<(TResult,TSecondResult)> HandleAsync(TInput command, CancellationToken token);
 }

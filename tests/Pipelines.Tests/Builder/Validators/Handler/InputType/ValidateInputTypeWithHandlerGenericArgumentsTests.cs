@@ -13,7 +13,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     {
         // Arrange
         Type inputType = null;
-        var handlerType = typeof(ICommandHandler<>);
+        var handlerType = typeof(IHandler<>);
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
@@ -24,7 +24,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_NullHandlerType_ThrowsArgumentNullException()
     {
         // Arrange
-        var inputType = typeof(ICommand);
+        var inputType = typeof(IInput);
         Type handlerType = null;
 
         // Act & Assert
@@ -36,8 +36,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_InputWithOneResultTypeMethodMatchesHandlerMethod_Passes()
     {
         // Arrange
-        var commandHandler = typeof(ICommandHandlerWithResult<,>);
-        var inputType = typeof(ICommandWithResult<>);
+        var commandHandler = typeof(IHandlerWithResult<,>);
+        var inputType = typeof(IInputWithResult<>);
 
         // Act
         ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
@@ -50,8 +50,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_InputWithTwoResultTypesMatchesHandlerMethod_Passes()
     {
         // Arrange
-        var commandHandler = typeof(ICommandHandlerWithTwoResults<,,>);
-        var inputType = typeof(ICommandWithTwoResults<,>);
+        var commandHandler = typeof(IHandlerWithTwoResults<,,>);
+        var inputType = typeof(IInputWithTwoResults<,>);
 
         // Act
         ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
@@ -64,8 +64,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_InputWithoutResultMatchesHandlerMethod_Passes()
     {
         // Arrange
-        var commandHandler = typeof(ICommandHandler<>);
-        var inputType = typeof(ICommand);
+        var commandHandler = typeof(IHandler<>);
+        var inputType = typeof(IInput);
 
         // Act
         ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, commandHandler);
@@ -78,8 +78,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_VoidCommandWithHandlerWithOneResult_ThrowsResultTypeCountMismatchException()
     {
         // Arrange
-        var inputType = typeof(ICommand);
-        var handlerType = typeof(ICommandHandlerWithResult<,>);
+        var inputType = typeof(IInput);
+        var handlerType = typeof(IHandlerWithResult<,>);
 
         // Act & Assert
         Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
@@ -90,8 +90,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_CommandWithOneResultWithVoidHandler_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
-        var inputType = typeof(ICommandWithResult<>);
-        var handlerType = typeof(ICommandHandler<>);
+        var inputType = typeof(IInputWithResult<>);
+        var handlerType = typeof(IHandler<>);
 
         // Act & Assert
         Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
@@ -102,8 +102,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_CommandWithOneResultWithHandlerWithTwoResults_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
-        var inputType = typeof(ICommandWithResult<>);
-        var handlerType = typeof(ICommandHandlerWithTwoResults<,,>);
+        var inputType = typeof(IInputWithResult<>);
+        var handlerType = typeof(IHandlerWithTwoResults<,,>);
 
         // Act & Assert
         Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
@@ -114,8 +114,8 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     public void Validate_CommandWithTwoResultsWithHandlerWithOneResult_ThrowsGenericArgumentsLengthMismatchException()
     {
         // Arrange
-        var inputType = typeof(ICommandWithTwoResults<,>);
-        var handlerType = typeof(ICommandHandlerWithResult<,>);
+        var inputType = typeof(IInputWithTwoResults<,>);
+        var handlerType = typeof(IHandlerWithResult<,>);
 
         // Act & Assert
         Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
@@ -127,7 +127,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
     {
         // Arrange
         var inputType = typeof(DiffNamespaceICommand);
-        var handlerType = typeof(ICommandHandler<>);
+        var handlerType = typeof(IHandler<>);
 
         // Act & Assert
         Assert.Throws<HandlerInputTypeMismatchException>(() =>

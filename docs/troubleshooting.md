@@ -157,18 +157,39 @@ public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> whe
 
 #### What happened?
 
+The number of generic arguments for `Input` defined in `AddInput()` does not align with the `Input` specified in the Handler definition.
+
+It's likely that a different `Input` type was used in the `AddInput()` method compared to the one in the `Handler` type definition.
 
 #### Bad example
 
-```cs
+```csharp
+public interface IInput
+{ }
 
+public interface IHandlerWithResult<in TInput, TResult> 
+    where TInput : IInputWithResult<TResult> 
+    where TResult : class
+{
+    Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure the same `Input` type is used in both the `AddInput()` method and the `Handler` definition.
 
-```cs
+```csharp
+public interface IInputWithResult<TResult> where TResult : class
+{ }
 
+public interface IHandlerWithResult<in TInput, TResult> 
+    where TInput : IInputWithResult<TResult> 
+    where TResult : class
+{
+    Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
 ```
+
 ---
 
 ### GenericArgumentsNotFoundException
