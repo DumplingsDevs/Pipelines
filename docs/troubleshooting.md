@@ -83,7 +83,7 @@ A provided type doesn't define a handle method.
 
 ```csharp
 
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {}
 
 ...
@@ -93,9 +93,9 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Define a Handle method in the handler.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ``` 
 ...
@@ -110,10 +110,10 @@ Multiple methods were defined in the provided type. Each interface must contain 
 #### Bad example
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
-    public Task<TResult> HandleAsync(TCommand command);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input);
 }
 ```
 
@@ -121,9 +121,9 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Remove extra methods from the interface.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ---
@@ -136,7 +136,7 @@ The defined Handle method does not have any parameters.
 #### Bad example
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
     public Task<TResult> HandleAsync();
 }
@@ -146,9 +146,9 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Ensure the method has at least one parameter, which should be of the Input Type.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ---
