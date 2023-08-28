@@ -59,6 +59,8 @@ internal class DispatcherProxyBuilder
     {
         AddLine("using System;");
         AddLine("using System.Linq;");
+        AddLine("using System.Collections.Generic;");
+        AddLine("using System.Threading.Tasks;");
         AddLine("using Pipelines.Builder.HandlerWrappers;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
         AddLine("using Pipelines.Exceptions;");
@@ -180,10 +182,10 @@ internal class DispatcherProxyBuilder
 
         AddLine($@"
     public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
-        IHandlersRepository handlersRepository)
+        IEnumerable<IHandlersRepository> handlerRepositories)
     {{
         _serviceProvider = serviceProvider;
-        var handlerTypes = handlersRepository.GetHandlers();
+        var handlerTypes = handlerRepositories.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).GetHandlers();
         foreach (var handlerType in handlerTypes)
         {{
             var genericArguments = handlerType.GetInterfaces()
