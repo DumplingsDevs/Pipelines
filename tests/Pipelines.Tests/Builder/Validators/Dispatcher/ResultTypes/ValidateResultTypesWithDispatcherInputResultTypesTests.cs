@@ -58,4 +58,18 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
         // Assert
         Assert.Pass();
     }
+    
+    [Test]
+    public void Validate_GivenIDispatcherWithGenericInputType_DoesNotThrowException()
+    {
+        // Arrange
+        var dispatcherType = typeof(IDispatcherWithGenericInput);
+        var commandType = typeof(ICommand);
+
+        // Act
+        ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType);
+
+        // Assert
+        Assert.Pass();
+    }
 }

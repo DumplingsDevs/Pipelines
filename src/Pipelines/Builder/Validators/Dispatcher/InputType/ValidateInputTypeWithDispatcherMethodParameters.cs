@@ -12,11 +12,29 @@ internal static class ValidateInputTypeWithDispatcherMethodParameters
 
         var firstMethodParameterType = GetFirstMethodParameterType(dispatcherType);
 
-        var areEqual = TypeNamespaceComparer.Compare(inputType, firstMethodParameterType);
-        if (!areEqual)
+        var inputTypeMatch = firstMethodParameterType.IsGenericMethodParameter
+            ? TryFindInputType(inputType, firstMethodParameterType)
+            : TypeNamespaceComparer.Compare(inputType, firstMethodParameterType);
+
+        if (!inputTypeMatch)
         {
             throw new DispatcherMethodInputTypeMismatchException(inputType, firstMethodParameterType);
         }
+    }
+
+    private static bool TryFindInputType(Type inputType, Type firstMethodParameterType)
+    {
+        var inputTypeFound = false;
+        foreach (var type in firstMethodParameterType.GetGenericParameterConstraints())
+        {
+            inputTypeFound = TypeNamespaceComparer.Compare(inputType, type);
+            if (inputTypeFound)
+            {
+                break;
+            }
+        }
+
+        return inputTypeFound;
     }
 
     private static Type GetFirstMethodParameterType(Type dispatcherType)
