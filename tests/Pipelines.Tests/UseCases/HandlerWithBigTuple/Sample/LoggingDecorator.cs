@@ -2,8 +2,8 @@ using Pipelines.Tests.UseCases.HandlerWithBigTuple.Types;
 
 namespace Pipelines.Tests.UseCases.HandlerWithBigTuple.Sample;
 
-public class LoggingDecorator<TCommand, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> : IHandler<TCommand, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
-    where TCommand : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
+public class LoggingDecorator<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> : IHandler<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
+    where TInput : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
     where TResult : class
     where TResult2 : class
     where TResult3 : class
@@ -12,16 +12,16 @@ public class LoggingDecorator<TCommand, TResult, TResult2, TResult3, TResult4, T
     where TResult6 : class
     where TResult7 : class
 {
-    private readonly IHandler<TCommand, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> _handler;
+    private readonly IHandler<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> _handler;
     private readonly DecoratorsState _state;
 
-    public LoggingDecorator(IHandler<TCommand, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> handler, DecoratorsState state)
+    public LoggingDecorator(IHandler<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> handler, DecoratorsState state)
     {
         _handler = handler;
         _state = state;
     }
 
-    public (TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7) HandleAsync(TCommand request, CancellationToken token)
+    public (TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7) HandleAsync(TInput request, CancellationToken token)
     {
         _state.Status.Add(typeof(LoggingDecorator<,,,,,,,>).Name);
         var result = _handler.HandleAsync(request, token);

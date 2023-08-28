@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.Builder.Decorators.Types;
 
-public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand<TResult>
+public interface ICommandHandler<in TInput, TResult> where TInput : ICommand<TResult>
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
 }

@@ -1,8 +1,8 @@
 namespace Pipelines.Tests.Builder.Validators.CrossValidation.ResultType.Types;
 
-public interface IHandlerTaskWithTwoConstraintedResults<in TCommand, TResultOne, TResultTwo> where TCommand : IInputType
+public interface IHandlerTaskWithTwoConstraintedResults<in TInput, TResultOne, TResultTwo> where TInput : IInputType
     where TResultOne : IResultOne
     where TResultTwo : IResultTwo
 {
-    public Task<(TResultOne,TResultTwo)> HandleAsync(TCommand command, CancellationToken token);
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
 }

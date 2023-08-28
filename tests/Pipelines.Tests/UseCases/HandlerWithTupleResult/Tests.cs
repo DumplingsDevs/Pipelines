@@ -36,7 +36,7 @@ public class Tests
         var request = new ExampleInput("My test request");
 
         //Act
-        var result = _dispatcher.SendAsync(request, new CancellationToken());
+        var result = _dispatcher.Send(request);
 
         //Assert
         Assert.That(result.Item1.Value, Is.EqualTo("My test request"));
@@ -57,6 +57,6 @@ public class Tests
 
         //Act & Assert
         Assert.Throws<HandlerNotRegisteredException>(() =>
-            _dispatcher.SendAsync(request, new CancellationToken()));
+            _dispatcher.Send(request));
     }
 }

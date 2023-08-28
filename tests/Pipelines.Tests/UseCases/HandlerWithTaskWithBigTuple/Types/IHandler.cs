@@ -1,7 +1,7 @@
 namespace Pipelines.Tests.UseCases.HandlerWithTaskWithBigTuple.Types;
 
-public interface IHandler<in TCommand,TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
-    where TCommand : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
+public interface IHandler<in TInput,TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
+    where TInput : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
     where TResult : class
     where TResult2 : class
     where TResult3 : class
@@ -10,5 +10,5 @@ public interface IHandler<in TCommand,TResult, TResult2, TResult3, TResult4, TRe
     where TResult6 : class
     where TResult7 : class
 {
-    public Task<(TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7)> HandleAsync(TCommand command, CancellationToken token);
+    public Task<(TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7)> HandleAsync(TInput command, CancellationToken token);
 }

@@ -1,7 +1,7 @@
 namespace Pipelines.Tests.UseCases.CrossValidationReturnType.Types;
 
-public interface IHandlerTaskWithConstrainedResult<in TCommand, TResultOne> where TCommand : IInputType
+public interface IHandlerTaskWithConstrainedResult<in TInput, TResultOne> where TInput : IInputType
     where TResultOne : IResultOne
 {
-    public Task<TResultOne> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResultOne> HandleAsync(TInput command, CancellationToken token);
 }
