@@ -59,7 +59,7 @@ public interface IInput { }
 // Handler Interface
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TInput command, CancellationToken token);
+    public Task HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ```cs
@@ -131,7 +131,7 @@ public interface IInput<TResult> where TResult: class{ }
 // Handler Interface
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -206,7 +206,7 @@ public interface IInput<TResult, TResult2> where TResult : class where TResult2 
 public interface IHandler<in TInput, TResult, TResult2>
     where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
-    public Task<(TResult, TResult2)> HandleAsync(TInput command, CancellationToken token);
+    public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ```cs
@@ -271,7 +271,7 @@ public interface IInput<TResult> where TResult: class { }
 // Handler Interface
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
-    public Task<TResult> HandleAsync(TInput command, CancellationToken token, bool canDoSomething,
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> fancyDictionary);
 }
 ```
@@ -321,10 +321,10 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TInput command, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
+    public async Task<TResult> HandleAsync(TInput input, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
     {
         _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
-        var result = await _handler.HandleAsync(command, token, canDoSomething, fancyDictionary);
+        var result = await _handler.HandleAsync(input, token, canDoSomething, fancyDictionary);
         _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;
@@ -347,7 +347,7 @@ public interface IInput { }
 // Handler Interface
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TInput command, CancellationToken token);
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ```cs
@@ -416,7 +416,7 @@ public interface IInput { }
 // Handler Interface
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public void Handle(TInput command);
+    public void Handle(TInput input);
 }
 ```
 ```cs
@@ -481,7 +481,7 @@ public interface IInput<TResult> where TResult: class{ }
 // Handler Interface
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public TResult Handle(TInput command);
+    public TResult Handle(TInput input);
 }
 ```
 ```cs
@@ -557,7 +557,7 @@ public interface IInput<TResult, TResult2> where TResult : class where TResult2 
 public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
     where TResult : class where TResult2 : class
 {
-    public (TResult, TResult2) HandleAsync(TInput command, CancellationToken token);
+    public (TResult, TResult2) HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ```cs
@@ -643,7 +643,7 @@ public interface IInput { }
 // Handler Interface
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public string Handle(TInput command);
+    public string Handle(TInput input);
 }
 ```
 ```cs
