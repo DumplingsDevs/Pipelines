@@ -133,4 +133,16 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
+    
+    [Test]
+    public void Validate_HandlerWithoutGenericArguments_ThrowsGenericArgumentsNotFoundException()
+    {
+        // Arrange
+        var inputType = typeof(IInput);
+        var handlerType = typeof(IHandlerWithoutGenericArguments);
+
+        // Act & Assert
+        Assert.Throws<GenericArgumentsNotFoundException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
 }

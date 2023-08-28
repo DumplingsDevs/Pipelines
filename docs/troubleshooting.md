@@ -196,13 +196,25 @@ public interface IHandlerWithResult<in TInput, TResult>
 
 #### What happened?
 
+The `Handler` lacks generic arguments. At least one generic argument is required, specifically for `Input`.
+
 #### Bad example
 
-```cs
+```csharp
+public interface IHandler
+{
+    Task HandleAsync(IInput command, CancellationToken token);
+}
 ```
 
 #### How to fix
-```cs
+Ensure the `Handler` has at least one generic argument representing the `Input`.
+
+```csharp
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput command, CancellationToken token);
+}
 ```
 ---
 
