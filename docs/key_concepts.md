@@ -24,8 +24,8 @@ Generic Arguments defines result types. `Pipelines` supports handling with both 
 Examples: 
 ```cs
 public interface IInput {} 
-public interface IInput<TResult>{}
-public interface IInput<TResult,TResult2> {}
+public interface IInput<TResult> where TResult: class{ } 
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
 ```
 
 ### 1.2 Handler
