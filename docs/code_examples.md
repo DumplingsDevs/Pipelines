@@ -57,9 +57,9 @@ public interface IInput { }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TCommand command, CancellationToken token);
+    public Task HandleAsync(TInput command, CancellationToken token);
 }
 ```
 ```cs
@@ -91,17 +91,17 @@ public class ExampleHandler : IHandler<ExampleInput>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand> : IHandler<TCommand>
-    where TCommand : IInput
+public class LoggingDecorator<TInput> : IHandler<TInput>
+    where TInput : IInput
 {
-    private readonly IHandler<TCommand> _handler;
+    private readonly IHandler<TInput> _handler;
 
-    public LoggingDecorator(IHandler<TCommand> handler)
+    public LoggingDecorator(IHandler<TInput> handler)
     {
         _handler = handler;
     }
 
-    public Task HandleAsync(TCommand request, CancellationToken token)
+    public Task HandleAsync(TInput request, CancellationToken token)
     {
         // Add logic there
 
@@ -129,9 +129,9 @@ public interface IInput<TResult> where TResult: class{ }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
 }
 ```
 
@@ -168,23 +168,23 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
-    where TCommand : IInput<TResult> where TResult : class
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
 {
-    private readonly IHandler<TCommand, TResult> _handler;
-    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+    private readonly IHandler<TInput, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TInput, TResult>> _logger;
 
-    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    public LoggingDecorator(IHandler<TInput, TResult> handler, ILogger<LoggingDecorator<TInput, TResult>> logger)
     {
         _handler = handler;
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TCommand request, CancellationToken token)
+    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
     {
-        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
         var result = await _handler.HandleAsync(request, token);
-        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;
     }
@@ -203,10 +203,10 @@ public interface IInput<TResult, TResult2> where TResult : class where TResult2 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult, TResult2> where TResult : class where TResult2 : class
+public interface IHandler<in TInput, TResult, TResult2>
+    where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
-    public Task<(TResult, TResult2)> HandleAsync(TCommand command, CancellationToken token);
+    public Task<(TResult, TResult2)> HandleAsync(TInput command, CancellationToken token);
 }
 ```
 ```cs
@@ -233,19 +233,19 @@ public record ExampleCommandResultSecond(string Value);
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2 : class
+public class LoggingDecorator<TInput, TResult, TResult2> : IHandler<TInput, TResult, TResult2>
+    where TInput : IInput<TResult,TResult2> where TResult : class where TResult2 : class
 {
-    private readonly IHandler<TCommand, TResult, TResult2> _handler;
+    private readonly IHandler<TInput, TResult, TResult2> _handler;
     private readonly DecoratorsState _state;
 
-    public LoggingDecorator(IHandler<TCommand, TResult, TResult2> handler, DecoratorsState state)
+    public LoggingDecorator(IHandler<TInput, TResult, TResult2> handler, DecoratorsState state)
     {
         _handler = handler;
         _state = state;
     }
 
-    public async Task<(TResult,TResult2)> HandleAsync(TCommand request, CancellationToken token)
+    public async Task<(TResult,TResult2)> HandleAsync(TInput request, CancellationToken token)
     {
         _state.Status.Add(typeof(LoggingDecorator<,,>).Name);
         var result = await _handler.HandleAsync(request, token);
@@ -269,9 +269,9 @@ public interface IInput<TResult> where TResult: class { }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult : class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething,
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> fancyDictionary);
 }
 ```
@@ -309,23 +309,23 @@ public class ExampleInputHandler : IInputHandler<ExampleInput, ExampleCommandRes
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
-    where TCommand : IInput<TResult> where TResult : class
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
 {
-    private readonly IHandler<TCommand, TResult> _handler;
-    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+    private readonly IHandler<TInput, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TInput, TResult>> _logger;
 
-    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    public LoggingDecorator(IHandler<TInput, TResult> handler, ILogger<LoggingDecorator<TInput, TResult>> logger)
     {
         _handler = handler;
         _logger = logger;
     }
 
-    public async Task<TResult> HandleAsync(TCommand command, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
+    public async Task<TResult> HandleAsync(TInput command, CancellationToken token, bool canDoSomething, Dictionary<string, string> fancyDictionary)
     {
-        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
         var result = await _handler.HandleAsync(command, token, canDoSomething, fancyDictionary);
-        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;
     }
@@ -345,9 +345,9 @@ public interface IInput { }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TCommand command, CancellationToken token);
+    public Task<string> HandleAsync(TInput command, CancellationToken token);
 }
 ```
 ```cs
@@ -378,17 +378,17 @@ public class ExampleHandler : IHandler<ExampleInput>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand> : IHandler<TCommand>
-    where TCommand : IInput
+public class LoggingDecorator<TInput> : IHandler<TInput>
+    where TInput : IInput
 {
-    private readonly IHandler<TCommand> _handler;
+    private readonly IHandler<TInput> _handler;
 
-    public LoggingDecorator(IHandler<TCommand> handler)
+    public LoggingDecorator(IHandler<TInput> handler)
     {
         _handler = handler;
     }
 
-    public Task<string> HandleAsync(TCommand request, CancellationToken token)
+    public Task<string> HandleAsync(TInput request, CancellationToken token)
     {
         var result = _handler.HandleAsync(request, token);
 
@@ -414,9 +414,9 @@ public interface IInput { }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public void Handle(TCommand command);
+    public void Handle(TInput command);
 }
 ```
 ```cs
@@ -445,17 +445,17 @@ public class ExampleHandler : IHandler<ExampleInput>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand> : IHandler<TCommand>
-    where TCommand : IInput
+public class LoggingDecorator<TInput> : IHandler<TInput>
+    where TInput : IInput
 {
-    private readonly IHandler<TCommand> _handler;
+    private readonly IHandler<TInput> _handler;
 
-    public LoggingDecorator(IHandler<TCommand> handler)
+    public LoggingDecorator(IHandler<TInput> handler)
     {
         _handler = handler;
     }
 
-    public void Handle(TCommand request)
+    public void Handle(TInput request)
     {
         //Add Logic there
 
@@ -479,9 +479,9 @@ public interface IInput<TResult> where TResult: class{ }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public TResult Handle(TCommand command);
+    public TResult Handle(TInput command);
 }
 ```
 ```cs
@@ -517,23 +517,23 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand, TResult> : IHandler<TCommand, TResult>
-    where TCommand : IInput<TResult> where TResult : class
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
 {
-    private readonly IHandler<TCommand, TResult> _handler;
-    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+    private readonly IHandler<TInput, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TInput, TResult>> _logger;
 
-    public LoggingDecorator(IHandler<TCommand, TResult> handler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    public LoggingDecorator(IHandler<TInput, TResult> handler, ILogger<LoggingDecorator<TInput, TResult>> logger)
     {
         _handler = handler;
         _logger = logger;
     }
 
-    public TResult Handle(TCommand request)
+    public TResult Handle(TInput request)
     {
-        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
         var result = _handler.Handle(request);
-        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TCommand));
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;
     }
@@ -554,10 +554,10 @@ public interface IInput<TResult, TResult2> where TResult : class where TResult2 
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand, TResult, TResult2> where TCommand : IInput<TResult, TResult2>
+public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
     where TResult : class where TResult2 : class
 {
-    public (TResult, TResult2) HandleAsync(TCommand command, CancellationToken token);
+    public (TResult, TResult2) HandleAsync(TInput command, CancellationToken token);
 }
 ```
 ```cs
@@ -604,17 +604,17 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleRecordCommandResult,
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand, TResult, TResult2> : IHandler<TCommand, TResult, TResult2>
-    where TCommand : IInput<TResult,TResult2> where TResult : class where TResult2: class
+public class LoggingDecorator<TInput, TResult, TResult2> : IHandler<TInput, TResult, TResult2>
+    where TInput : IInput<TResult,TResult2> where TResult : class where TResult2: class
 {
-    private readonly IHandler<TCommand, TResult, TResult2> _handler;
+    private readonly IHandler<TInput, TResult, TResult2> _handler;
 
-    public LoggingDecorator(IHandler<TCommand, TResult, TResult2> handler)
+    public LoggingDecorator(IHandler<TInput, TResult, TResult2> handler)
     {
         _handler = handler;
     }
 
-    public (TResult,TResult2) HandleAsync(TCommand request, CancellationToken token)
+    public (TResult,TResult2) HandleAsync(TInput request, CancellationToken token)
     {
         //Add logic there 
 
@@ -641,9 +641,9 @@ public interface IInput { }
 ```
 ```cs
 // Handler Interface
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public string Handle(TCommand command);
+    public string Handle(TInput command);
 }
 ```
 ```cs
@@ -674,17 +674,17 @@ public class ExampleHandler : IHandler<ExampleInput>
 
 ```cs
 // Open Type Decorator Implementation
-public class LoggingDecorator<TCommand> : IHandler<TCommand>
-    where TCommand : IInput
+public class LoggingDecorator<TInput> : IHandler<TInput>
+    where TInput : IInput
 {
-    private readonly IHandler<TCommand> _handler;
+    private readonly IHandler<TInput> _handler;
 
-    public LoggingDecorator(IHandler<TCommand> handler)
+    public LoggingDecorator(IHandler<TInput> handler)
     {
         _handler = handler;
     }
 
-    public string Handle(TCommand request)
+    public string Handle(TInput request)
     {
         //Add logic there
 
