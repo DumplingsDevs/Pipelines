@@ -37,39 +37,39 @@ Examples:
 ```cs
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public void Handle(TInput command, CancellationToken token);
+    public void Handle(TInput input, CancellationToken token);
 }
 
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public string Handle(TInput command, CancellationToken token);
+    public string Handle(TInput input, CancellationToken token);
 }
 
 public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
 {
-    public (TResult, TResult2) Handle(TInput command, CancellationToken token);
+    public (TResult, TResult2) Handle(TInput input, CancellationToken token);
 }
 ```
 
 ```cs
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TInput command, CancellationToken token);
+    public Task HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TInput command, CancellationToken token);
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
 {
-    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
 {
-    public Task<(TResult, TResult2)> HandleAsync(TInput command, CancellationToken token);
+    public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -86,39 +86,39 @@ Examples:
 ```cs
 public interface IDispatcher
 {
-    public void Send(IInput command);
+    public void Send(IInput input);
 }
 
 public interface IDispatcher
 {
-    public string Send(IInput command);
+    public string Send(IInput input);
 }
 
 public interface IDispatcher
 {
-    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> command);
+    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> input);
 }
 ```
 
 ```cs
 public interface IDispatcher
 {
-    public Task SendAsync(IInput command, CancellationToken token);
+    public Task SendAsync(IInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<string> SendAsync(IInput command, CancellationToken token);
+    public Task<string> SendAsync(IInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> command, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> command,
+    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
         CancellationToken token);
 }
 ```
