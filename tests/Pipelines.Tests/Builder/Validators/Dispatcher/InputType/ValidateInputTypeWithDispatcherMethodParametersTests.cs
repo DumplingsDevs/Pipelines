@@ -38,6 +38,17 @@ public class ValidateInputTypeWithDispatcherMethodParametersTests
         //Act and Assert
         ValidateInputTypeWithDispatcherMethodParameters.Validate(inputType, dispatcherType);
     }
+    
+    [Test]
+    public void Validate_WhenTypesAreEqual_DispatcherWithGenericMethodParameter_DoesNotThrowException()
+    {
+        //Arrange
+        var inputType = typeof(ICommand);
+        var dispatcherType = typeof(IDispatcherWithGenericMethodParameter);
+        
+        //Act and Assert
+        ValidateInputTypeWithDispatcherMethodParameters.Validate(inputType, dispatcherType);
+    }
 
     [Test]
     public void Validate_WhenTypesAreNotEqual_ThrowsDispatcherMethodInputTypeMismatchException()
