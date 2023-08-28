@@ -45,10 +45,15 @@ public interface IHandler<in TInput> where TInput : IInput
     public string Handle(TInput input, CancellationToken token);
 }
 
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+{
+    public TResult Handle(TInput input);
+}
+
 public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
     where TResult : class where TResult2 : class
 {
-    public (TResult, TResult2) HandleAsync(TInput input, CancellationToken token);
+    public (TResult, TResult2) Handle(TInput input, CancellationToken token);
 }
 ```
 
@@ -98,7 +103,13 @@ public interface IDispatcher
 
 public interface IDispatcher
 {
-    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> input);
+    public TResult Send<TResult>(IInput<TResult> input) where TResult : class;
+}
+
+public interface IDispatcher
+{
+    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
@@ -115,13 +126,13 @@ public interface IDispatcher
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token);
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 
 public interface IDispatcher
 {
     public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
-        CancellationToken token);
+        CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
@@ -180,7 +191,8 @@ There is a lot of ways how to register Closed Types Decorators:
 
 Open Type Decorator example:
 ```cs
-public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult> where TInput : IInput<TResult>
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
 {
     private readonly IHandler<TInput, TResult> _handler;
    
@@ -192,9 +204,10 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult> where
 
     public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
     {
-
+        //Add logic here 
         var result = await _handler.HandleAsync(request, token);
-
+       
+        //Add logic here 
         return result;
     }
 }
@@ -217,7 +230,11 @@ public class
     public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
         CancellationToken token)
     {
+        //Add logic here 
         var result = await _handler.HandleAsync(request, token);
+
+        //Add logic here 
+
         return result;
     }
 ```
