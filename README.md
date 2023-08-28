@@ -52,9 +52,9 @@ Handlers house the application logic and can generate both synchronous and async
 <summary style="color: green">📜 Show me code </summary>
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -172,7 +172,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
     {
         app.MapPost("/example", async (ExampleInput request, IDispatcher dispatcher, CancellationToken token) =>
         {
-            var result = await dispatcher.SendAsync(command,token);
+            var result = await dispatcher.SendAsync(input,token);
             return Results.Ok();
         });
     }
