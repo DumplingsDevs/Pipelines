@@ -8,7 +8,6 @@ internal class DispatcherInterceptor : DispatchProxy
 {
     private Type _handlerInterfaceType = null!;
     private Type _inputInterfaceType = null!;
-
     private IServiceProvider _serviceProvider = null!;
 
     public static T Create<T>(IServiceProvider serviceProvider, Type handlerInterfaceType, Type inputInterfaceType)
@@ -31,10 +30,12 @@ internal class DispatcherInterceptor : DispatchProxy
     private object? HandleExecutedMethod(object[] args)
     {
         ValidateArgs(args);
-
         var inputType = GetInputType(args);
 
-        var handlers = GetHandlerService(inputType, _inputInterfaceType);
+        using var scope = _serviceProvider.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+            
+        var handlers = GetHandlerService(inputType, _inputInterfaceType, serviceProvider);
         if (handlers.Count == 1)
         {
             var handler = handlers.First();
@@ -65,7 +66,7 @@ internal class DispatcherInterceptor : DispatchProxy
         return interfaceMap.InterfaceMethods.First();
     }
 
-    private List<object?> GetHandlerService(Type inputType, Type inputInterfaceType)
+    private List<object?> GetHandlerService(Type inputType, Type inputInterfaceType, IServiceProvider serviceProvider)
     {
         var typesForGenericType = new List<Type> { inputType };
 
@@ -74,9 +75,9 @@ internal class DispatcherInterceptor : DispatchProxy
         {
             typesForGenericType.AddRange(resultType);
         }
-
+        
         var handlerTypeWithInput = _handlerInterfaceType.MakeGenericType(typesForGenericType.ToArray());
-        var handlers = _serviceProvider.GetServices(handlerTypeWithInput);
+        var handlers = serviceProvider.GetServices(handlerTypeWithInput);
 
         var handlerService = handlers.ToList();
 

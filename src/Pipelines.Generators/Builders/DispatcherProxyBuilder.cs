@@ -146,7 +146,10 @@ internal class DispatcherProxyBuilder
         string returnStatement, string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            var handler = serviceProvider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+            
+            var handler = provider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
 
             {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
     }
@@ -155,7 +158,10 @@ internal class DispatcherProxyBuilder
         string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            var handlers = serviceProvider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+
+            var handlers = provider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
             if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
             foreach (var handler in handlers)
                 {{
