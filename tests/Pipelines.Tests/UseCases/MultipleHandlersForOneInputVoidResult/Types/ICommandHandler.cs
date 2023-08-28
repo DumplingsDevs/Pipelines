@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.MultipleHandlersForOneInputVoidResult.Types;
 
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface ICommandHandler<in TInput> where TInput : ICommand
 {
-    public void HandleAsync(TCommand command, CancellationToken token);
+    public void HandleAsync(TInput command, CancellationToken token);
 }

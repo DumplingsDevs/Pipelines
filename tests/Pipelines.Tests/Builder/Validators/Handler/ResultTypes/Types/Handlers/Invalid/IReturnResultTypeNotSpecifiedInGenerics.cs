@@ -2,7 +2,7 @@ using Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.InputTypes;
 
 namespace Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.Invalid;
 
-public interface IReturnResultTypeNotSpecifiedInGenerics<in TCommand> where TCommand : ICommand
+public interface IReturnResultTypeNotSpecifiedInGenerics<in TInput> where TInput : ICommand
 {
-    public Task<int> HandleAsync(TCommand command, CancellationToken token);
+    public Task<int> HandleAsync(TInput command, CancellationToken token);
 }

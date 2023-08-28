@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.TaskVoidHandler.Types;
 
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TCommand command, CancellationToken token);
+    public Task HandleAsync(TInput command, CancellationToken token);
 }

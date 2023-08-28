@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.HandlerWithSingleParameter.Types;
 
-public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand<TResult> where TResult : class
+public interface ICommandHandler<in TInput, TResult> where TInput : ICommand<TResult> where TResult : class
 {
-    public Task<TResult> HandleAsync(TCommand command);
+    public Task<TResult> HandleAsync(TInput command);
 }

@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.SyncNotGenericResult.Types;
 
-public interface IHandler<in TCommand> where TCommand : IInput
+public interface IHandler<in TInput> where TInput : IInput
 {
-    public string Handle(TCommand command);
+    public string Handle(TInput command);
 }

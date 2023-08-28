@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.CrossValidationMethodParameters.Types;
 
-public interface IHandlerWithThreeParameters<in TCommand> where TCommand : IInputType
+public interface IHandlerWithThreeParameters<in TInput> where TInput : IInputType
 {
-    public Task<string> HandleAsync(TCommand command, int index, CancellationToken token);
+    public Task<string> HandleAsync(TInput command, int index, CancellationToken token);
 }
