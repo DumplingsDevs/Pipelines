@@ -430,15 +430,38 @@ public interface IDispatcher
 
 ### TypeMismatchException
 
+There's a mismatch between the non generic result types in the Handler and Dispatcher.
+
 #### What happened?
 
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public int HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public string SendAsync(IInputType input);
+}
 ```
 
 #### How to fix
+
+Ensure that both the Handler and Dispatcher return the same type of result.
+
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public int HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public int SendAsync(IInputType input);
+}
 ```
 ---
 
