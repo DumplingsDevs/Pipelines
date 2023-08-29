@@ -25,14 +25,14 @@ public class ValidateInputTypeWithDispatcherMethodParametersTests
     [Test]
     public void Validate_WhenSecondParameterTypeIsNull_ThrowsException()
     {
-        Assert.Throws<ArgumentNullException>(() => ValidateInputTypeWithDispatcherMethodParameters.Validate(typeof(ICommand), null));
+        Assert.Throws<ArgumentNullException>(() => ValidateInputTypeWithDispatcherMethodParameters.Validate(typeof(IInput), null));
     }
 
     [Test]
     public void Validate_WhenTypesAreEqual_DoesNotThrowException()
     {
         //Arrange
-        var inputType = typeof(ICommand);
+        var inputType = typeof(IInput);
         var dispatcherType = typeof(IDispatcher);
         
         //Act and Assert
@@ -43,7 +43,7 @@ public class ValidateInputTypeWithDispatcherMethodParametersTests
     public void Validate_WhenTypesAreEqual_DispatcherWithGenericMethodParameter_DoesNotThrowException()
     {
         //Arrange
-        var inputType = typeof(ICommand);
+        var inputType = typeof(IInput);
         var dispatcherType = typeof(IDispatcherWithGenericMethodParameter);
         
         //Act and Assert
@@ -54,7 +54,7 @@ public class ValidateInputTypeWithDispatcherMethodParametersTests
     public void Validate_WhenTypesAreNotEqual_ThrowsDispatcherMethodInputTypeMismatchException()
     {
         //Arrange
-        var inputType = typeof(ICommand);
+        var inputType = typeof(IInput);
         var dispatcherType = typeof(IDispatcherWithIncorrectParameter);
 
         //Act and Assert

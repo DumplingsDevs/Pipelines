@@ -469,13 +469,31 @@ public interface IDispatcher
 
 #### What happened?
 
+The Dispatcher's Handle method does not use the expected Input type as its first parameter.
+
 #### Bad example
 
 ```cs
+public interface IInput
+{ }
+
+public interface IDispatcher
+{
+    public Task SendAsync(int request, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that the Input type is used as the first parameter in the method.
+
 ```cs
+public interface IInput
+{ }
+
+public interface IDispatcher
+{
+    public Task SendAsync(IInput request, CancellationToken token);
+}
 ```
 ---
 
