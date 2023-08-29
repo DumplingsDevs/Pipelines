@@ -44,9 +44,6 @@ internal static class MethodResultTypesValidator
         {
             case true when expectedResultTypes.Any():
                 throw new ExpectedMethodWithResultException(handlerType, expectedResultSourceType);
-
-            case false when !expectedResultTypes.Any():
-                throw new ExpectedVoidMethodException(handlerType, expectedResultSourceType);
         }
     }
 
