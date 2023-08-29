@@ -652,12 +652,11 @@ public interface IDispatcher
 ```
 ---
 
-### ConstructorValidationException
-
-The decorator type's generic type does not align with the expected handler type.
-
+### InterfaceImplementationException
 
 #### What happened?
+
+The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types.
 
 #### Bad example
 
@@ -686,20 +685,20 @@ public class Decorator : IDifferentHandler<InputWithResult, Result>
 
 #### How to fix
 
-Ensure that the decorator type matches the interface type it's intended to decorate. The generic type parameters of the decorator should be compatible with those of the handler it decorates.
+Ensure that the decorator class implements the correct interface, which it's intended to decorate. The generic type parameters of the decorator should align with those of the interface it should implement.
 
 
 ```cs
-public class Decorator : IHandler<InputWithResult, Result>
+public class Decorator : IHandler<IInput, Result>
 {
-    private readonly IHandler<InputWithResult, Result> _handler;
+    private readonly IHandler<IInput, Result> _handler;
 
-    public Decorato(IHandler<InputWithResult, Result> handler)
+    public Decorator(IHandler<IInput, Result> handler)
     {
         _handler = handler;
     }
 
-    public async Task<Result> HandleAsync(InputWithResult input, CancellationToken token)
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
     {
         return await _handler.HandleAsync(input, token);
     }
@@ -707,17 +706,54 @@ public class Decorator : IHandler<InputWithResult, Result>
 ```
 ---
 
-### InterfaceImplementationException
+### ConstructorValidationException
 
 #### What happened?
+
+The decorator's constructor does not have the required handler dependency (either it's missing or invalid).
 
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInput
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
+
+public class Decorator : IHandler<IInput, Result>
+{
+    public Decorator()
+    { }
+
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
+    {
+        return Task.CompletedTask;
+    }
+}
+
 ```
 
 #### How to fix
+
+Include the required handler dependency in the decorator's constructor and use it in the HandleAsync method:
+
 ```cs
+
+public class Decorator : IHandler<IInput, Result>
+{
+    private readonly IHandler<IInput, Result> _handler;
+
+    public Decorator(IHandler<IInput, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
+
 ```
 ---
 
