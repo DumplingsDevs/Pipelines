@@ -13,7 +13,7 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
     {
         // Arrange
         var dispatcherType = typeof(IDispatcherMismatchGenericMethodArgumentAndResultType);
-        var commandType = typeof(ICommandWithResult<>);
+        var commandType = typeof(IInputWithResult<>);
 
         // Act & Assert
         Assert.Throws<ExpectedMethodWithResultException>(() =>
@@ -21,11 +21,23 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
     }
 
     [Test]
+    public void Validate_IDispatcherMismatchTwoResultExpectedOne_ThrowsException()
+    {
+        // Arrange
+        var dispatcherType = typeof(IDispatcherMismatchTwoResultExpectedOne);
+        var commandType = typeof(IInputWithResult<>);
+
+        // Act & Assert
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
+            ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType));
+    }
+    
+    [Test]
     public void Validate_GivenIVoidDispatcher_DoesNotThrowException()
     {
         // Arrange
         var dispatcherType = typeof(IVoidDispatcher);
-        var commandType = typeof(ICommand);
+        var commandType = typeof(IInput);
 
         // Act
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType);
@@ -39,7 +51,7 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
     {
         // Arrange
         var dispatcherType = typeof(IDispatcherWithGenericInput);
-        var commandType = typeof(ICommand);
+        var commandType = typeof(IInput);
 
         // Act
         ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType);

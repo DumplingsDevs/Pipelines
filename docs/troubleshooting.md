@@ -26,8 +26,8 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [ParameterTypeMismatchException](#parametertypemismatchexception)
   - [TaskReturnTypeMismatchException](#taskreturntypemismatchexception)
   - [VoidAndValueMethodMismatchException](#voidandvaluemethodmismatchexception)
-  - [ConstructorValidationException](#constructorvalidationexception)
   - [InterfaceImplementationException](#interfaceimplementationexception)
+  - [ConstructorValidationException](#constructorvalidationexception)
 
 - [2. Runtime Exceptions](#2-runtime-exceptions)
   - [HandlerNotRegisteredException](#handlernotregisteredexception)
@@ -83,7 +83,7 @@ A provided type doesn't define a handle method.
 
 ```csharp
 
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {}
 
 ...
@@ -93,9 +93,9 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Define a Handle method in the handler.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ``` 
 ...
@@ -110,10 +110,10 @@ Multiple methods were defined in the provided type. Each interface must contain 
 #### Bad example
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
-    public Task<TResult> HandleAsync(TCommand command);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input);
 }
 ```
 
@@ -121,9 +121,9 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Remove extra methods from the interface.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ---
@@ -136,7 +136,7 @@ The defined Handle method does not have any parameters.
 #### Bad example
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
     public Task<TResult> HandleAsync();
 }
@@ -146,42 +146,37 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 Ensure the method has at least one parameter, which should be of the Input Type.
 
 ```cs
-public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult> where TResult: class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TCommand command, CancellationToken token);
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
----
 
-### GenericArgumentsLengthMismatchException
-
-#### What happened?
-
-
-#### Bad example
-
-```cs
-
-```
-
-#### How to fix
-
-```cs
-
-```
 ---
 
 ### GenericArgumentsNotFoundException
 
 #### What happened?
 
+The `Handler` lacks generic arguments. At least one generic argument is required, specifically for `Input`.
+
 #### Bad example
 
-```cs
+```csharp
+public interface IHandler
+{
+    Task HandleAsync(IInput input, CancellationToken token);
+}
 ```
 
 #### How to fix
-```cs
+Ensure the `Handler` has at least one generic argument representing the `Input`.
+
+```csharp
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
 ---
 
@@ -189,27 +184,66 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+The first generic argument doesn't have the `Input` type as its constraint.
+
 #### Bad example
 
-```cs
+```csharp
+public interface IInput
+{ }
+
+public interface IHandlerWithResult<in TInput, TResult> 
+    where TInput : IInputWithResult<TResult> 
+    where TResult : class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
 ```
 
 #### How to fix
-```cs
+The first generic argument of the handler must use the `Input` type, specified in the `AddInput()` method, as its constraint.
+
+```csharp
+public interface IInput
+{ }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
+
 ---
 
 ### InvalidConstraintLengthException
 
 #### What happened?
 
+The first generic argument lacks constraints. At least one constraint is required, specifically for the Input type.
+
 #### Bad example
 
 ```cs
+public interface IInput
+{ }
+
+public interface IHandler<in TInput>
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure the first generic argument of the handler has the Input type as its constraint.
+
 ```cs
+public interface IInput
+{ }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
 ---
 
@@ -217,41 +251,91 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
-#### Bad example
-
-```cs
-```
-
-#### How to fix
-```cs
-```
----
-
-### ExpectedVoidMethodException
-
-#### What happened?
+Given the Input generic arguments, it was anticipated that the Handler/Dispatcher would have a method returning a result, but a void was found instead.
 
 #### Bad example
 
 ```cs
+public interface IInput<TResult>
+{}
+
+public interface IDispatcher
+{
+    public Task SendAsync<TResult>(IInput<TResult> request, CancellationToken token);
+}
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
+{
+    public Task HandleAsync(TInput command, CancellationToken token);
+}
+
 ```
 
 #### How to fix
+Ensure that result types align with the Input generic arguments.
+
 ```cs
+public interface IInput<TResult>
+{}
+
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> request, CancellationToken token);
+}
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
+{
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
 ```
+
 ---
 
 ### ResultTypeCountMismatchException
 
 #### What happened?
 
+The number of result types defined by the Input generic arguments does not match the number of result types found in the Dispatcher/Handler method.
+
 #### Bad example
 
 ```cs
+public interface IInputWithResult<TResult>
+{ }
+
+
+public interface IHandler<in TInput, TResult>
+    where TInput : IInputWithResult<TResult> where TResult : class
+{
+    public Task<(TResult, bool)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResult2)> SendAsync<TResult,TResult2>(IInputWithResult<TResult> request, CancellationToken token);
+}
+
 ```
 
 #### How to fix
+Ensure that the Dispatcher/Handler method's result types align with the Input generic arguments.
+
 ```cs
+public interface IInputWithResult<TResult>
+{ }
+
+
+public interface IHandler<in TInput, TResult>
+    where TInput : IInputWithResult<TResult> where TResult : class
+{
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInputWithResult<TResult> request, CancellationToken token);
+}
+
 ```
 ---
 
@@ -259,13 +343,49 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+The number of constraints in the result types defined in the Handler or Dispatcher does not match.
+
 #### Bad example
 
 ```cs
+public interface IInputType
+{}
+
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType)
+        where TResult : IResultOne;
+}
 ```
 
 #### How to fix
+Ensure that the number of constraints on result types in the Handler or Dispatcher matches.
+
 ```cs
+public interface IInputType
+{}
+
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType)
+        where TResult : IResultOne
+        where TResultTwo : IResultTwo;
+}
+
 ```
 ---
 
@@ -273,27 +393,75 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+There's a mismatch between the result types in the Handler and Dispatcher: one is generic, while the other is not.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput, TResult> where TInput : IInputType
+    where TResult : IResult
+{
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that both the Handler and Dispatcher return the same type of result.
+
 ```cs
+public interface IHandler<in TInput, TResult> where TInput : IInputType
+    where TResult : IResult
+{
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInputType inputType, CancellationToken token);
+}
+
 ```
 ---
 
 ### TypeMismatchException
+
+There's a mismatch between the non generic result types in the Handler and Dispatcher.
 
 #### What happened?
 
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public int HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public string SendAsync(IInputType input);
+}
 ```
 
 #### How to fix
+
+Ensure that both the Handler and Dispatcher return the same type of result.
+
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public int HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public int SendAsync(IInputType input);
+}
 ```
 ---
 
@@ -301,13 +469,31 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+The Dispatcher's Handle method does not use the expected Input type as its first parameter.
+
 #### Bad example
 
 ```cs
+public interface IInput
+{ }
+
+public interface IDispatcher
+{
+    public Task SendAsync(int request, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that the Input type is used as the first parameter in the method.
+
 ```cs
+public interface IInput
+{ }
+
+public interface IDispatcher
+{
+    public Task SendAsync(IInput request, CancellationToken token);
+}
 ```
 ---
 
@@ -315,13 +501,38 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+The Handler and Dispatcher methods have a mismatch in the number of parameters.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, int index, CancellationToken token);
+}
 ```
 
 #### How to fix
+
+Ensure that the Handler and Dispatcher methods have the same number and type of parameters.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, int index, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, int index, CancellationToken token);
+}
+
 ```
 ---
 
@@ -329,13 +540,40 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+There's a mismatch in the type of a parameter between the Handler and Dispatcher methods.
+
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, int index, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, string text, CancellationToken token);
+}
+
 ```
 
 #### How to fix
+
+Ensure that the parameters in both the Handler and Dispatcher methods are of the same type and order.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, string text, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, string text, CancellationToken token);
+}
+
 ```
 ---
 
@@ -343,13 +581,36 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+There's a mismatch in the return type of the Handler and Dispatcher methods. One method returns a Task<> type, while the other does not.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public string HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that both the Handler and Dispatcher methods have consistent return types. If one returns a Task<>, the other should too.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 ---
 
@@ -357,27 +618,37 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
-#### Bad example
-
-```cs
-```
-
-#### How to fix
-```cs
-```
----
-
-### ConstructorValidationException
-
-#### What happened?
+There's an inconsistency in the return types between the Handler and Dispatcher methods. One method returns a value, while the other returns void.
 
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public string HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcherVoid
+{
+    public void SendAsync(IInputType inputType);
+}
 ```
 
 #### How to fix
+
+Ensure both the Handler and Dispatcher methods have matching return types. Either both should return a value, or both should return void.
+
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType);
+}
+
 ```
 ---
 
@@ -385,13 +656,104 @@ public interface IHandler<in TCommand, TResult> where TCommand : IInput<TResult>
 
 #### What happened?
 
+The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInput
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
+
+public class Decorator : IDifferentHandler<InputWithResult, Result>
+{
+    private readonly IDifferentHandler<InputWithResult, Result> _handler;
+
+    public Decorator(IDifferentHandler<InputWithResult, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(InputWithResult input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
+
 ```
 
 #### How to fix
+
+Ensure that the decorator class implements the correct interface, which it's intended to decorate. The generic type parameters of the decorator should align with those of the interface it should implement.
+
+
 ```cs
+public class Decorator : IHandler<IInput, Result>
+{
+    private readonly IHandler<IInput, Result> _handler;
+
+    public Decorator(IHandler<IInput, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
+```
+---
+
+### ConstructorValidationException
+
+#### What happened?
+
+The decorator's constructor does not have the required handler dependency (either it's missing or invalid).
+
+#### Bad example
+
+```cs
+public interface IHandler<in TInput> where TInput : IInput
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
+
+public class Decorator : IHandler<IInput, Result>
+{
+    public Decorator()
+    { }
+
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
+    {
+        return Task.CompletedTask;
+    }
+}
+
+```
+
+#### How to fix
+
+Include the required handler dependency in the decorator's constructor and use it in the HandleAsync method:
+
+```cs
+
+public class Decorator : IHandler<IInput, Result>
+{
+    private readonly IHandler<IInput, Result> _handler;
+
+    public Decorator(IHandler<IInput, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(IInput input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
+
 ```
 ---
 

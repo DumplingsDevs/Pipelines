@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.Builder.Validators.Dispatcher.ResultTypes.Types;
 
-public interface ICommand
+public interface IInputWithResult<TResult>
 {
     
 }

@@ -148,4 +148,19 @@ public class CrossValidateResultTypesTests
             () => CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo,
                 dispatcherMethodInfo));
     }
+    
+    [Test]
+    public void Validate_WithMismatchingType_ThrowsGenericTypeMismatchException()
+    {
+        // Arrange
+        var handlerType = typeof(IHandlerIntResult<>);
+        var dispatcherType = typeof(IDispatcherStringResult);
+        var handlerMethodInfo = handlerType.GetFirstMethodInfo();
+        var dispatcherMethodInfo = dispatcherType.GetFirstMethodInfo();
+
+        // Act & Assert
+        Assert.Throws<TypeMismatchException>(
+            () => CrossValidateResultTypes.Validate(handlerType, dispatcherType, handlerMethodInfo,
+                dispatcherMethodInfo));
+    }
 }
