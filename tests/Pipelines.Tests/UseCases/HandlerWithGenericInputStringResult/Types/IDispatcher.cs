@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.HandlerWithResult.Types;
+namespace Pipelines.Tests.UseCases.HandlerWithGenericInputStringResult.Types;
 
 public interface IDispatcher
 {

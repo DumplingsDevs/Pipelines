@@ -3,14 +3,7 @@ using Pipelines.Tests.UseCases.HandlerWithBigTuple.Types;
 namespace Pipelines.Tests.UseCases.HandlerWithBigTuple.Sample;
 
 public class LoggingDecorator<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> : IHandler<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
-    where TInput : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> 
-    where TResult : class
-    where TResult2 : class
-    where TResult3 : class
-    where TResult4 : class
-    where TResult5 : class
-    where TResult6 : class
-    where TResult7 : class
+    where TInput : IInput<TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7>
 {
     private readonly IHandler<TInput, TResult, TResult2, TResult3, TResult4, TResult5, TResult6, TResult7> _handler;
     private readonly DecoratorsState _state;

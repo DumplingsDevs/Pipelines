@@ -1,4 +1,4 @@
-namespace Pipelines.Tests.UseCases.HandlerWithResult.Types;
+namespace Pipelines.Tests.UseCases.HandlerWithGenericInputStringResult.Types;
 
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
 {

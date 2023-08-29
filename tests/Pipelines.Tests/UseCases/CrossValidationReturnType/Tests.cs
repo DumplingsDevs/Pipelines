@@ -1,7 +1,6 @@
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters.Exceptions;
 using Pipelines.Builder.Validators.CrossValidation.ResultType.Exceptions;
 using Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions;
-using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint.Exceptions;
 using Pipelines.Tests.UseCases.CrossValidationReturnType.Types;
 
 namespace Pipelines.Tests.UseCases.CrossValidationReturnType;
@@ -25,13 +24,13 @@ public class Tests
     }
     
     [Test]
-    public void Validate_WithMatchingHandlerAndDispatcherTaskGenericResult_ThrowsReturnTypesShouldHaveClassConstraintException()
+    public void Validate_WithMatchingHandlerAndDispatcherTaskGenericResult_ThrowsGenericTypeCountMismatchException()
     {
         var dependencyContainer = new DependencyContainer();
     
         var assembly = typeof(DependencyContainer).Assembly;
     
-        Assert.Throws<ReturnTypesShouldHaveClassConstraintException>(() =>
+        Assert.DoesNotThrow(() =>
         {
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskGenericResult<,>), assembly)

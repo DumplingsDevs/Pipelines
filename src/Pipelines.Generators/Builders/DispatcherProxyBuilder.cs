@@ -25,7 +25,6 @@ internal class DispatcherProxyBuilder
         _pipelineConfig = pipelineConfig;
         _context = context;
 
-        DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
         CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
 

@@ -1,7 +1,6 @@
 using System.Reflection;
 using Pipelines.Builder.Validators.Shared.CompareTypes;
 using Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions;
-using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder.Validators.Shared.MethodResultTypes;
@@ -21,8 +20,6 @@ internal static class MethodResultTypesValidator
         CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count, handlerType,
             expectedResultSourceType);
         
-        ReturnTypesShouldBeClassOrHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
-
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes, handlerType,
             expectedResultSourceType);
     }

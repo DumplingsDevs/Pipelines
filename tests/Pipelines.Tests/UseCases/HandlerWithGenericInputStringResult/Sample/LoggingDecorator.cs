@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Pipelines.Tests.UseCases.HandlerWithGenericInputStringResult.Types;
 
-namespace Pipelines.Tests.UseCases.SyncGenericResult.Sample;
-using Types;
+namespace Pipelines.Tests.UseCases.HandlerWithGenericInputStringResult.Sample;
 
 public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
     where TInput : IInput<TResult>
@@ -15,10 +15,10 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
         _logger = logger;
     }
 
-    public TResult Handle(TInput input)
+    public async Task<TResult> HandleAsync(TInput input, CancellationToken token)
     {
         _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
-        var result = _handler.Handle(input);
+        var result = await _handler.HandleAsync(input, token);
         _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
 
         return result;
