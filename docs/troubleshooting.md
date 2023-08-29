@@ -581,13 +581,36 @@ public interface IDispatcher
 
 #### What happened?
 
+There's a mismatch in the return type of the Handler and Dispatcher methods. One method returns a Task<> type, while the other does not.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public string HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that both the Handler and Dispatcher methods have consistent return types. If one returns a Task<>, the other should too.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 ---
 
