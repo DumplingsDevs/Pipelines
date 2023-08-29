@@ -151,44 +151,6 @@ public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> whe
     public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
----
-
-### GenericArgumentsLengthMismatchException
-
-#### What happened?
-
-The number of generic arguments for `Input` defined in `AddInput()` does not align with the `Input` specified in the Handler definition.
-
-It's likely that a different `Input` type was used in the `AddInput()` method compared to the one in the `Handler` type definition.
-
-#### Bad example
-
-```csharp
-public interface IInput
-{ }
-
-public interface IHandlerWithResult<in TInput, TResult> 
-    where TInput : IInputWithResult<TResult> 
-    where TResult : class
-{
-    Task<TResult> HandleAsync(TInput command, CancellationToken token);
-}
-```
-
-#### How to fix
-Ensure the same `Input` type is used in both the `AddInput()` method and the `Handler` definition.
-
-```csharp
-public interface IInputWithResult<TResult> where TResult : class
-{ }
-
-public interface IHandlerWithResult<in TInput, TResult> 
-    where TInput : IInputWithResult<TResult> 
-    where TResult : class
-{
-    Task<TResult> HandleAsync(TInput command, CancellationToken token);
-}
-```
 
 ---
 
@@ -222,19 +184,42 @@ public interface IHandler<in TInput> where TInput : IInput
 
 #### What happened?
 
+The first generic argument doesn't have the `Input` type as its constraint.
+
 #### Bad example
 
-```cs
+```csharp
+public interface IInput
+{ }
+
+public interface IHandlerWithResult<in TInput, TResult> 
+    where TInput : IInputWithResult<TResult> 
+    where TResult : class
+{
+    Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
 ```
 
 #### How to fix
-```cs
+The first generic argument of the handler must use the `Input` type, specified in the `AddInput()` method, as its constraint.
+
+```csharp
+public interface IInput
+{ }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput command, CancellationToken token);
+}
 ```
+
 ---
 
 ### InvalidConstraintLengthException
 
 #### What happened?
+
+The first generic argument doesn't have any constraints. Required at least one for `Input` type.
 
 #### Bad example
 

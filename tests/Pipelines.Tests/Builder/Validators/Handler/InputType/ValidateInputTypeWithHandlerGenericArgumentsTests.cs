@@ -82,7 +82,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(IHandlerWithResult<,>);
 
         // Act & Assert
-        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+        Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
@@ -94,7 +94,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(IHandler<>);
 
         // Act & Assert
-        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+        Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
@@ -106,7 +106,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(IHandlerWithTwoResults<,,>);
 
         // Act & Assert
-        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+        Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 
@@ -118,7 +118,7 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         var handlerType = typeof(IHandlerWithResult<,>);
 
         // Act & Assert
-        Assert.Throws<GenericArgumentsLengthMismatchException>(() =>
+        Assert.Throws<HandlerInputTypeMismatchException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
 

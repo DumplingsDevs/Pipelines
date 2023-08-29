@@ -26,33 +26,27 @@ internal static class ValidateInputTypeWithHandlerGenericArguments
     private static bool InputTypeNotMatchGenericArgumentConstraint(Type inputType, Type handlerGenericParameter)
     {
         //Only one constraint is expected for 
-        var handlerInputConstraint = handlerGenericParameter.GetGenericParameterConstraints();
-        if (handlerInputConstraint.Length is not 1)
+        var handlerInputConstraints = handlerGenericParameter.GetGenericParameterConstraints();
+        if (handlerInputConstraints.Length == 0)
         {
             throw new InvalidConstraintLengthException(handlerGenericParameter);
         }
-
-        var handleInputType = handlerInputConstraint.First();
-
-        // Validating both the namespaces and the GenericTypeArguments is sufficient in this case.
-        // This approach ensures the following checks:
-        // 1. Within the same namespace, a type with the same generic argument length cannot exist as it would result in a build error.
-        // 2. The handler uses the expected input type as defined by matching namespaces.
-        ValidateGenericTypeArgumentsLenght(inputType, handleInputType);
-        var areEqual = TypeNamespaceComparer.Compare(handleInputType, inputType);
-
-        return !areEqual;
-    }
-
-    private static void ValidateGenericTypeArgumentsLenght(Type inputType, Type handleInputType)
-    {
-        var inputGenericArguments = inputType.GetGenericArguments();
-        var handleGenericArguments = handleInputType.GetGenericArguments();
-
-        if (inputGenericArguments.Length != handleGenericArguments.Length)
+        
+        var inputTypeFound = false;
+        
+        foreach (var handlerInputConstraint in handlerInputConstraints)
         {
-            throw new GenericArgumentsLengthMismatchException(inputGenericArguments.Length,
-                handleGenericArguments.Length);
+            // Validating both the namespaces and the GenericTypeArguments is sufficient in this case.
+            // This approach ensures the following checks:
+            // 1. Within the same namespace, a type with the same generic argument length cannot exist as it would result in a build error.
+            // 2. The handler uses the expected input type as defined by matching namespaces.
+            inputTypeFound = TypeNamespaceComparer.Compare(handlerInputConstraint, inputType);
+            if (inputTypeFound)
+            {
+                break;
+            }
         }
+        
+        return !inputTypeFound;
     }
 }
