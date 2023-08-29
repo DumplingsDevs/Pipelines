@@ -393,13 +393,38 @@ public interface IDispatcher
 
 #### What happened?
 
+There's a mismatch between the result types in the Handler and Dispatcher: one is generic, while the other is not.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput, TResult> where TInput : IInputType
+    where TResult : IResult
+{
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure that both the Handler and Dispatcher return the same type of result.
+
 ```cs
+public interface IHandler<in TInput, TResult> where TInput : IInputType
+    where TResult : IResult
+{
+    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInputType inputType, CancellationToken token);
+}
+
 ```
 ---
 
