@@ -618,13 +618,37 @@ public interface IDispatcher
 
 #### What happened?
 
+There's an inconsistency in the return types between the Handler and Dispatcher methods. One method returns a value, while the other returns void.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public string HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcherVoid
+{
+    public void SendAsync(IInputType inputType);
+}
 ```
 
 #### How to fix
+
+Ensure both the Handler and Dispatcher methods have matching return types. Either both should return a value, or both should return void.
+
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType);
+}
+
 ```
 ---
 
