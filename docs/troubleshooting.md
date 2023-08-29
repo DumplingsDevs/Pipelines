@@ -654,15 +654,56 @@ public interface IDispatcher
 
 ### ConstructorValidationException
 
+The decorator type's generic type does not align with the expected handler type.
+
+
 #### What happened?
 
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInput
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
+
+public class Decorator : IDifferentHandler<InputWithResult, Result>
+{
+    private readonly IDifferentHandler<InputWithResult, Result> _handler;
+
+    public Decorator(IDifferentHandler<InputWithResult, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(InputWithResult input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
+
 ```
 
 #### How to fix
+
+Ensure that the decorator type matches the interface type it's intended to decorate. The generic type parameters of the decorator should be compatible with those of the handler it decorates.
+
+
 ```cs
+public class Decorator : IHandler<InputWithResult, Result>
+{
+    private readonly IHandler<InputWithResult, Result> _handler;
+
+    public Decorato(IHandler<InputWithResult, Result> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<Result> HandleAsync(InputWithResult input, CancellationToken token)
+    {
+        return await _handler.HandleAsync(input, token);
+    }
+}
 ```
 ---
 
