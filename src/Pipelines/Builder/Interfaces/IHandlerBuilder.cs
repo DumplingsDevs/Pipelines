@@ -14,12 +14,10 @@ public interface IHandlerBuilder
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.HandlerMethodNotFoundException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod.Exceptions.MultipleHandlerMethodsException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodWithOneParameter.Exceptions.MethodShouldHaveAtLeastOneParameterException"></exception>
-    /// <exception cref="Pipelines.Builder.Validators.Handler.InputType.Exceptions.GenericArgumentsLengthMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Handler.InputType.Exceptions.GenericArgumentsNotFoundException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Handler.InputType.Exceptions.HandlerInputTypeMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Handler.InputType.Exceptions.InvalidConstraintLengthException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ExpectedMethodWithResultException"></exception>
-    /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ExpectedVoidMethodException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ResultTypeCountMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeCountMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeMismatchException"></exception>

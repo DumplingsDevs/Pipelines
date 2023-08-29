@@ -288,20 +288,7 @@ public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
     public Task<TResult> HandleAsync(TInput command, CancellationToken token);
 }
 ```
----
 
-### ExpectedVoidMethodException
-
-#### What happened?
-
-#### Bad example
-
-```cs
-```
-
-#### How to fix
-```cs
-```
 ---
 
 ### ResultTypeCountMismatchException

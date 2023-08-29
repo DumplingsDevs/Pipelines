@@ -17,7 +17,6 @@ public interface IDispatcherBuilder
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodWithOneParameter.Exceptions.MethodShouldHaveAtLeastOneParameterException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Dispatcher.InputType.Exceptions.DispatcherMethodInputTypeMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ExpectedMethodWithResultException"></exception>
-    /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ExpectedVoidMethodException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.MethodResultTypes.Exceptions.ResultTypeCountMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeCountMismatchException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Shared.CompareTypes.Exceptions.GenericTypeMismatchException"></exception>

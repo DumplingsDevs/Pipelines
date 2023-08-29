@@ -20,7 +20,7 @@ internal static class MethodResultTypesValidator
 
         CompareInputResultTypeCountWithHandler(expectedResultTypes.Length, methodReturnTypes.Count, handlerType,
             expectedResultSourceType);
-        
+
         ReturnTypesShouldBeClassOrHaveClassConstraintValidator.Validate(methodReturnTypes, handlerType);
 
         CompareInputResultTypesMatchWithHandler(expectedResultTypes, methodReturnTypes, handlerType,
@@ -47,9 +47,6 @@ internal static class MethodResultTypesValidator
         {
             case true when expectedResultTypes.Any():
                 throw new ExpectedMethodWithResultException(handlerType, expectedResultSourceType);
-
-            case false when !expectedResultTypes.Any():
-                throw new ExpectedVoidMethodException(handlerType, expectedResultSourceType);
         }
     }
 
