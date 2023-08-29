@@ -21,6 +21,18 @@ public class ValidateResultTypesWithDispatcherInputResultTypesTests
     }
 
     [Test]
+    public void Validate_IDispatcherMismatchTwoResultExpectedOne_ThrowsException()
+    {
+        // Arrange
+        var dispatcherType = typeof(IDispatcherMismatchTwoResultExpectedOne);
+        var commandType = typeof(IInputWithResult<>);
+
+        // Act & Assert
+        Assert.Throws<ResultTypeCountMismatchException>(() =>
+            ValidateResultTypesWithDispatcherInputResultTypes.Validate(commandType, dispatcherType));
+    }
+    
+    [Test]
     public void Validate_GivenIVoidDispatcher_DoesNotThrowException()
     {
         // Arrange
