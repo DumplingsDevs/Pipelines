@@ -293,9 +293,9 @@ public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
 
 ### ResultTypeCountMismatchException
 
-The number of result types defined by the Input generic arguments does not match the number of result types found in the Dispatcher/Handler method.
-
 #### What happened?
+
+The number of result types defined by the Input generic arguments does not match the number of result types found in the Dispatcher/Handler method.
 
 #### Bad example
 
@@ -343,13 +343,49 @@ public interface IDispatcher
 
 #### What happened?
 
+The number of constraints in the result types defined in the Handler or Dispatcher does not match.
+
 #### Bad example
 
 ```cs
+public interface IInputType
+{}
+
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType)
+        where TResult : IResultOne;
+}
 ```
 
 #### How to fix
+Ensure that the number of constraints on result types in the Handler or Dispatcher matches.
+
 ```cs
+public interface IInputType
+{}
+
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType)
+        where TResult : IResultOne
+        where TResultTwo : IResultTwo;
+}
+
 ```
 ---
 
