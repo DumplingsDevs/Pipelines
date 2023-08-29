@@ -1,6 +1,7 @@
 namespace Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.InputTypes;
 
-public interface ICommand
+public interface IInputWithResult<TResult>
 {
-    
 }
+
+

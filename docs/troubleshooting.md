@@ -251,13 +251,42 @@ public interface IHandler<in TInput> where TInput : IInput
 
 #### What happened?
 
+Given the Input generic arguments, it was anticipated that the Handler/Dispatcher would have a method returning a result, but a void was found instead.
+
 #### Bad example
 
 ```cs
+public interface IInput<TResult>
+{}
+
+public interface IDispatcher
+{
+    public Task SendAsync<TResult>(IInput<TResult> request, CancellationToken token);
+}
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
+{
+    public Task HandleAsync(TInput command, CancellationToken token);
+}
+
 ```
 
 #### How to fix
+Ensure that result types align with the Input generic arguments.
+
 ```cs
+public interface IInput<TResult>
+{}
+
+public interface IDispatcher
+{
+    public Task<TResult> SendAsync<TResult>(IInput<TResult> request, CancellationToken token);
+}
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
+{
+    public Task<TResult> HandleAsync(TInput command, CancellationToken token);
+}
 ```
 ---
 
