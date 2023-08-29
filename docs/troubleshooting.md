@@ -26,8 +26,8 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [ParameterTypeMismatchException](#parametertypemismatchexception)
   - [TaskReturnTypeMismatchException](#taskreturntypemismatchexception)
   - [VoidAndValueMethodMismatchException](#voidandvaluemethodmismatchexception)
-  - [ConstructorValidationException](#constructorvalidationexception)
   - [InterfaceImplementationException](#interfaceimplementationexception)
+  - [ConstructorValidationException](#constructorvalidationexception)
 
 - [2. Runtime Exceptions](#2-runtime-exceptions)
   - [HandlerNotRegisteredException](#handlernotregisteredexception)
