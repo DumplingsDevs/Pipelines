@@ -540,13 +540,40 @@ public interface IDispatcher
 
 #### What happened?
 
+There's a mismatch in the type of a parameter between the Handler and Dispatcher methods.
+
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, int index, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, string text, CancellationToken token);
+}
+
 ```
 
 #### How to fix
+
+Ensure that the parameters in both the Handler and Dispatcher methods are of the same type and order.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput command, string text, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, string text, CancellationToken token);
+}
+
 ```
 ---
 
