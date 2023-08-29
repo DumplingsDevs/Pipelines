@@ -165,7 +165,7 @@ The `Handler` lacks generic arguments. At least one generic argument is required
 ```csharp
 public interface IHandler
 {
-    Task HandleAsync(IInput command, CancellationToken token);
+    Task HandleAsync(IInput input, CancellationToken token);
 }
 ```
 
@@ -175,7 +175,7 @@ Ensure the `Handler` has at least one generic argument representing the `Input`.
 ```csharp
 public interface IHandler<in TInput> where TInput : IInput
 {
-    Task HandleAsync(TInput command, CancellationToken token);
+    Task HandleAsync(TInput input, CancellationToken token);
 }
 ```
 ---
@@ -196,7 +196,7 @@ public interface IHandlerWithResult<in TInput, TResult>
     where TInput : IInputWithResult<TResult> 
     where TResult : class
 {
-    Task<TResult> HandleAsync(TInput command, CancellationToken token);
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -209,7 +209,7 @@ public interface IInput
 
 public interface IHandler<in TInput> where TInput : IInput
 {
-    Task HandleAsync(TInput command, CancellationToken token);
+    Task HandleAsync(TInput input, CancellationToken token);
 }
 ```
 
@@ -219,15 +219,31 @@ public interface IHandler<in TInput> where TInput : IInput
 
 #### What happened?
 
-The first generic argument doesn't have any constraints. Required at least one for `Input` type.
+The first generic argument lacks constraints. At least one constraint is required, specifically for the Input type.
 
 #### Bad example
 
 ```cs
+public interface IInput
+{ }
+
+public interface IHandler<in TInput>
+{
+    public Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
 
 #### How to fix
+Ensure the first generic argument of the handler has the Input type as its constraint.
+
 ```cs
+public interface IInput
+{ }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput input, CancellationToken token);
+}
 ```
 ---
 

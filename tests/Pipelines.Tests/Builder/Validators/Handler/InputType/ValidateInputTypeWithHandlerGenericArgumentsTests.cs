@@ -145,4 +145,16 @@ public class ValidateInputTypeWithHandlerGenericArgumentsTests
         Assert.Throws<GenericArgumentsNotFoundException>(() =>
             ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
     }
+    
+    [Test]
+    public void Validate_HandlerWithoutGenericArgumentsConstraint_ThrowsInvalidConstraintLengthException()
+    {
+        // Arrange
+        var inputType = typeof(IInput);
+        var handlerType = typeof(IHandlerWithoutGenericArgumentsConstraint<>);
+
+        // Act & Assert
+        Assert.Throws<InvalidConstraintLengthException>(() =>
+            ValidateInputTypeWithHandlerGenericArguments.Validate(inputType, handlerType));
+    }
 }
