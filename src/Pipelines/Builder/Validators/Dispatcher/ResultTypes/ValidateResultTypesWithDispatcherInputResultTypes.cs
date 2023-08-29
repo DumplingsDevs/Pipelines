@@ -1,5 +1,4 @@
 using Pipelines.Builder.Validators.Shared.MethodResultTypes;
-using Pipelines.Builder.Validators.Shared.ShouldHaveClassConstraint;
 
 namespace Pipelines.Builder.Validators.Dispatcher.ResultTypes;
 
@@ -26,10 +25,6 @@ internal static class ValidateResultTypesWithDispatcherInputResultTypes
         {
             //compare types found in method generic arguments (Handler<TResult>) with method return types (Task<TResult>)
             MethodResultTypesValidator.Validate(handleMethod, genericMethodTypes, handlerType, handlerType);
-        }
-        else if (isThereIsAnyExpectedResultsInHandleMethod && !isThereIsAnyExpectedResultsFromInput)
-        {
-            ReturnTypesShouldBeClassOrHaveClassConstraintValidator.Validate(genericMethodTypes.ToList(), handlerType);
         }
     }
 }

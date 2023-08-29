@@ -1,6 +1,6 @@
 namespace Pipelines.Tests.UseCases.HandlerWithResult.Types;
 
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult>
 {
     public Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }

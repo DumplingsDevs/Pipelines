@@ -4,7 +4,7 @@ namespace Pipelines.Tests.UseCases.SyncGenericResult.Sample;
 using Types;
 
 public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
-    where TInput : IInput<TResult> where TResult : class
+    where TInput : IInput<TResult>
 {
     private readonly IHandler<TInput, TResult> _handler;
     private readonly ILogger<LoggingDecorator<TInput, TResult>> _logger;

@@ -1,8 +1,8 @@
 namespace Pipelines.Tests.UseCases.CrossValidationReturnType.Types;
 
 public interface IHandlerTaskWithTwoConstraintedResults<in TInput, TResultOne, TResultTwo> where TInput : IInputType
-    where TResultOne : class, IResultOne
-    where TResultTwo : class, IResultTwo
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
 {
-    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+    public Task<(TResultOne, TResultTwo)> HandleAsync(TInput command, CancellationToken token);
 }

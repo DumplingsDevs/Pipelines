@@ -4,8 +4,7 @@ namespace Pipelines.Tests.Builder.Validators.Handler.ResultTypes.Types.Handlers.
 
 public interface IReturnTwoValuesExpectedTwoTypeMismatch<in TInput, TResult, TSecondResult>
     where TInput : ICommandWithTwoResults<TResult, TSecondResult>
-    where TResult : class
-    where TSecondResult : class,IMarkerInterface
+    where TSecondResult : IMarkerInterface
 {
     public Task<(TSecondResult, TResult)> HandleAsync(TInput command, CancellationToken token);
 }
