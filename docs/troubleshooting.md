@@ -501,13 +501,38 @@ public interface IDispatcher
 
 #### What happened?
 
+The Handler and Dispatcher methods have a mismatch in the number of parameters.
+
 #### Bad example
 
 ```cs
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, int index, CancellationToken token);
+}
 ```
 
 #### How to fix
+
+Ensure that the Handler and Dispatcher methods have the same number and type of parameters.
+
 ```cs
+
+public interface IHandler<in TInput> where TInput : IInputType
+{
+    public Task<string> HandleAsync(TInput input, int index, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<string> SendAsync(IInputType inputType, int index, CancellationToken token);
+}
+
 ```
 ---
 
