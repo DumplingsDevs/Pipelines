@@ -10,8 +10,8 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// </summary>
     /// <param name="genericDecorator">The Type of the open type decorator to add to the pipeline.</param>
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
-    /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException"></exception>
-    /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException">The decorator's constructor does not have the required handler dependency (either it's missing or invalid). See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#constructorvalidationexception">documentation</a> for troubleshooting details.</exception>
+    /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException">The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types. See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#interfaceimplementationexception">documentation</a> for troubleshooting details.</exception>
     public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator);
 
     /// <inheritdoc cref="WithOpenTypeDecorator(Type)"/>
@@ -23,8 +23,8 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// </summary>
     /// <typeparam name="T">The Type of the closed type decorator to add to the pipeline.</typeparam>
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
-    /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException"></exception>
-    /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException"></exception>
+    /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException">The decorator's constructor does not have the required handler dependency (either it's missing or invalid). See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#constructorvalidationexception">documentation</a> for troubleshooting details.</exception>
+    /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException">The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types. See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#interfaceimplementationexception">documentation</a> for troubleshooting details.</exception>
     IPipelineDecoratorBuilder WithClosedTypeDecorator<T>();
     
     /// <inheritdoc cref="WithClosedTypeDecorator{T}()"/>
