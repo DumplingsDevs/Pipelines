@@ -849,17 +849,22 @@ var result = await _dispatcher.SendAsync(request, new CancellationToken());
 
 #### What happened?
 
-...
+The dispatcher was invoked with a null value instead of an actual input object.
+
 
 #### Bad example
 
 ```csharp
-...
+var result = await _dispatcher.SendAsync(null, new CancellationToken());
 ```
 
 #### How to fix
+Ensure that you provide a valid input object to the method and avoid passing null values.
 
-...
+```csharp
+var request = new ExampleCommand2("My test request");
+var result = await _dispatcher.SendAsync(request, new CancellationToken());
+```
 
 ---
 
