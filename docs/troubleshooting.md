@@ -30,8 +30,8 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [ConstructorValidationException](#constructorvalidationexception)
 
 - [2. Runtime Exceptions](#2-runtime-exceptions)
+  - [DispatcherNotRegisteredException](#dispatchernotregisteredexception)
   - [HandlerNotRegisteredException](#handlernotregisteredexception)
-  - [InputNotSupportedByDispatcherException](#inputnotsupportedbydispatcherexception)
   - [InputNullReferenceException](#inputnullreferenceexception)
    
 - [3. How to debug Source Generated Dispatcher](#3-how-to-debug-source-generated-dispatcher)
@@ -824,24 +824,6 @@ var request = new ExampleCommand2("My test request");
 var result = await _dispatcher.SendAsync(request, new CancellationToken());
 
 ```
-
----
-
-### InputNotSupportedByDispatcherException
-
-#### What happened?
-
-...
-
-#### Bad example
-
-```csharp
-...
-```
-
-#### How to fix
-
-...
 
 ---
 
