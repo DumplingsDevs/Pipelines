@@ -19,6 +19,7 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [ExpectedVoidMethodException](#expectedvoidmethodexception)
   - [ResultTypeCountMismatchException](#resulttypecountmismatchexception)
   - [GenericTypeCountMismatchException](#generictypecountmismatchexception)
+  - [GenericTypeMismatchException](#generictypemismatchexception)
   - [IsGenericMismatchException](#isgenericmismatchexception)
   - [TypeMismatchException](#typemismatchexception)
   - [DispatcherMethodInputTypeMismatchException](#dispatchermethodinputtypemismatchexception)
@@ -386,6 +387,52 @@ public interface IDispatcher
         where TResultTwo : IResultTwo;
 }
 
+```
+---
+
+### GenericTypeMismatchException
+
+#### What happened?
+
+There is a mismatch in the generic type constraints between the Handler and the Dispatcher, or between the Input result types constraint and the Handler or Dispatcher.
+
+#### Bad example
+
+```cs
+public interface IInputType
+{ }
+
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType, CancellationToken token)
+        where TResult : IResultOne where TResultTwo : struct;
+}
+```
+
+#### How to fix
+Ensure that both the Handler and Dispatcher are consistent in their return types, and their generic type constraints match accordingly.
+
+
+```cs
+public interface IHandler<in TInput, TResultOne, TResultTwo> where TInput : IInputType
+    where TResultOne : IResultOne
+    where TResultTwo : IResultTwo
+{
+    public Task<(TResultOne,TResultTwo)> HandleAsync(TInput command, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    public Task<(TResult, TResultTwo)> SendAsync<TResult, TResultTwo>(IInputType inputType, CancellationToken token)
+        where TResult : IResultOne where TResultTwo : IResultTwo;
+}
 ```
 ---
 
