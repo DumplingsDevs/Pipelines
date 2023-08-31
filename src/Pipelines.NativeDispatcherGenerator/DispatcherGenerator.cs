@@ -1,31 +1,29 @@
-using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using Pipelines.WrapperDispatcherGenerator.Extensions;
-using Pipelines.WrapperDispatcherGenerator.Builders;
-using Pipelines.WrapperDispatcherGenerator.Exceptions;
-using Pipelines.WrapperDispatcherGenerator.Models;
-using Pipelines.WrapperDispatcherGenerator.Syntax;
+using Pipelines.NativeDispatcherGenerator.Builders;
+using Pipelines.NativeDispatcherGenerator.Exceptions;
+using Pipelines.NativeDispatcherGenerator.Extensions;
+using Pipelines.NativeDispatcherGenerator.Models;
+using Pipelines.NativeDispatcherGenerator.Syntax;
 
+#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-namespace Pipelines.WrapperDispatcherGenerator;
+namespace Pipelines.NativeDispatcherGenerator;
 
-[Generator]
-public class DispatcherGeneratorWithoutInputs : ISourceGenerator
+// 31.08.2023 Mateusz Wróblewski - Generator disabled. There is a problem when library is added to shared project
+// without references to projects where inputs exist. This causes the problem that dispatcher is generated without inputs. 
+// We can agree to that restriction, or figure something out.
+// [Generator]
+public class DispatcherGenerator
 {
-    public void Initialize(GeneratorInitializationContext context)
-    {
-
-    }
-
     public void Execute(GeneratorExecutionContext context)
     {
         var configs = GetPipelineConfigs(context).Distinct();
-        
+
         foreach (var config in configs)
         {
             var interfaceName = config.DispatcherType.GetNameWithNamespace();
@@ -41,12 +39,12 @@ public class DispatcherGeneratorWithoutInputs : ISourceGenerator
             }
         }
     }
-    
+
     private static string? BuildSourceCode(GeneratorExecutionContext context, PipelineConfig config)
     {
         try
         {
-            var builder = new DispatcherProxyBuilder(config, context);
+            var builder = new DispatcherImplementationBuilder(config, context);
             return builder.Build();
         }
         catch (GeneratorException e)
@@ -55,7 +53,7 @@ public class DispatcherGeneratorWithoutInputs : ISourceGenerator
             return null;
         }
     }
-    
+
     private IEnumerable<PipelineConfig> GetPipelineConfigs(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
@@ -90,8 +88,8 @@ public class DispatcherGeneratorWithoutInputs : ISourceGenerator
             }
         }
     }
-    
-        private INamedTypeSymbol? GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
+
+    private INamedTypeSymbol? GetGenericSymbol(Compilation compilation, InvocationExpressionSyntax invocationSyntax,
         string methodName)
     {
         var semanticModel = compilation.GetSemanticModel(invocationSyntax.SyntaxTree);
@@ -148,5 +146,9 @@ public class DispatcherGeneratorWithoutInputs : ISourceGenerator
         }
 
         return null;
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
     }
 }

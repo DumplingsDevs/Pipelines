@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Authors>DumplingsDevs (Mateusz Wróblewski,Kamil Bytner)</Authors>
         <Description>Extension for Pipelines package that improves performance by generating source code for dispatcher</Description>
-        <PackageId>DumplingsDevs.Pipelines.WrapperDispatcherGenerator</PackageId>
+        <PackageId>DumplingsDevs.Pipelines.NativeDispatcherGenerator</PackageId>
         <PackageTags>pipelines</PackageTags>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -22,5 +22,5 @@
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
-
+    
 </Project>

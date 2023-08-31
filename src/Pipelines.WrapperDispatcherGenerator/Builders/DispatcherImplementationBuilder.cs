@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Pipelines.WrapperDispatcherGenerator.Extensions;
+using Pipelines.WrapperDispatcherGenerator.Validators.Dispatcher;
 using Pipelines.WrapperDispatcherGenerator.Models;
 using Pipelines.WrapperDispatcherGenerator.Validators.CrossValidation;
-using Pipelines.WrapperDispatcherGenerator.Validators.Dispatcher;
 
 namespace Pipelines.WrapperDispatcherGenerator.Builders;
 
@@ -16,14 +16,24 @@ internal class DispatcherImplementationBuilder
     private readonly PipelineConfig _pipelineConfig;
     private readonly GeneratorExecutionContext _context;
 
+    private readonly IMethodSymbol _dispatcherMethod;
+    private readonly IMethodSymbol _handlerMethod;
+    private readonly string _dispatcherInterfaceName;
+
     public DispatcherImplementationBuilder(PipelineConfig pipelineConfig, GeneratorExecutionContext context)
     {
         _pipelineConfig = pipelineConfig;
         _context = context;
 
-        DispatcherParameterConstraintValidator.Validate(_pipelineConfig.DispatcherType);
         CrossValidateResultTypes.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
         CrossValidateParameters.Validate(_pipelineConfig.DispatcherType, _pipelineConfig.HandlerType);
+
+        _dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
+        _handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>().First();
+        _dispatcherInterfaceName = _pipelineConfig.DispatcherType.GetFormattedFullname();
+
+        CrossValidateGenericParameters.Validate(_dispatcherMethod, _pipelineConfig.HandlerType,
+            _pipelineConfig.InputType);
     }
 
     public string Build()
@@ -32,9 +42,13 @@ internal class DispatcherImplementationBuilder
         //TO DO - add info that file is generated (good practise)
         BuildClassDefinition();
         AddLine("{");
-        AddLine("private readonly IServiceProvider _serviceProvider;");
+        BuildRequestHandlerBase();
+        BuildRequestHandlerWrapper();
+        AddLine("   private readonly IServiceProvider _serviceProvider;");
+        AddLine(
+            $"   private readonly Dictionary<Type, {_dispatcherInterfaceName}RequestHandlerBase> _handlers = new();");
         BuildConstructor();
-        BuildMethodImplementations();
+        BuildDispatcherHandlerMethod(_dispatcherMethod);
         AddLine("}");
 
         return _builder.ToString();
@@ -44,50 +58,239 @@ internal class DispatcherImplementationBuilder
     {
         AddLine("using System;");
         AddLine("using System.Linq;");
+        AddLine("using System.Collections.Generic;");
+        AddLine("using System.Threading.Tasks;");
+        AddLine("using Pipelines.Builder.HandlerWrappers;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
         AddLine("using Pipelines.Exceptions;");
     }
 
+    private void BuildRequestHandlerBase()
+    {
+        var methodParameters = GetDispatcherMethodParametersTypeName();
+        var comma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
+        var dispatcherResults = _dispatcherMethod.GetMethodResults();
+        var hasResponse = dispatcherResults.Count > 0;
+        string wrapperReturnType;
+        if (hasResponse)
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task<object>" : "object";
+        }
+        else
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "Task" : "void";
+        }
+
+        AddLine(@$"
+    private abstract class {_dispatcherInterfaceName}RequestHandlerBase
+    {{
+        internal abstract {wrapperReturnType} Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
+    }}");
+    }
+
+    private void BuildRequestHandlerWrapper()
+    {
+        var methodGenericResults = _handlerMethod.GetMethodGenericResults();
+        var bracket = GenerateGenericParameters(methodGenericResults);
+        var dispatcherResults = _dispatcherMethod.GetMethodResults();
+        var hasResponse = dispatcherResults.Count > 0;
+        var handlerReturnType = _handlerMethod.ReturnType;
+        var handlerTypeName = _pipelineConfig.HandlerType.GetNameWithNamespace();
+        var methodParameters = GetDispatcherMethodParametersTypeName();
+        var wrapperMethodDefinitionComma = string.IsNullOrEmpty(methodParameters) ? "" : ", ";
+        var parameterNames = GetParametersString(_dispatcherMethod, 1);
+        var handlerCallComma = string.IsNullOrEmpty(parameterNames) ? "" : ", ";
+        var inputInterfaceWithDispatchersGeneric = _pipelineConfig.InputType.ConstructedFrom.IsGenericType
+            ? _pipelineConfig.InputType.GetNameWithNamespace() + $"<{string.Join(", ", methodGenericResults)}>"
+            : _pipelineConfig.InputType.GetNameWithNamespace();
+        var constrains =
+            GenerateWrapperConstraints(inputInterfaceWithDispatchersGeneric, GetConstraints(_dispatcherMethod));
+        var awaitOperator = _handlerMethod.IsAsync() ? "await" : "";
+        var asyncModifier = _handlerMethod.IsAsync() ? "async" : "";
+        var configureAwait = _handlerMethod.IsAsync() ? ".ConfigureAwait(false)" : "";
+        string wrapperReturnType;
+        if (hasResponse)
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task<object>" : "object";
+        }
+        else
+        {
+            wrapperReturnType = _handlerMethod.IsAsync() ? "async Task" : "void";
+        }
+
+        var returnStatement = hasResponse ? "return" : "";
+        var handleBody = hasResponse
+            ? HandlerCallWithResult(handlerTypeName, bracket, returnStatement, awaitOperator, handlerCallComma,
+                parameterNames)
+            : HandlerCallWithoutResult(handlerTypeName, bracket, awaitOperator, handlerCallComma,
+                parameterNames);
+
+
+        AddLine(@$"
+    private class {_dispatcherInterfaceName}RequestHandlerWrapperImpl{bracket} : {_dispatcherInterfaceName}RequestHandlerBase
+        {constrains}
+        
+    {{
+        internal override {wrapperReturnType} Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
+            {awaitOperator} Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider{handlerCallComma} {parameterNames}){configureAwait};
+
+        private {asyncModifier} {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
+            {methodParameters})
+        {{
+            {handleBody}
+        }}
+    }}");
+    }
+
+    private string GenerateWrapperConstraints(string inputInterfaceWithDispatchersGeneric, string constraints)
+    {
+        var constrains =
+            _pipelineConfig.HandlerType.GetTypeParametersConstraints();
+        var genericTypes = _pipelineConfig.HandlerType.TypeParameters.Select(x => x.Name).ToList();
+        var inputConstraint = $"where TRequest : {constrains[0].Item2}";
+        if (constrains.Count == genericTypes.Count)
+        {
+            for (int i = 1; i < genericTypes.Count; i++)
+            {
+                inputConstraint += $" where {genericTypes[i]} : {constrains[i].Item2}";
+            }
+        }
+
+        return inputConstraint;
+    }
+
+    private string HandlerCallWithResult(string handlerTypeName, string handlerGenericParameters,
+        string returnStatement, string awaitOperator, string handlerCallComma, string parameterNames)
+    {
+        return @$"
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+            
+            var handler = provider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
+
+            {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
+    }
+
+    private string HandlerCallWithoutResult(string handlerTypeName, string handlerGenericParameters,
+        string awaitOperator, string handlerCallComma, string parameterNames)
+    {
+        return @$"
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+
+            var handlers = provider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
+            foreach (var handler in handlers)
+                {{
+                    {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});;
+                }}";
+    }
+
+
+    private string GetDispatcherMethodParametersTypeName()
+    {
+        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} {p.Name}"));
+    }
+
     private void BuildClassDefinition()
     {
-        var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
-
-        AddLine($"public class {dispatcherInterface}Implementation : {_pipelineConfig.DispatcherType}");
+        AddLine($"public class {_dispatcherInterfaceName}Implementation : {_pipelineConfig.DispatcherType}");
     }
 
     private void BuildConstructor()
     {
         var dispatcherInterface = _pipelineConfig.DispatcherType.GetFormattedFullname();
+        var methodGenericResults = _dispatcherMethod.GetMethodGenericResults();
+        var wrapperGenericString = GenerateCommasForGenericParameters(methodGenericResults.Count);
 
-        AddLine($"public {dispatcherInterface}Implementation(IServiceProvider serviceProvider)");
+        AddLine($@"
+    public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
+        IEnumerable<IHandlersRepository> handlerRepositories)
+    {{
+        _serviceProvider = serviceProvider;
+        var handlerTypes = handlerRepositories.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).GetHandlers();
+        foreach (var handlerType in handlerTypes)
+        {{
+            var genericArguments = handlerType.GetInterfaces()
+                .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType.GetNameWithNamespace()}<{wrapperGenericString}>))
+                .GetGenericArguments();
+            var requestType = genericArguments[0];
+            var wrapperType = typeof({_dispatcherInterfaceName}RequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
+            var wrapper = Activator.CreateInstance(wrapperType) ??
+                          throw new InvalidOperationException($""Could not create wrapper type for {{requestType}}"");
+            _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;
+        }}
+    }}
+");
+    }
+
+    private void BuildDispatcherHandlerMethod(IMethodSymbol dispatcherHandlerMethod)
+    {
+        var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
+            .First();
+        var dispatcherResults = dispatcherHandlerMethod.GetMethodResults();
+        var hasMultipleResults = dispatcherResults.Count > 1;
+        var hasResponse = dispatcherResults.Count > 0;
+        var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
+        var inputParameterName = _dispatcherMethod.Parameters.First().Name;
+
+        AddLine("public",
+            AsyncModified(dispatcherHandlerMethod),
+            GenerateMethodReturnType(dispatcherHandlerMethod),
+            dispatcherHandlerMethod.Name,
+            GetMethodConstraint(dispatcherHandlerMethod),
+            $"({GenerateMethodParameters(dispatcherHandlerMethod)})",
+            GetConstraints(dispatcherHandlerMethod));
+
         AddLine("{");
-        AddLine("_serviceProvider = serviceProvider;");
+        AddLine($"var requestType = {inputParameterName}.GetType();");
+        AddLine("if (!_handlers.TryGetValue(requestType, out var handlerWrapper))");
+        AddLine("{");
+        AddLine("throw new HandlerNotRegisteredException(requestType);");
+        AddLine("}");
+        AddLine(CallHandlerWrapperTemplate(hasResponse, hasMultipleResults, asyncModifier, dispatcherHandlerMethod,
+            dispatcherResults));
         AddLine("}");
     }
 
-    private void BuildMethodImplementations()
+    public string CallHandlerWrapperTemplate(bool hasResponse, bool hasMultipleResults, string @await,
+        IMethodSymbol dispatcherMethod, List<ITypeSymbol> dispatcherResults)
     {
-        var dispatcherMethods = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>();
-
-        foreach (var methodSymbol in dispatcherMethods)
+        if (hasResponse && !hasMultipleResults)
         {
-            BuildMethod(methodSymbol);
+            return SingleResponseHandlerWrapper(@await, dispatcherMethod, dispatcherResults);
+        }
+
+        if (hasResponse && hasMultipleResults)
+        {
+            return MultipleResponsesHandlerWrapper(@await, dispatcherMethod, dispatcherResults);
+        }
+        else
+        {
+            return NoneResponseHandlerWrapper(@await, dispatcherMethod, dispatcherResults);
         }
     }
 
-    private void BuildMethod(IMethodSymbol methodSymbol)
+    private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
     {
-        AddLine("public",
-            AsyncModified(methodSymbol),
-            GenerateMethodReturnType(methodSymbol),
-            methodSymbol.Name,
-            GetMethodConstraint(methodSymbol),
-            $"({GenerateMethodParameters(methodSymbol)})",
-            GetConstraints(methodSymbol));
+        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);";
+    }
 
-        AddLine("{");
-        BuildSwitchCase(methodSymbol);
-        AddLine("}");
+    private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
+    {
+        return
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+{GenerateMultipleArgumentReturn(dispatcherResults)};";
+    }
+
+    private string SingleResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
+        List<ITypeSymbol> dispatcherResults)
+    {
+        return
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+{GenerateSingleArgumentReturn(dispatcherResults)};";
     }
 
     private static string AsyncModified(IMethodSymbol methodSymbol)
@@ -110,222 +313,21 @@ internal class DispatcherImplementationBuilder
         return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
     }
 
-    private void BuildSwitchCase(IMethodSymbol methodSymbol)
-    {
-        var parameterName = methodSymbol.Parameters.First().Name;
-
-        AddLine("switch", $"({parameterName})");
-        AddLine("{");
-        BuildSwitchBody();
-        AddLine(
-            $"default: throw new InputNotSupportedByDispatcherException({parameterName}.GetType(), typeof({_pipelineConfig.DispatcherType}));");
-        AddLine("}");
-    }
-
-    // Example:
-    //     case Sample.ExampleCommand r:
-    //     var result = _serviceProvider.GetRequiredService<ICommandHandler<Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>>().HandleAsync(r, token);
-    //     return ((result.Item1 as TResult), (result.Item2 as TResult2));
-    private void BuildSwitchBody()
-    {
-        var inputImplementations = GetInputImplementations();
-        foreach (var inputClass in inputImplementations)
-        {
-            var interfaces = inputClass.AllInterfaces.ToList();
-            var implementedInputInterface = interfaces.FirstOrDefault(x =>
-                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
-
-            var handlerMethod = _pipelineConfig.HandlerType.ConstructedFrom.GetMembers().OfType<IMethodSymbol>()
-                .First();
-            var dispatcherMethod = _pipelineConfig.DispatcherType.GetMembers().OfType<IMethodSymbol>().First();
-            var dispatcherResults = GetHandlerArgumentResults(dispatcherMethod);
-            var inputResults = implementedInputInterface.TypeArguments.ToList();
-            var hasMultipleResults = dispatcherResults.Count > 1;
-            var dispatcherArgumentResults = dispatcherMethod.TypeArguments.ToList();
-            var hasResponse = dispatcherResults.Count > 0;
-            var genericStructure = GenerateGenericBrackets(hasResponse, inputClass, dispatcherArgumentResults, inputResults);
-            var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
-            var resultName = $"result{inputClass.GetFormattedFullname()}";
-
-            AddLine("case ");
-            AddInLine(inputClass.ToString());
-            AddInLine(" i: ");
-            AddLine(GetCaseTemplate(hasResponse,
-                hasMultipleResults,
-                resultName,
-                asyncModifier,
-                $"{_pipelineConfig.HandlerType.GetNameWithNamespace()}{genericStructure}",
-                handlerMethod,
-                dispatcherMethod,
-                dispatcherResults));
-        }
-    }
-
-    private List<INamedTypeSymbol> GetInputImplementations()
-    {
-        var allTypes = new List<INamedTypeSymbol>();
-
-        List<IAssemblySymbol> assemblySymbol = _context.Compilation.SourceModule.ReferencedAssemblySymbols.ToList();
-        assemblySymbol.Add(_context.Compilation.Assembly);
-
-        foreach (var assembly in assemblySymbol)
-        {
-            ProcessNamespace(assembly.GlobalNamespace, allTypes);
-        }
-
-        return allTypes;
-    }
-
-    private void ProcessNamespace(INamespaceSymbol namespaceSymbol, List<INamedTypeSymbol> allTypes)
-    {
-        foreach (var typeSymbol in namespaceSymbol.GetTypeMembers())
-        {
-            var implementsInputInterface = typeSymbol.AllInterfaces.Any(x =>
-                SymbolEqualityComparer.Default.Equals(x.ConstructedFrom, _pipelineConfig.InputType.ConstructedFrom));
-            if (implementsInputInterface)
-            {
-                allTypes.Add(typeSymbol);
-            }
-        }
-
-        foreach (var nestedNamespace in namespaceSymbol.GetNamespaceMembers())
-        {
-            ProcessNamespace(nestedNamespace, allTypes);
-        }
-    }
-
-    private List<ITypeSymbol> GetHandlerArgumentResults(IMethodSymbol methodSymbol)
-    {
-        if (methodSymbol.ReturnsVoid)
-        {
-            return new List<ITypeSymbol>();
-        }
-
-        if (methodSymbol.ReturnType is ITypeParameterSymbol typeParameterSymbol)
-        {
-            return new List<ITypeSymbol>() { typeParameterSymbol };
-        }
-
-        var namedSymbol = ((INamedTypeSymbol)methodSymbol.ReturnType);
-
-        if (namedSymbol.IsVoidTask())
-        {
-            return new List<ITypeSymbol>();
-        }
-
-        if (!namedSymbol.IsGenericType)
-        {
-            return new List<ITypeSymbol>() { namedSymbol };
-        }
-
-        var handlerResultTypeArguments = namedSymbol.TypeArguments.ToList();
-
-        if (handlerResultTypeArguments.Count > 1)
-        {
-            return handlerResultTypeArguments;
-        }
-
-        if (handlerResultTypeArguments.Count == 0)
-        {
-            return new List<ITypeSymbol>();
-        }
-
-        switch (handlerResultTypeArguments.First())
-        {
-            case INamedTypeSymbol taskNamedResult:
-            {
-                var taskArguments = taskNamedResult.TypeArguments;
-
-                return taskArguments.Length > 0 ? taskArguments.ToList() : new List<ITypeSymbol> { taskNamedResult };
-            }
-            case ITypeParameterSymbol taskTypeResult:
-                return new List<ITypeSymbol> { taskTypeResult };
-        }
-
-        return new List<ITypeSymbol>();
-    }
-
-    private string GetCaseTemplate(bool hasResponse, bool hasMultipleResults, string resultName, string @await,
-        string handlerType, IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod,
-        List<ITypeSymbol> handlerResults)
-    {
-        if (hasResponse && !hasMultipleResults)
-        {
-            return CaseBodyForSingleResponse(resultName, @await, handlerType, handlerMethod, dispatcherMethod,
-                handlerResults);
-        }
-
-        if (hasResponse && hasMultipleResults)
-        {
-            return CaseBodyForMultipleResponses(resultName, @await, handlerType, handlerMethod, dispatcherMethod,
-                handlerResults);
-        }
-
-        if (!hasResponse)
-        {
-            return CaseBodyWithoutResult(resultName, @await, handlerType, handlerMethod, dispatcherMethod);
-        }
-
-        return "";
-    }
-
-    private string CaseBodyWithoutResult(string resultName, string await, string handlerType,
-        IMethodSymbol handlerMethod,
-        IMethodSymbol dispatcherMethod)
-    {
-        return @$"var {resultName}Handlers = _serviceProvider.GetServices<{handlerType}>().ToList();
-            if ({resultName}Handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            foreach (var {resultName}Handler in {resultName}Handlers)
-                {{
-                    {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
-                }}
-            break;";
-    }
-
-    private string CaseBodyForMultipleResponses(string resultName, string await, string handlerType,
-        IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod, List<ITypeSymbol> handlerResults)
-    {
-        return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
-            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
-            {GenerateMultipleArgumentReturn(resultName, handlerResults)}";
-    }
-
-    private string CaseBodyForSingleResponse(string resultName, string await, string handlerType,
-        IMethodSymbol handlerMethod, IMethodSymbol dispatcherMethod, List<ITypeSymbol> handlerResults)
-    {
-        return @$"var {resultName}Handler = _serviceProvider.GetService<{handlerType}>();
-            if ({resultName}Handler is null) throw new HandlerNotRegisteredException(typeof({handlerType}));
-            var {resultName} = {@await} {resultName}Handler.{handlerMethod.Name}(i{GetParametersString(dispatcherMethod, 1)});
-            {GenerateSingleArgumentReturn(resultName, handlerResults)}";
-    }
-
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
-    private static string GenerateGenericBrackets(bool hasResponse, ISymbol inputClass, List<ITypeSymbol> results, List<ITypeSymbol> inputResults)
+    private static string GenerateGenericParameters(List<ITypeSymbol> results)
     {
-        if (!hasResponse)
+        if (results.Count == 0)
         {
-            return $"<{inputClass}>";
+            return $"<TRequest>";
         }
 
         var builder = new StringBuilder();
 
-        builder.Append($"<{inputClass}");
-        
-        // If input has generic response defined, then we need to use it, otherwise, use dispatcher results.
-        if (inputResults.Count > 0)
+        builder.Append($"<TRequest");
+
+        foreach (var response in results)
         {
-            foreach (var response in inputResults)
-            {
-                builder.Append($", {response}");
-            }
-        }
-        else
-        {
-            foreach (var response in results)
-            {
-                builder.Append($", {response}");
-            }
+            builder.Append($", {response}");
         }
 
         builder.Append(">");
@@ -334,11 +336,11 @@ internal class DispatcherImplementationBuilder
     }
 
     // Example: return ((result.Item1 as TResult), (result.Item2 as TResult2));
-    private string GenerateMultipleArgumentReturn(string resultName, List<ITypeSymbol> results)
+    private string GenerateMultipleArgumentReturn(List<ITypeSymbol> results)
     {
         var builder = new StringBuilder();
 
-        builder.Append("return (");
+        builder.Append("return (ValueTuple<");
         for (var index = 0; index < results.Count; index++)
         {
             var result = results[index];
@@ -347,30 +349,26 @@ internal class DispatcherImplementationBuilder
                 builder.Append(", ");
             }
 
-            builder.Append($"({resultName}.Item{index + 1} as {result})");
+            builder.Append(result);
         }
 
-        builder.Append(");");
+        builder.Append(">)result;");
 
         return builder.ToString();
     }
 
     // Example: return resultPipelinesTestsUseCasesHandlerWithResultSampleExampleCommand as TResult;
-    private string GenerateSingleArgumentReturn(string resultName, List<ITypeSymbol> handlerResults)
+    private string GenerateSingleArgumentReturn(List<ITypeSymbol> handlerResults)
     {
         var builder = new StringBuilder();
 
-        builder.Append($"return {resultName} ");
-        builder.Append("as ");
+        builder.Append($"return (");
         builder.Append(handlerResults.First());
+        builder.Append(")");
+        builder.Append($"result");
         builder.Append(";");
 
         return builder.ToString();
-    }
-
-    private string GenerateSingleCastExpression()
-    {
-        return _pipelineConfig.HandlerType.TypeArguments.Skip(1).First().Name;
     }
 
     private string GetConstraints(IMethodSymbol methodSymbol)
@@ -385,13 +383,20 @@ internal class DispatcherImplementationBuilder
     }
 
 
-
     private string GetParametersString(IMethodSymbol method, int skip)
     {
-        var parameters = string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
-        return string.IsNullOrEmpty(parameters) ? "" : ", " + parameters;
+        return string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
     }
 
+    static string GenerateCommasForGenericParameters(int n)
+    {
+        if (n <= 0)
+        {
+            return "";
+        }
+
+        return string.Join("", Enumerable.Repeat(",", n));
+    }
 
     private void AddEmptyLine()
     {

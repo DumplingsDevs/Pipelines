@@ -1,9 +1,8 @@
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Pipelines.WrapperDispatcherGenerator.Extensions;
@@ -12,13 +11,16 @@ using Pipelines.WrapperDispatcherGenerator.Exceptions;
 using Pipelines.WrapperDispatcherGenerator.Models;
 using Pipelines.WrapperDispatcherGenerator.Syntax;
 
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
 namespace Pipelines.WrapperDispatcherGenerator;
 
-// [Generator]
-public class DispatcherGenerator
+[Generator]
+public class DispatcherGenerator : ISourceGenerator
 {
+    public void Initialize(GeneratorInitializationContext context)
+    {
+    }
+
     public void Execute(GeneratorExecutionContext context)
     {
         var configs = GetPipelineConfigs(context).Distinct();
@@ -115,7 +117,7 @@ public class DispatcherGenerator
         var typeOfSyntax = invocationSyntax.DescendantNodes().OfType<TypeOfExpressionSyntax>().Skip(skip)
             .FirstOrDefault();
         if (typeOfSyntax is null) return null;
-        
+
         var semanticModel = compilation.GetSemanticModel(typeOfSyntax.SyntaxTree);
 
         var identifierSyntax = typeOfSyntax.ChildNodes().OfType<IdentifierNameSyntax>()
@@ -145,10 +147,5 @@ public class DispatcherGenerator
         }
 
         return null;
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // Tutaj można zarejestrować wszelkie niezbędne metadane
     }
 }
