@@ -1,4 +1,6 @@
 # Pipelines
+[![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
+[![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
 ------
 
 
@@ -22,7 +24,7 @@
 ----
 ```
 dotnet add package DumplingsDevs.Pipelines
-dotnet add package DumplingsDevs.Pipelines.Generators
+dotnet add package DumplingsDevs.Pipelines.WrapperDispatcherGenerator
 ```
 
 # Quick Start
