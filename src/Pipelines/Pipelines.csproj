@@ -4,12 +4,13 @@
         <Authors>DumplingsDevs (Mateusz Wróblewski,Kamil Bytner)</Authors>
         <Description>The fastest and most extensible pipeline in the .NET ecosystem</Description>
         <PackageId>DumplingsDevs.Pipelines</PackageId>
-        <PackageTags>pipelines</PackageTags>
+        <PackageTags>pipelines, mediation, commands, queries, sourcegenerated, dispatcher</PackageTags>
         <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/DumplingsDevs/Pipelines</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
