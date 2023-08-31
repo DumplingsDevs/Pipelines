@@ -24,7 +24,7 @@
 ----
 ```
 dotnet add package DumplingsDevs.Pipelines
-dotnet add package DumplingsDevs.Pipelines.Generators
+dotnet add package DumplingsDevs.Pipelines.WrapperDispatcherGenerator
 ```
 
 # Quick Start
