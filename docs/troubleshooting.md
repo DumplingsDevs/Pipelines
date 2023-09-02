@@ -931,5 +931,16 @@ issue you're facing, there are specific symptoms to look out for and steps to di
   project, the build errors related to it no longer appear. This suggests that the issue is indeed connected to the
   generated dispatcher.
 
-If you suspect that the issue is related to a bug in the dispatcher generation, we encourage you to report it as a GitHub issue on our repository at [https://github.com/DumplingsDevs/Pipelines/issues](https://github.com/DumplingsDevs/Pipelines/issues). Your feedback helps us improve the library and assists other users who may encounter similar problems.
+Additionally, if the problem you're facing is a blocker for your project, a workaround is to remove the "Pipelines.WrapperDispatcherGenerator" package and utilize the built-in ProxyImplementation that uses reflection to handle dispatcher functionality. To enable the proxy, set the option `UseReflectionProxyImplementation` to `true`. Here's a code example:
+
+```cs
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>), assembly)
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true)
+    .Build()
+```
+
+We encourage you to report any bug as a GitHub issue on our repository at [https://github.com/DumplingsDevs/Pipelines/issues](https://github.com/DumplingsDevs/Pipelines/issues). Your feedback helps us improve the library and assists other users who may encounter similar problems.
 
