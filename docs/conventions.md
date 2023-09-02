@@ -11,28 +11,6 @@ This page provides conventions and examples for defining and implementing Pipeli
 
 ## 1 . Pipelines conventions
 
-- Generic result types must have a `class` constraint.
-
-<details>
-<summary style="color: green">📜 Show me example </summary>
-
-```cs
-public interface IInput<TResult> where TResult: class{ } 
-
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
-{
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IDispatcher
-{
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
-}
-```
-
-</details>
-
--------
 
 - The `Input` must be the first parameter of the Dispatcher and Handler methods.
 
