@@ -34,6 +34,7 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [DispatcherNotRegisteredException](#dispatchernotregisteredexception)
   - [HandlerNotRegisteredException](#handlernotregisteredexception)
   - [InputNullReferenceException](#inputnullreferenceexception)
+  - [CannotCreateDispatcherWrapperException](#inputnullreferenceexception)
    
 - [3. How to debug Source Generated Dispatcher](#3-how-to-debug-source-generated-dispatcher)
 
@@ -894,6 +895,14 @@ Ensure that you provide a valid input object to the method and avoid passing nul
 var request = new ExampleCommand2("My test request");
 var result = await _dispatcher.SendAsync(request, new CancellationToken());
 ```
+
+---
+
+### CannotCreateDispatcherWrapperException
+
+#### What happened?
+
+Something went wrong with source generator and generated Dispatcher. Please create issue on [Github](https://github.com/DumplingsDevs/Pipelines/issues) with types and builder description.
 
 ---
 
