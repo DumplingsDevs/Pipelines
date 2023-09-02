@@ -829,6 +829,9 @@ services
     .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true)
     .Build()
 ```
+#### Additional Possibility:
+#### What happened?
+Another possible issue could be related to problems during the generation of the dispatcher. In this situation, we recommend creating an issue on our GitHub repository: https://github.com/DumplingsDevs/Pipelines/issues. Please provide a detailed description of your Pipelines configuration to help us assist you better.
 
 ---
 
