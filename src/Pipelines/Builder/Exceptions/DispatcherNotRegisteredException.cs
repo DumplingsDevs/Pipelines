@@ -1,5 +1,9 @@
 namespace Pipelines.Builder.Exceptions;
 
+/// <summary>
+/// Occurs when dispatcher is not available in DI.
+/// Troubleshooting: https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#dispatchernotregisteredexception
+/// </summary>
 public class DispatcherNotRegisteredException : Exception
 {
     private static readonly string ErrorMessage =
