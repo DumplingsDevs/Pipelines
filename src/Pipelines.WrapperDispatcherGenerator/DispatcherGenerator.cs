@@ -23,6 +23,18 @@ public class DispatcherGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
+        GenerateDispatchers(context);
+        GenerateExceptions(context);
+    }
+
+    private void GenerateExceptions(GeneratorExecutionContext context)
+    {
+        var source = new ExceptionsBuilder().Build();
+        context.AddSource("Exceptions", source);
+    }
+
+    private void GenerateDispatchers(GeneratorExecutionContext context)
+    {
         var configs = GetPipelineConfigs(context).Distinct();
 
         foreach (var config in configs)

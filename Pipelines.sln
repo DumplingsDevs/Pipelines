@@ -19,6 +19,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.Tests.SharedLibra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.NativeDispatcherGenerator", "src\Pipelines.NativeDispatcherGenerator\Pipelines.NativeDispatcherGenerator.csproj", "{DD88D05F-D9A7-48AF-BBEA-26D3A3663055}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{74834919-89F5-49D9-8C3C-3257C0C531A8}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-615A-41E5-A7F4-995894B9A76C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\troubleshooting.md = docs\troubleshooting.md
+		docs\code_examples.md = docs\code_examples.md
+		docs\conventions.md = docs\conventions.md
+		docs\key_concepts.md = docs\key_concepts.md
+		docs\adr.md = docs\adr.md
+		docs\configuration.md = docs\configuration.md
+		docs\dispatcher_source_generator.md = docs\dispatcher_source_generator.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,5 +81,6 @@ Global
 		{36D7DF6E-7BDB-484E-9530-D578028A5DC3} = {46767E7B-DA07-4511-85DF-C453E4574153}
 		{6B8B5AB7-D155-4875-820F-722ADBD75CAE} = {46767E7B-DA07-4511-85DF-C453E4574153}
 		{3CF7A8C3-A8BF-4542-8751-76FCF1159383} = {46767E7B-DA07-4511-85DF-C453E4574153}
+		{5D26DFB1-615A-41E5-A7F4-995894B9A76C} = {74834919-89F5-49D9-8C3C-3257C0C531A8}
 	EndGlobalSection
 EndGlobal

@@ -217,7 +217,7 @@ internal class DispatcherImplementationBuilder
             var requestType = genericArguments[0];
             var wrapperType = typeof({_dispatcherInterfaceName}RequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
             var wrapper = Activator.CreateInstance(wrapperType) ??
-                          throw new InvalidOperationException($""Could not create wrapper type for {{requestType}}"");
+                          throw new CannotCreateDispatcherWrapperException(requestType);
             _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;
         }}
     }}
@@ -243,6 +243,11 @@ internal class DispatcherImplementationBuilder
             GetConstraints(dispatcherHandlerMethod));
 
         AddLine("{");
+        AddLine(@$"
+        if ({inputParameterName} is null)
+        {{
+            throw new InputNullReferenceException();
+        }}");
         AddLine($"var requestType = {inputParameterName}.GetType();");
         AddLine("if (!_handlers.TryGetValue(requestType, out var handlerWrapper))");
         AddLine("{");
