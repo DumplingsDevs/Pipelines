@@ -11,12 +11,12 @@ In this section of the documentation, you'll learn about the core components of 
   - [1.2 Handler](#12-handler)
   - [1.3 Dispatcher](#13-dispatcher)
   - [1.4 Decorators](#14-decorators)
-- [2. Multiple handlers for same Input](#2-multiple-handlers-for-same-input)
+- [2. Multiple handlers for same Input](#2-multiple-handlers-for-the-same-input)
 - [3. Execution Flow](#3-execution-flow)
 ------
 
 ## 1 Building blocks
-### 1.1 Input 
+### 1.1 Input
 First method parameter in the Handler and Dispatcher methods, guiding the identification of the appropriate Handler. Pipelines supports handling with both void and results.
 
 Generic Arguments defines result types. `Pipelines` supports handling with both void and results.
@@ -239,9 +239,10 @@ public class
     }
 ```
 
-## 2. Multiple handlers for same Input
+## 2. Multiple handlers for the same Input
 In situations where you have multiple handlers for a single type of input, the dispatcher will execute each one, including their associated decorators. This use case is highly likely when you are creating a Pipeline for Domain Event Execution.
 
+**Warning** - This situation is supported only, when dispatcher does not return value!
 
 ```
     Dispatcher Invocation │                             │  Handler1
