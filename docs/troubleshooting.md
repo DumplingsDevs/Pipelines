@@ -36,7 +36,7 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [InputNullReferenceException](#inputnullreferenceexception)
   - [CannotCreateDispatcherWrapperException](#inputnullreferenceexception)
    
-- [3. How to debug Source Generated Dispatcher](#3-how-to-debug-source-generated-dispatcher)
+- [3. Cannot build project - how to debug](#3-cannot-build-project---how-to-debug)
 
 ------
 
@@ -829,6 +829,9 @@ services
     .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true)
     .Build()
 ```
+#### Additional Possibility:
+#### What happened?
+Another possible issue could be related to problems during the generation of the dispatcher. In this situation, we recommend creating an issue on our GitHub repository: https://github.com/DumplingsDevs/Pipelines/issues. Please provide a detailed description of your Pipelines configuration to help us assist you better.
 
 ---
 
@@ -906,4 +909,38 @@ Something went wrong with source generator and generated Dispatcher. Please crea
 
 ---
 
-## 3. How to debug Source Generated Dispatcher
+## 3. Cannot build project - how to debug
+
+### What happened?
+
+In some cases, the Pipelines source generator may generate code that cannot be compiled. This can happen when users
+create pipelines builders with objects that are not supported by the Pipelines library. If you suspect that this is the
+issue you're facing, there are specific symptoms to look out for and steps to diagnose and resolve the problem.
+
+#### Symptoms of Generated Dispatcher Issues:
+
+1. **Build Result Contains Errors in "Pipelines.WrapperDispatcherGenerator" Files:**
+
+- One indication of a problem with the generated dispatcher is the presence of build errors that are logged in files
+  with "Pipelines.WrapperDispatcherGenerator" in the file path. These errors typically relate to issues within the
+  generated code.
+
+2. **Build Errors Disappear After Removing the "Pipelines.WrapperDispatcherGenerator" NuGet Package:**
+
+- Another significant clue is that when you remove the "Pipelines.WrapperDispatcherGenerator" NuGet package from your
+  project, the build errors related to it no longer appear. This suggests that the issue is indeed connected to the
+  generated dispatcher.
+
+Additionally, if the problem you're facing is a blocker for your project, a workaround is to remove the "Pipelines.WrapperDispatcherGenerator" package and utilize the built-in ProxyImplementation that uses reflection to handle dispatcher functionality. To enable the proxy, set the option `UseReflectionProxyImplementation` to `true`. Here's a code example:
+
+```cs
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>), assembly)
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true)
+    .Build()
+```
+
+We encourage you to report any bug as a GitHub issue on our repository at [https://github.com/DumplingsDevs/Pipelines/issues](https://github.com/DumplingsDevs/Pipelines/issues). Your feedback helps us improve the library and assists other users who may encounter similar problems.
+
