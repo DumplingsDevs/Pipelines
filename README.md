@@ -199,3 +199,15 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
 - Cannot create a Pipeline that returns both generic and non-generic types.
+
+# Roadmap
+- [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
+- [ ] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
+- [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
+- [ ] **Parallel Pipeline**: Introduce a pipeline to facilitate parallel execution of multiple handlers.
+- [ ] **Stream Pipeline**: Implement support for streaming pipelines.
+- [ ] **Decorator Performance Optimization**: Improve performance, especially concerning the use of `ActivatorUtilities.CreateInstance()`.
+
+# Authors
+Dumplings Devs (Mateusz Wróblewski & Kamil Bytner)
+
