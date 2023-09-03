@@ -1,12 +1,16 @@
 # Pipelines
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
+
 ------
 
+📝 <i>``` In almost every project I've been a part of, we had a set of reusable code that was used across multiple microservices. Each time, to maintain full control over types, I had to provide my own implementation for Commands, Queries, or Domain Events. This year was no different - a new client and once again the need to implement the same solution. That's why we decided to create 'Pipelines'.```</i>
 
-<i>```'Pipelines' is perfectly tailored for creating pipelines for Queries, Commands, Domain Events, any other pipeline utilizing your OWN types. Everywhere in your app will remain unaware of 'Pipelines' usage, with the exception of pipeline registration. If you're aiming to separate code execution logic from its invocation, such as with the Mediation pattern, this tool offers the flexibility you require.```</i>
+------
 
-----
+🛠 ```'Pipelines' is perfectly tailored for creating pipelines for Queries, Commands, Domain Events, any other pipeline utilizing your OWN types. Everywhere in your app will remain unaware of 'Pipelines' usage, with the exception of pipeline registration. If you're aiming to separate code execution logic from its invocation, such as with the Mediation pattern, this tool offers the flexibility you require.```
+
+-----
 
 ✅ <b>Fastest on the Market</b> - `Pipelines` guarantees rapid performance, thanks to bypassing the reflection mechanism to find the appropriate handler. Efficiency is at the core of design!
 
@@ -20,18 +24,18 @@
 
 ✅ <b>Designed with Developers in Mind</b> - Constructed with the developer's requirements at heart, our tool simplifies and accelerates your work, always upholding top-notch standards.
 
-# Installation
+# 📦 Installation
 ----
 ```
 dotnet add package DumplingsDevs.Pipelines
 dotnet add package DumplingsDevs.Pipelines.WrapperDispatcherGenerator
 ```
 
-# Quick Start
+# 🚀 Quick Start
 
 ---- 
 
-## 1. Define your own types
+## 1️⃣ Define your own types
 
 ### 1.1 Input 
 
@@ -78,7 +82,7 @@ public interface IDispatcher
 
 </details>
 
-## 2. Implement first decorator (optional step)
+## 2️⃣ Implement first decorator (optional step)
 
 Analogous to Middlewares in .NET. Think of them as layers of logic that execute before or after the handler.
 
@@ -110,7 +114,7 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult> where
 
 </details>
 
-## 3. Implement first handler
+## 3️⃣  Implement first handler
 
 ### 3.1 Input and Result
 
@@ -141,7 +145,7 @@ public class ExampleHandler : IHandler<ExampleInput, ExampleCommandResult>
 
 </details>
 
-## 4. Register pipeline
+## 4️⃣ Register pipeline
 
 In your application's initialization, such as `Startup.cs`:
 
@@ -164,7 +168,7 @@ _services
 
 </details>
 
-## 5. Example Usage (Fluent API .NET)
+## 5️⃣ Example Usage (Fluent API .NET)
 
 <details>
 <summary style="color: green">📜 Show me code </summary>
@@ -184,7 +188,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 ---- 
 
-# Detailed documentation
+# 📚 Detailed documentation
 ------
 - [Conventions](docs/conventions.md)
 - [Key Concepts](docs/key_concepts.md)
@@ -196,11 +200,11 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 ---- 
 
-# Limitations
+# ⚠️ Limitations
 - Pipelines in which multiple handlers will be handled for one input must have a `Task` or `void` return type.
 - Cannot create a Pipeline that returns both generic and non-generic types.
 
-# Roadmap
+# 🛤 Roadmap
 - [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
 - [ ] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
 - [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
@@ -208,6 +212,5 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [ ] **Stream Pipeline**: Implement support for streaming pipelines.
 - [ ] **Decorator Performance Optimization**: Improve performance, especially concerning the use of `ActivatorUtilities.CreateInstance()`.
 
-# Authors
-Dumplings Devs (Mateusz Wróblewski & Kamil Bytner)
-
+# 🥟💡 The Dumplings Behind the Magic
+Hey there! We're Dumplings Devs, made up of `Mateusz Wróblewski` and `Kamil Bytner`. We're passionate about software and always up for a coding challenge. 
