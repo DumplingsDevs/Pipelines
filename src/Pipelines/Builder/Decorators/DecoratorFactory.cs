@@ -12,7 +12,7 @@ internal static class DecoratorFactory
     private static Func<IServiceProvider, object> TypeDecorator(Type serviceType, Type decoratorType) =>
         serviceProvider =>
         {
-            var instanceToDecorate = serviceProvider.GetRequiredService(serviceType);
+            var instanceToDecorate = serviceProvider.GetService(serviceType);
             return ActivatorUtilities.CreateInstance(serviceProvider, decoratorType, instanceToDecorate);
         };
 }

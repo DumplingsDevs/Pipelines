@@ -166,7 +166,7 @@ internal class DispatcherImplementationBuilder
             using var scope = serviceProvider.CreateScope();
             var provider = scope.ServiceProvider;
             
-            var handler = provider.GetRequiredService<{handlerTypeName}{handlerGenericParameters}>();
+            var handler = provider.GetService<{handlerTypeName}{handlerGenericParameters}>();
 
             {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
     }
