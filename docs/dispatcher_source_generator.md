@@ -1,6 +1,6 @@
 # Proxy vs Generated Dispatcher
 
-In the context of the Pipelines framework, two distinct approaches exist for handling the routing of requests to their
+In the context of the Pipelines framework, two distinct approaches exist for handling the routing of inputs to their
 respective handlers: the Dispatcher Proxy and the Pipelines.WrapperDispatcherGenerator generated using source
 generators.
 
@@ -63,3 +63,5 @@ dispatcher code tailored to your project's needs that handles the routing of inp
 **Recommendation**: We highly recommend using the WrapperDispatcherGenerator for its significant performance advantages and
 versatility in handling various configuration types. It is designed to efficiently handle a wide range of
 configurations, providing both type safety and optimized performance, making it the preferred choice for most projects.
+
+Please check [Benchmarks](benchmarks.md) section to see performance difference.
