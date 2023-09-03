@@ -252,12 +252,12 @@ public class PipelinesBenchmark
     [Benchmark()]
     public async Task<List<ExampleCommandResult>> MediatR()
     {
-        var mediator = _mediatorProvider.GetRequiredService<IMediator>();
-
         var responses = new List<ExampleCommandResult>();
         
         foreach (var pipelinesRequest in _mediatorRequests)
         {
+            using var scope = _mediatorProvider.CreateScope();
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             var response = await mediator.Send(pipelinesRequest, new CancellationToken());
             responses.Add(response);
         }
@@ -268,12 +268,12 @@ public class PipelinesBenchmark
     [Benchmark()]
     public async Task<List<ExampleCommandResult>> MediatRWithBehaviours()
     {
-        var mediator = _mediatorWithBehavioursProvider.GetRequiredService<IMediator>();
-
         var responses = new List<ExampleCommandResult>();
         
         foreach (var pipelinesRequest in _mediatorRequests)
         {
+            using var scope = _mediatorWithBehavioursProvider.CreateScope();
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             var response = await mediator.Send(pipelinesRequest, new CancellationToken());
             responses.Add(response);
         }
