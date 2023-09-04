@@ -6,4 +6,16 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="DumplingsDevs.Pipelines" Version="0.0.14-alpha" />
+      <PackageReference Include="DumplingsDevs.Pipelines.WrapperDispatcherGenerator" Version="0.0.14-alpha" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Pipelines.CleanArchitecture.Abstractions\Pipelines.CleanArchitecture.Abstractions.csproj" />
+      <ProjectReference Include="..\Pipelines.CleanArchitecture.Application\Pipelines.CleanArchitecture.Application.csproj" />
+    </ItemGroup>
+
 </Project>

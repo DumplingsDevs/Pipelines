@@ -7,8 +7,8 @@ namespace Pipelines.CleanArchitecture.Application.Commands.CreateToDo;
 
 public class CreateToDoCommandHandler : ICommandHandler<CreateToDoCommand>
 {
-    private IToDoRepository _toDoRepository;
-    private IDomainEventsDispatcher _domainEventsDispatcher;
+    private readonly IToDoRepository _toDoRepository;
+    private readonly IDomainEventsDispatcher _domainEventsDispatcher;
 
     public CreateToDoCommandHandler(IToDoRepository toDoRepository, IDomainEventsDispatcher domainEventsDispatcher)
     {
