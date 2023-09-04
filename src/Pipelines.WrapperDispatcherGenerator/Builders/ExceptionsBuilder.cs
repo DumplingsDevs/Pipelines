@@ -16,6 +16,8 @@ internal class ExceptionsBuilder
     private void BuildExceptions()
     {
         _builder.AppendLine(@"
+using System;
+
 internal class CannotCreateDispatcherWrapperException : Exception
 {
     private const string ErrorMessage = ""Could not create wrapper type for {0}. Please create issue on https://github.com/DumplingsDevs/Pipelines"";
