@@ -99,9 +99,9 @@ public class PipelinesBenchmark
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
             .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
                 assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-            .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
-            .WithClosedTypeDecorators(x =>
+            .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorator(typeof(TracingDecorator<,>))
+            .WithDecorators(x =>
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();
@@ -140,9 +140,9 @@ public class PipelinesBenchmark
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
             .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
                 assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-            .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
-            .WithClosedTypeDecorators(x =>
+            .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorator(typeof(TracingDecorator<,>))
+            .WithDecorators(x =>
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();

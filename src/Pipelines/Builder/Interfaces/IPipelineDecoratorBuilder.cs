@@ -12,11 +12,11 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException">The decorator's constructor does not have the required handler dependency (either it's missing or invalid). See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#constructorvalidationexception">documentation</a> for troubleshooting details.</exception>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException">The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types. See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#interfaceimplementationexception">documentation</a> for troubleshooting details.</exception>
-    public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator);
+    public IPipelineDecoratorBuilder WithDecorator(Type genericDecorator);
 
-    /// <inheritdoc cref="WithOpenTypeDecorator(Type)"/>
+    /// <inheritdoc cref="WithDecorator"/>
     /// <param name="decoratorOptions">The Options for registering decorators</param>
-    public IPipelineDecoratorBuilder WithOpenTypeDecorator(DecoratorOptions decoratorOptions, Type genericDecorator);
+    public IPipelineDecoratorBuilder WithDecorator(DecoratorOptions decoratorOptions, Type genericDecorator);
 
     /// <summary>
     /// Registers a closed type decorator to the pipeline.
@@ -25,11 +25,11 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException">The decorator's constructor does not have the required handler dependency (either it's missing or invalid). See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#constructorvalidationexception">documentation</a> for troubleshooting details.</exception>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException">The decorator class is not implementing the expected interface, leading to a type mismatch between the expected and actual generic types. See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#interfaceimplementationexception">documentation</a> for troubleshooting details.</exception>
-    IPipelineDecoratorBuilder WithClosedTypeDecorator<T>();
+    IPipelineDecoratorBuilder WithDecorator<T>();
     
-    /// <inheritdoc cref="WithClosedTypeDecorator{T}()"/>
+    /// <inheritdoc cref="WithDecorator{T}"/>
     /// <param name="decoratorOptions">The Options for registering decorators</param>
-    IPipelineDecoratorBuilder WithClosedTypeDecorator<T>(DecoratorOptions decoratorOptions);
+    IPipelineDecoratorBuilder WithDecorator<T>(DecoratorOptions decoratorOptions);
 
     /// <summary>
     /// Registers multiple closed type decorators to the pipeline.
@@ -39,11 +39,11 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException"></exception>
-    IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
+    IPipelineDecoratorBuilder WithDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies);
 
-    /// <inheritdoc cref="WithClosedTypeDecorators(Action{IPipelineClosedTypeDecoratorBuilder}, Assembly[])"/>
+    /// <inheritdoc cref="WithDecorators"/>
     /// <param name="decoratorOptions">The Options for registering decorators</param>
-    IPipelineDecoratorBuilder WithClosedTypeDecorators(DecoratorOptions decoratorOptions,
+    IPipelineDecoratorBuilder WithDecorators(DecoratorOptions decoratorOptions,
         Action<IPipelineClosedTypeDecoratorBuilder> action, params Assembly[] assemblies);
 }

@@ -21,9 +21,9 @@ public class Tests
             .AddHandler(typeof(IRequestHandler<,>), assembly)
             .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
                 assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-            .WithOpenTypeDecorator(typeof(TracingDecorator<,>))
-            .WithClosedTypeDecorators(x =>
+            .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorator(typeof(TracingDecorator<,>))
+            .WithDecorators(x =>
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();

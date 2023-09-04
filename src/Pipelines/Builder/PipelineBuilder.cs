@@ -92,23 +92,23 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineDecoratorBuilder WithOpenTypeDecorator(Type genericDecorator)
+    public IPipelineDecoratorBuilder WithDecorator(Type genericDecorator)
     {
-        return WithOpenTypeDecorator(new DecoratorOptions(), genericDecorator);
+        return WithDecorator(new DecoratorOptions(), genericDecorator);
     }
 
-    public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>()
+    public IPipelineDecoratorBuilder WithDecorator<T>()
     {
-        return WithClosedTypeDecorator<T>(new DecoratorOptions());
+        return WithDecorator<T>(new DecoratorOptions());
     }
 
-    public IPipelineDecoratorBuilder WithClosedTypeDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
+    public IPipelineDecoratorBuilder WithDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        return WithClosedTypeDecorators(new DecoratorOptions(), action, assemblies);
+        return WithDecorators(new DecoratorOptions(), action, assemblies);
     }
 
-    public IPipelineDecoratorBuilder WithOpenTypeDecorator(DecoratorOptions decoratorOptions, Type genericDecorator)
+    public IPipelineDecoratorBuilder WithDecorator(DecoratorOptions decoratorOptions, Type genericDecorator)
     {
         if (decoratorOptions.StrictMode)
         {
@@ -119,7 +119,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineDecoratorBuilder WithClosedTypeDecorator<T>(DecoratorOptions decoratorOptions)
+    public IPipelineDecoratorBuilder WithDecorator<T>(DecoratorOptions decoratorOptions)
     {
         var decoratorType = typeof(T);
         if (decoratorOptions.StrictMode)
@@ -131,7 +131,7 @@ public class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuilde
         return this;
     }
 
-    public IPipelineDecoratorBuilder WithClosedTypeDecorators(DecoratorOptions decoratorOptions,
+    public IPipelineDecoratorBuilder WithDecorators(DecoratorOptions decoratorOptions,
         Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
