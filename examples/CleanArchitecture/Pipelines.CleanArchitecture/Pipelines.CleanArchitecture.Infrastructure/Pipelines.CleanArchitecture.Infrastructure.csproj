@@ -12,6 +12,7 @@
       <PackageReference Include="FluentValidation" Version="11.7.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
       <PackageReference Include="Scrutor" Version="4.2.2" />
     </ItemGroup>
 

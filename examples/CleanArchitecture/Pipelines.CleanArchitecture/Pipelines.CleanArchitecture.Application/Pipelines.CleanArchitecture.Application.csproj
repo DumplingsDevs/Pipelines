@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Pipelines.CleanArchitecture.Domain\Pipelines.CleanArchitecture.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="11.7.1" />
+    </ItemGroup>
+
 </Project>

@@ -19,11 +19,18 @@ public static class Extensions
             .AddDispatcher<ICommandDispatcher>(infrastructureAssembly)
             .WithDecorator(typeof(FluentValidationCommandDecorator<>))
             .WithDecorator(typeof(ValidationCommandDecorator<>))
+            .WithDecorator(typeof(UnitOfWorkCommandDecorator<>))
             .Build();
         
         services.Scan(s => s.FromAssemblies(commandsAssembly)
             .AddClasses(classes =>
                 classes.AssignableTo(typeof(IValidator<>)).Where(_ => !_.IsGenericType))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+        
+        services.Scan(s => s.FromAssemblies(commandsAssembly)
+            .AddClasses(classes =>
+                classes.AssignableTo(typeof(ICommandValidator<>)).Where(_ => !_.IsGenericType))
             .AsImplementedInterfaces()
             .WithScopedLifetime());
     }

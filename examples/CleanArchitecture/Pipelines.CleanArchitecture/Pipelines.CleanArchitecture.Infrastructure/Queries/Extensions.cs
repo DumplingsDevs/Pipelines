@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.CleanArchitecture.Abstractions.Queries;
 using Pipelines.CleanArchitecture.Application;
@@ -14,9 +15,15 @@ public static class Extensions
 
         services.AddPipeline()
             .AddInput(typeof(IQuery<>))
-            .AddHandler(typeof(IQueryHandler<,>), queryAssembly)
+            .AddHandler(typeof(IQueryHandler<,>), infrastructureAssembly)
             .AddDispatcher<IQueryDispatcher>(infrastructureAssembly)
             .WithDecorator(typeof(FluentValidationQueryDecorator<,>))
             .Build();
+        
+        services.Scan(s => s.FromAssemblies(queryAssembly)
+            .AddClasses(classes =>
+                classes.AssignableTo(typeof(IValidator<>)).Where(_ => !_.IsGenericType))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
     }
 }

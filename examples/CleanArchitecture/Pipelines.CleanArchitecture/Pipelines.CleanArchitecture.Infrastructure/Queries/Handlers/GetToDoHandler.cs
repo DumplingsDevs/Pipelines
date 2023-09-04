@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Pipelines.CleanArchitecture.Abstractions.Queries;
 using Pipelines.CleanArchitecture.Application.Queries;
+using Pipelines.CleanArchitecture.Application.Queries.GetToDo;
 using Pipelines.CleanArchitecture.Infrastructure.Persistance;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Queries.Handlers;

@@ -8,6 +8,8 @@ public class ToDoEntityConfiguration: IEntityTypeConfiguration<ToDo>
 {
     public void Configure(EntityTypeBuilder<ToDo> builder)
     {
+        builder.ToTable("ToDo");
+        
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Title);
 

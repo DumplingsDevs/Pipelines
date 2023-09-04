@@ -17,6 +17,7 @@ builder.Services.AddDomainEvents();
 builder.Services.AddPersistence();
 
 var app = builder.Build();
+DatabaseCreator.CreateDatabaseSchema(app.Services);
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

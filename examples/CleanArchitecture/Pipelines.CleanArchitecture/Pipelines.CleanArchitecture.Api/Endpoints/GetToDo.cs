@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Pipelines.CleanArchitecture.Abstractions.Queries;
 using Pipelines.CleanArchitecture.Application.Queries;
+using Pipelines.CleanArchitecture.Application.Queries.GetToDo;
 
 namespace Pipelines.CleanArchitecture.Api.Endpoints;
 
