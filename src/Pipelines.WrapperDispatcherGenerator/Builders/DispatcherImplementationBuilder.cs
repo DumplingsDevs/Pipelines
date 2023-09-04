@@ -189,7 +189,7 @@ internal class DispatcherImplementationBuilder
 
     private string GetDispatcherMethodParametersTypeName()
     {
-        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} {p.Name}"));
+        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} @{p.Name}"));
     }
 
     private void BuildClassDefinition()
@@ -232,7 +232,7 @@ internal class DispatcherImplementationBuilder
         var hasMultipleResults = dispatcherResults.Count > 1;
         var hasResponse = dispatcherResults.Count > 0;
         var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
-        var inputParameterName = _dispatcherMethod.Parameters.First().Name;
+        var inputParameterName = $"@{_dispatcherMethod.Parameters.First().Name}";
 
         AddLine("public",
             AsyncModified(dispatcherHandlerMethod),
@@ -315,7 +315,7 @@ internal class DispatcherImplementationBuilder
 
     private static string GenerateMethodParameters(IMethodSymbol methodSymbol)
     {
-        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
+        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} @{p.Name}"));
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
