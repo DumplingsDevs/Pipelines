@@ -192,6 +192,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 ------
 - [Conventions](docs/conventions.md)
 - [Key Concepts](docs/key_concepts.md)
+- [Benchmarks](docs/benchmarks.md)
 - [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Code examples](docs/code_examples.md)
 - [Configuration](docs/configuration.md)
