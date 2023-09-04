@@ -213,4 +213,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 - [ ] **Decorator Performance Optimization**: Improve performance, especially concerning the use of `ActivatorUtilities.CreateInstance()`.
 
 # 🥟💡 The Dumplings Behind the Magic
-Hey there! We're Dumplings Devs, made up of `Mateusz Wróblewski` and `Kamil Bytner`. We're passionate about software and always up for a coding challenge. 
+Hey there! We're Dumplings Devs, made up of <a href="https://pl.linkedin.com/in/matwroblewski">Mateusz Wróblewski</a> and <a href="https://pl.linkedin.com/in/kamil-bytner">Kamil Bytner</a>. We're passionate about software and always up for a coding challenge. 
+
+
+
