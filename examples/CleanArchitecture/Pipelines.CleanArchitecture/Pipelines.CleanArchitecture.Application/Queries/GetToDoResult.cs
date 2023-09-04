@@ -1,3 +1,3 @@
 namespace Pipelines.CleanArchitecture.Application.Queries;
 
-public record GetToDo(Guid Id);
+public record GetToDoResult(Guid Id, string Title);
