@@ -1,10 +1,15 @@
 using Pipelines.CleanArchitecture.Api;
+using Pipelines.CleanArchitecture.Api.Extensions;
 using Pipelines.CleanArchitecture.Infrastructure.Commands;
 using Pipelines.CleanArchitecture.Infrastructure.DomainEvents;
 using Pipelines.CleanArchitecture.Infrastructure.Persistance;
 using Pipelines.CleanArchitecture.Infrastructure.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddApiVersioningConfiguration();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddCommands();
 builder.Services.AddQueries();
