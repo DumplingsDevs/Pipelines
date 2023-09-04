@@ -6,7 +6,7 @@ namespace Pipelines.CleanArchitecture.Infrastructure.DomainEvents;
 
 public static class Extensions
 {
-    public static void AddCommands(this IServiceCollection services)
+    public static void AddDomainEvents(this IServiceCollection services)
     {
         var infrastructureAssembly = typeof(Extensions).Assembly;
         var commandsAssembly = typeof(ApplicationMarker).Assembly;

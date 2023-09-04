@@ -2,7 +2,7 @@ using Pipelines.CleanArchitecture.Abstractions.DomainEvents;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.DomainEvents;
 
-public class DomainEventsDispatcher : IDomainEventsDispatcher
+internal class DomainEventsDispatcher : IDomainEventsDispatcher
 {
     private readonly IDomainEventDispatcher _domainEventDispatcher;
 

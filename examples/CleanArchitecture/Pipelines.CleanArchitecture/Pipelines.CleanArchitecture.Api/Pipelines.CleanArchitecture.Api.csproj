@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Pipelines.CleanArchitecture.Abstractions\Pipelines.CleanArchitecture.Abstractions.csproj" />
       <ProjectReference Include="..\Pipelines.CleanArchitecture.Application\Pipelines.CleanArchitecture.Application.csproj" />
+      <ProjectReference Include="..\Pipelines.CleanArchitecture.Infrastructure\Pipelines.CleanArchitecture.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
