@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Pipelines.CleanArchitecture.Abstractions\Pipelines.CleanArchitecture.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>

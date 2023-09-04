@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture", "Pipelines.CleanArchitecture\Pipelines.CleanArchitecture.csproj", "{CC435168-90BE-4B33-8B4E-81C7ABE8A43F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture.Domain", "Pipelines.CleanArchitecture.Domain\Pipelines.CleanArchitecture.Domain.csproj", "{CC435168-90BE-4B33-8B4E-81C7ABE8A43F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture.Abstractions", "Pipelines.CleanArchitecture.Abstractions\Pipelines.CleanArchitecture.Abstractions.csproj", "{BB714B4D-E8AE-4201-9E54-24AB0CF8E9BD}"
 EndProject
