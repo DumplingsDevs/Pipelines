@@ -163,7 +163,7 @@ _services
     .AddInput(typeof(IInput<>))
             .AddHandler(typeof(IHandler<,>), handlersAssembly)
             .AddDispatcher<IDispatcher>(dispatcherAssembly)
-              .WithOpenTypeDecorator(typeof(LoggingDecorator<,>));
+              .WithDecorator(typeof(LoggingDecorator<,>));
 ```
 
 </details>

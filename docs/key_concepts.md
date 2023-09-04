@@ -179,8 +179,8 @@ There is a lot of ways how to register Closed Types Decorators:
 
 ```cs
 .AddDispatcher<IDispatcher>(dispatcherAssembly)
-    .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-            .WithClosedTypeDecorators(x =>
+    .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorators(x =>
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();
