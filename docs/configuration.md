@@ -28,7 +28,7 @@ Choose the type of Dispatcher your application would like to use:
 
 ### 1.2 DecoratorOptions
 
-Decorator options can be set using the `WithOpenTypeDecorator()` and `WithClosedTypeDecorator()` methods.
+Decorator options can be set using the `WithDecorator()` and `WithDecorators()` methods.
 
 #### 1.2.1 StrictMode
 

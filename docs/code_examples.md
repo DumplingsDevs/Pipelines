@@ -34,8 +34,8 @@ _services
     .AddInput(typeof(IInput<>))
             .AddHandler(typeof(IHandler<,>), handlersAssembly)
             .AddDispatcher<IDispatcher>(dispatcherAssembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
-            .WithClosedTypeDecorators(x =>
+            .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorators(x =>
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();

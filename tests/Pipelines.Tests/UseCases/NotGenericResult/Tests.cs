@@ -20,7 +20,7 @@ public class Tests
             .AddHandler(typeof(IHandler<>), assembly)
             .AddDispatcher<IDispatcher>(
                 new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<>)));
+            .WithDecorator(typeof(LoggingDecorator<>)));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
 

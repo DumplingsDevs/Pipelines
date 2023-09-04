@@ -13,7 +13,7 @@ public class SharedLibraryTest
             .AddHandler(typeof(IHandlerShared<,>), handlerAssembly)
             .AddDispatcher<IDispatcherShared>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
                 typeof(SharedLibraryTest).Assembly)
-            .WithOpenTypeDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorator(typeof(LoggingDecorator<,>))
             .Build();
     }
 }
