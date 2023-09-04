@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Pipelines.CleanArchitecture.Abstractions.Commands;
 using Pipelines.CleanArchitecture.Abstractions.DomainEvents;
 using Pipelines.CleanArchitecture.Application;
 
