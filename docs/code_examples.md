@@ -707,7 +707,7 @@ public class LoggingDecorator<TInput> : IHandler<TInput>
 In this repository, you'll find a fully functional project adhering to the principles of Clean Architecture that utilizes Pipelines.
 Want a quick dive into how Pipelines function? Simply download the example to your local computer, open it in your IDE, and hit 'Run'. No extra setup required. There are two exposed routes for you to play with and debug.
 
-Check out the <a href=""> Repository </a>
+Check out the <a href="ttps://github.com/DumplingsDevs/Pipelines/tree/main/examples/CleanArchitecture/Pipelines.CleanArchitecture"> Repository </a>
 
 In the example, you'll discover how to use three distinct Pipelines:
 
