@@ -17,6 +17,7 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
   - [3.2 Generic result](#32-generic-result)
   - [3.3 Generic Tuple result](#33-generic-tuple-result)
   - [3.4 No generic result](#34-no-generic-result)
+- [4. Example project](#4-example-project)
 
 ------
 
@@ -700,4 +701,19 @@ public class LoggingDecorator<TInput> : IHandler<TInput>
 [Unit tests](../tests/Pipelines.Tests/UseCases/SyncNotGenericResult/)
 
 -----
+
+## 4. Example project
+
+In this repository, you'll find a fully functional project adhering to the principles of Clean Architecture that utilizes Pipelines.
+
+Check out the <a href=""> Repository </a>
+
+In the example, you'll discover how to use three distinct Pipelines:
+
+- **Query**: This includes the capability to validate query parameters using Fluent Validator.
+
+- **Command**: Apart from validating command parameters with Fluent Validator, it also validates other business rules with a separate validator and integrates a Unit of Work decorator.
+
+- **Domain Events**: This pipeline doesn't employ any decorators.
+
 
