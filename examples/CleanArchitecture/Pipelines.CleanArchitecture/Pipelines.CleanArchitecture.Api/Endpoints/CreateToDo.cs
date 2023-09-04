@@ -8,7 +8,7 @@ public static partial class Endpoint
 {
     public static void CreateToDoEndpoint(this WebApplication app)
     {
-        app.MapPost("/toDo", async (CreateToDoCommand command, [FromServices] ICommandDispatcher commandDispatcher, CancellationToken token) =>
+        app.MapPost("/toDo", async (CreateToDoCommand command, ICommandDispatcher commandDispatcher, CancellationToken token) =>
         {
             var result = await commandDispatcher.SendAsync(command,token);
             return Results.Ok(result);

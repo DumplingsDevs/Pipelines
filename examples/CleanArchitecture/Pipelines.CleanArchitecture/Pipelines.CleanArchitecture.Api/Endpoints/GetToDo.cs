@@ -9,7 +9,7 @@ public static partial class Endpoint
     public static void GetToDoEndpoint(this WebApplication app)
     {
         app.MapGet("/toDo/{id:guid}",
-            async ([FromServices] IQueryDispatcher queryDispatcher, Guid id, CancellationToken token) =>
+            async (IQueryDispatcher queryDispatcher, Guid id, CancellationToken token) =>
             {
                 var query = new GetToDoQuery(id);
 

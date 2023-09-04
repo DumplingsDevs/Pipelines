@@ -14,6 +14,7 @@ public static class Extensions
         services.AddPipeline()
             .AddInput(typeof(ICommand))
             .AddHandler(typeof(ICommandHandler<>), commandsAssembly)
-            .AddDispatcher<ICommandDispatcher>(infrastructureAssembly);
+            .AddDispatcher<ICommandDispatcher>(infrastructureAssembly)
+            .Build();
     }
 }

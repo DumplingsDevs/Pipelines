@@ -14,6 +14,7 @@ public static class Extensions
         services.AddPipeline()
             .AddInput(typeof(IQuery<>))
             .AddHandler(typeof(IQueryHandler<,>), queryAssembly)
-            .AddDispatcher<IQueryDispatcher>(infrastructureAssembly);
+            .AddDispatcher<IQueryDispatcher>(infrastructureAssembly)
+            .Build();
     }
 }
