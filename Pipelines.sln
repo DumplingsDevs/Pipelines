@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-6
 		docs\adr.md = docs\adr.md
 		docs\configuration.md = docs\configuration.md
 		docs\dispatcher_source_generator.md = docs\dispatcher_source_generator.md
+		docs\benchmarks.md = docs\benchmarks.md
 	EndProjectSection
 EndProject
 Global
