@@ -11,8 +11,9 @@ In this section of the documentation, you'll learn about the core components of 
   - [1.2 Handler](#12-handler)
   - [1.3 Dispatcher](#13-dispatcher)
   - [1.4 Decorators](#14-decorators)
-- [2. Multiple handlers for same Input](#2-multiple-handlers-for-the-same-input)
-- [3. Execution Flow](#3-execution-flow)
+- [2. Constraints on type parameters](#2-constraints-on-type-parameters)
+- [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
+- [4. Execution Flow](#4-execution-flow)
 ------
 
 ## 1 Building blocks
@@ -239,7 +240,15 @@ public class
     }
 ```
 
-## 2. Multiple handlers for the same Input
+## 2. Constraints on type parameters
+Pipelines supports constraints in inputs and results but it's not mandatory. 
+
+Examples:
+```csharp
+public interface IHandler<in TInput> where TInput : class, IInput { }
+public interface IHandler<in TInput> where TInput : IInput { }
+```
+## 3. Multiple handlers for the same Input
 In situations where you have multiple handlers for a single type of input, the dispatcher will execute each one, including their associated decorators. This use case is highly likely when you are creating a Pipeline for Domain Event Execution.
 
 **Warning** - This situation is supported only, when dispatcher does not return value!
@@ -273,7 +282,7 @@ In situations where you have multiple handlers for a single type of input, the d
                           ▼                             ▼
 ```
 
-## 3. Execution Flow
+## 4. Execution Flow
 
 1. An Input is dispatched using the Dispatcher.
 
