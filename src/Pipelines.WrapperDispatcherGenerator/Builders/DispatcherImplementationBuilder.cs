@@ -189,7 +189,7 @@ internal class DispatcherImplementationBuilder
 
     private string GetDispatcherMethodParametersTypeName()
     {
-        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} {p.Name}"));
+        return string.Join(", ", _dispatcherMethod.Parameters.Skip(1).Select(p => $"{p.Type} @{p.Name}"));
     }
 
     private void BuildClassDefinition()
@@ -211,14 +211,18 @@ internal class DispatcherImplementationBuilder
         var handlerTypes = handlerRepositories.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).GetHandlers();
         foreach (var handlerType in handlerTypes)
         {{
-            var genericArguments = handlerType.GetInterfaces()
-                .Single(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType.GetNameWithNamespace()}<{wrapperGenericString}>))
-                .GetGenericArguments();
-            var requestType = genericArguments[0];
-            var wrapperType = typeof({_dispatcherInterfaceName}RequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
-            var wrapper = Activator.CreateInstance(wrapperType) ??
-                          throw new CannotCreateDispatcherWrapperException(requestType);
-            _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;
+            var handlers = handlerType.GetInterfaces()
+                .Where(i => i.GetGenericTypeDefinition() == typeof({_pipelineConfig.HandlerType.GetNameWithNamespace()}<{wrapperGenericString}>))
+                .ToList();
+            foreach (var handler in handlers)
+            {{
+                var genericArguments = handler.GetGenericArguments();
+                var requestType = genericArguments[0];
+                var wrapperType = typeof({_dispatcherInterfaceName}RequestHandlerWrapperImpl<{wrapperGenericString}>).MakeGenericType(genericArguments);
+                var wrapper = Activator.CreateInstance(wrapperType) ??
+                              throw new CannotCreateDispatcherWrapperException(requestType);
+                _handlers[requestType] = ({_dispatcherInterfaceName}RequestHandlerBase)wrapper;
+            }}
         }}
     }}
 ");
@@ -232,7 +236,7 @@ internal class DispatcherImplementationBuilder
         var hasMultipleResults = dispatcherResults.Count > 1;
         var hasResponse = dispatcherResults.Count > 0;
         var asyncModifier = handlerMethod.IsAsync() ? "await" : "";
-        var inputParameterName = _dispatcherMethod.Parameters.First().Name;
+        var inputParameterName = $"@{_dispatcherMethod.Parameters.First().Name}";
 
         AddLine("public",
             AsyncModified(dispatcherHandlerMethod),
@@ -315,7 +319,7 @@ internal class DispatcherImplementationBuilder
 
     private static string GenerateMethodParameters(IMethodSymbol methodSymbol)
     {
-        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} {p.Name}"));
+        return string.Join(", ", methodSymbol.Parameters.Select(p => $"{p.Type} @{p.Name}"));
     }
 
     // <Sample.ExampleCommand, Sample.ExampleRecordCommandResult, Sample.ExampleCommandClassResult>
@@ -390,7 +394,7 @@ internal class DispatcherImplementationBuilder
 
     private string GetParametersString(IMethodSymbol method, int skip)
     {
-        return string.Join(", ", method.Parameters.Skip(skip).Select(x => x.Name));
+        return string.Join(", ", method.Parameters.Skip(skip).Select(x => $"@{x.Name}"));
     }
 
     static string GenerateCommasForGenericParameters(int n)

@@ -61,7 +61,10 @@ internal static class Extensions
     private static void AddHandlerWithCompatibleDecorators(IServiceCollection serviceCollection, Type handlerType,
         IEnumerable<Type> compatibleDecorators, Type genericTypeInterface)
     {
-        serviceCollection.AddScoped(handlerType);
+        if (serviceCollection.All(x => x.ServiceType != handlerType))
+        {
+            serviceCollection.AddScoped(handlerType);
+        }
 
         var lastDecorator = DecorateRecursively(serviceCollection, handlerType, genericTypeInterface, new Queue<Type>(compatibleDecorators));
 
@@ -85,7 +88,7 @@ internal static class Extensions
 
         if (decoratorType.IsGenericType)
         {
-            var genericArguments = decoratedType.GetInterfaces().First(type => TypeNamespaceComparer.CompareWithoutFullName(type, genericTypeInterface)).GetGenericArguments();
+            var genericArguments = decoratedType.GetInterfaces().First(type => type.AssemblyQualifiedName == genericTypeInterface.AssemblyQualifiedName).GetGenericArguments();
             var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
             var closedImplementationFactory = DecoratorFactory.CreateDecorator(decoratedType, closedDecorator);

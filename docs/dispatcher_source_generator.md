@@ -7,29 +7,43 @@ generators.
 This section provides an in-depth exploration of both Dispatcher Proxy and WrapperDispatcherGenerator, describing their
 functionalities, key features, and practical applications.
 
-## Dispatcher Proxy
+---
 
-### Description
+## Table of Contents
+
+- [1. Dispatcher Proxy](#1-dispatcher-proxy)
+  - [1.1 Description](#11-description)
+  - [1.2 Key Features](#12-key-features)
+- [2. WrapperDispatcherGenerator](#2-wrapperdispatchergenerator)
+  - [2.1 Description](#21-description)
+  - [2.2 Key Features](#22-key-features)
+- [3. Comparison](#3-comparison)
+-----
+
+
+## 1. Dispatcher Proxy
+
+### 1.1 Description
 
 Dispatcher Proxy is a mechanism that allows for dynamic redirection of method calls to objects that handle specific
 inputs in the Pipelines architecture. It is used to handle inputs and route them to the appropriate handlers
 dynamically.
 
-### Key Features
+### 1.2 Key Features
 
 - **Dynamic Redirection**: Dispatcher Proxy enables dynamic redirection of calls to handlers based on the type of input.
 - **Flexibility**: The Proxy uses reflection and can handle various types of inputs, making it a flexible solution for
   managing different types of inputs.
 
-## WrapperDispatcherGenerator
+## 2. WrapperDispatcherGenerator
 
-### Description
+### 2.1 Description
 
 The WrapperDispatcherGenerator is a crucial component of the Pipelines framework that automates the generation of
 dispatchers during the build process. This source generator analyzes your Pipelines configuration and creates optimized
 dispatcher code tailored to your project's needs that handles the routing of inputs to handlers.
 
-### Key Features
+### 2.2 Key Features
 
 1. **Static Code Analysis**: When you build your project, the WrapperDispatcherGenerator performs static code analysis.
    It examines your Pipelines configuration, including registered inputs, handlers, and dispatchers.
@@ -48,7 +62,7 @@ dispatcher code tailored to your project's needs that handles the routing of inp
 5. **Enhanced Performance**: The generated dispatchers are optimized for performance, as they eliminate the need for
    reflection-based dispatching, resulting in faster request handling.
 
-## Comparison
+## 3. Comparison
 
 - **Flexibility vs. Performance**: The Proxy dispatcher is flexible and suitable for scenarios where the configuration
   is
