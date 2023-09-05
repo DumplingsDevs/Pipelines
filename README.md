@@ -192,6 +192,7 @@ public static void CreateExampleEndpoint(this WebApplication app)
 ------
 - [Conventions](docs/conventions.md)
 - [Key Concepts](docs/key_concepts.md)
+- [Benchmarks](docs/benchmarks.md)
 - [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Code examples](docs/code_examples.md)
 - [Configuration](docs/configuration.md)
@@ -206,8 +207,11 @@ public static void CreateExampleEndpoint(this WebApplication app)
 
 # 🛤 Roadmap
 - [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
-- [ ] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
 - [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
+- [ ] **Support for Nullable Results**: Add functionality to handle nullable result types.
+- [ ] **Configurable Dispatcher Behavior**: Implement configuration settings to decide if the dispatcher should throw an exception in case there's no handler for a given Input.
+- [ ] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
+- [ ] **Multiple Inputs in Dispatcher**: Enhance the dispatcher handle method to accept a list of inputs instead of just one.
 - [ ] **Parallel Pipeline**: Introduce a pipeline to facilitate parallel execution of multiple handlers.
 - [ ] **Stream Pipeline**: Implement support for streaming pipelines.
 - [ ] **Decorator Performance Optimization**: Improve performance, especially concerning the use of `ActivatorUtilities.CreateInstance()`.
