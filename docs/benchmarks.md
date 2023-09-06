@@ -3,6 +3,16 @@
 In this section, you'll find comprehensive benchmark results that compare Pipelines in different configuration comparing
 to other libraries.
 
+---
+## Table of Contents
+
+- [1. Benchmarking Pipelines: Emulating Real-World Application Scenarios](#1-benchmarking-pipelines-emulating-real-world-application-scenarios)
+  - [1.1 Configuration](#11-configuration)
+  - [1.2 Benchmark methods](#12-benchmark-methods)
+  - [1.3 Results](#13-results)
+
+---
+
 ## 1. Benchmarking Pipelines: Emulating Real-World Application Scenarios
 
 In order to rigorously evaluate the performance and efficiency of the Pipelines library, we have designed a
@@ -51,3 +61,19 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | PipelinesReflection                      |  39.550 μs | 0.2030 μs | 0.1799 μs |  5.27 |    0.04 |    4 |  6.3477 | 0.0610 |     39 KB |        2.19 |
 | WrapperDispatcherGeneratorWithDecorators | 129.368 μs | 2.5578 μs | 4.7411 μs | 17.10 |    1.07 |    5 |  9.7656 | 4.8828 |  60.08 KB |        3.37 |
 | PipelinesReflectionWithDecorators        | 160.350 μs | 1.0823 μs | 0.9595 μs | 21.36 |    0.19 |    6 | 13.4277 | 6.5918 |   82.3 KB |        4.61 |
+
+Based on the benchmark results, it is evident that the **WrapperDispatcherGenerator** method stands out as the fastest among
+the tested options.
+
+However, an interesting observation arises when we examine the performance of the
+**WrapperDispatcherGeneratorWithDecorators** method, which is noticeably slower than MediatRWithBehaviours, despite the
+better performance without decorators. This performance gap can be attributed to the use of
+ActivatorUtilities.CreateInstance and the registration of decorators through implementationFactory in dependency
+injection, which introduces
+overhead compared to the more streamlined approach employed by MediatR.
+
+In our roadmap, we have plans to address this performance discrepancy and optimize the
+**WrapperDispatcherGeneratorWithDecorators** method. Our goal is to enhance the efficiency of Pipelines, ensuring that it
+remains competitive with other solutions like **MediatRWithBehaviours** while still offering the flexibility and
+extensibility that decorators provide.
+
