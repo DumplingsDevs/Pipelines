@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Pipelines.Benchmarks.Sample.Mediator.Behaviours;
 
-public class ExampleRequestBehaviourThree<TInput, TResult> : IPipelineBehavior<TInput, TResult> where TInput : MediatorExampleRequest200
+public class ExampleRequestBehaviourThree<TInput, TResult> : IPipelineBehavior<TInput, TResult>
 {
     private readonly DecoratorsState _state;
 

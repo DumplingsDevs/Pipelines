@@ -22,57 +22,68 @@ public class PipelinesBenchmark
     private IServiceProvider _pipelinesReflectionWithDecoratorsProvider = null!;
     private IServiceProvider _mediatorProvider = null!;
     private IServiceProvider _mediatorWithBehavioursProvider = null!;
+
     private readonly List<Types.IRequest<ExampleCommandResult>> _pipelinesRequests = new()
     {
-        new ExampleRequest("My test request"),
-        new ExampleRequest10("My test request 10"),
-        new ExampleRequest20("My test request 20"),
-        new ExampleRequest30("My test request 30"),
-        new ExampleRequest40("My test request 40"),
-        new ExampleRequest50("My test request 50"),
-        new ExampleRequest60("My test request 60"),
-        new ExampleRequest70("My test request 70"),
-        new ExampleRequest80("My test request 80"),
-        new ExampleRequest90("My test request 90"),
-        new ExampleRequest100("My test request 100"),
-        new ExampleRequest110("My test request 110"),
-        new ExampleRequest120("My test request 120"),
-        new ExampleRequest130("My test request 130"),
-        new ExampleRequest140("My test request 140"),
-        new ExampleRequest150("My test request 150"),
-        new ExampleRequest160("My test request 160"),
-        new ExampleRequest170("My test request 170"),
-        new ExampleRequest180("My test request 180"),
-        new ExampleRequest190("My test request 190"),
-        new ExampleRequest200("My test request 200"),
-    };
-    
-    private readonly List<MediatR.IRequest<ExampleCommandResult>> _mediatorRequests = new()
-    {
-        new MediatorExampleRequest("My test request"),
-        new MediatorExampleRequest10("My test request 10"),
-        new MediatorExampleRequest20("My test request 20"),
-        new MediatorExampleRequest30("My test request 30"),
-        new MediatorExampleRequest40("My test request 40"),
-        new MediatorExampleRequest50("My test request 50"),
-        new MediatorExampleRequest60("My test request 60"),
-        new MediatorExampleRequest70("My test request 70"),
-        new MediatorExampleRequest80("My test request 80"),
-        new MediatorExampleRequest90("My test request 90"),
-        new MediatorExampleRequest100("My test request 100"),
-        new MediatorExampleRequest110("My test request 110"),
-        new MediatorExampleRequest120("My test request 120"),
-        new MediatorExampleRequest130("My test request 130"),
-        new MediatorExampleRequest140("My test request 140"),
-        new MediatorExampleRequest150("My test request 150"),
-        new MediatorExampleRequest160("My test request 160"),
-        new MediatorExampleRequest170("My test request 170"),
-        new MediatorExampleRequest180("My test request 180"),
-        new MediatorExampleRequest190("My test request 190"),
-        new MediatorExampleRequest200("My test request 200"),
+        new ExampleRequest1("My test request 1"),
+        new ExampleRequest21("My test request 21"),
+        new ExampleRequest41("My test request 41"),
+        new ExampleRequest61("My test request 61"),
+        new ExampleRequest81("My test request 81"),
+        new ExampleRequest101("My test request 101"),
+        new ExampleRequest121("My test request 121"),
+        new ExampleRequest141("My test request 141"),
+        new ExampleRequest161("My test request 161"),
+        new ExampleRequest181("My test request 181"),
+        new ExampleRequest201("My test request 201"),
+        new ExampleRequest221("My test request 221"),
+        new ExampleRequest241("My test request 241"),
+        new ExampleRequest261("My test request 261"),
+        new ExampleRequest281("My test request 281"),
+        new ExampleRequest301("My test request 301"),
+        new ExampleRequest321("My test request 321"),
+        new ExampleRequest341("My test request 341"),
+        new ExampleRequest361("My test request 361"),
+        new ExampleRequest381("My test request 381"),
+        new ExampleRequest401("My test request 401"),
+        new ExampleRequest421("My test request 421"),
+        new ExampleRequest441("My test request 441"),
+        new ExampleRequest461("My test request 461"),
+        new ExampleRequest481("My test request 481"),
     };
 
-    [GlobalSetup(Targets = new string[] {nameof(WrapperDispatcherGenerator)})]
+
+    private readonly List<MediatR.IRequest<ExampleCommandResult>> _mediatorRequests = new()
+    {
+        new MediatorExampleRequest1("My test request 1"),
+        new MediatorExampleRequest21("My test request 21"),
+        new MediatorExampleRequest41("My test request 41"),
+        new MediatorExampleRequest61("My test request 61"),
+        new MediatorExampleRequest81("My test request 81"),
+        new MediatorExampleRequest101("My test request 101"),
+        new MediatorExampleRequest121("My test request 121"),
+        new MediatorExampleRequest141("My test request 141"),
+        new MediatorExampleRequest161("My test request 161"),
+        new MediatorExampleRequest181("My test request 181"),
+        new MediatorExampleRequest201("My test request 201"),
+        new MediatorExampleRequest221("My test request 221"),
+        new MediatorExampleRequest241("My test request 241"),
+        new MediatorExampleRequest261("My test request 261"),
+        new MediatorExampleRequest281("My test request 281"),
+        new MediatorExampleRequest301("My test request 301"),
+        new MediatorExampleRequest321("My test request 321"),
+        new MediatorExampleRequest341("My test request 341"),
+        new MediatorExampleRequest361("My test request 361"),
+        new MediatorExampleRequest381("My test request 381"),
+        new MediatorExampleRequest401("My test request 401"),
+        new MediatorExampleRequest421("My test request 421"),
+        new MediatorExampleRequest441("My test request 441"),
+        new MediatorExampleRequest461("My test request 461"),
+        new MediatorExampleRequest481("My test request 481"),
+    };
+
+
+    [GlobalSetup(Targets = new string[] { nameof(WrapperDispatcherGenerator) })]
     public void SetupPipelines()
     {
         var services = new ServiceCollection();
@@ -99,20 +110,16 @@ public class PipelinesBenchmark
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
             .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
                 assembly)
-            .WithDecorator(typeof(LoggingDecorator<,>))
-            .WithDecorator(typeof(TracingDecorator<,>))
-            .WithDecorators(x =>
-            {
-                x.WithImplementedInterface<IDecorator>();
-                x.WithInheritedClass<BaseDecorator>();
-                x.WithAttribute<DecoratorAttribute>();
-                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
-            }, assembly)
+            .WithDecorator(typeof(ExampleRequestDecoratorOne<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorTwo<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorThree<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorFourUniqueNameForSearch<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorFive<,>))
             .Build();
         servicesWithDecorators.AddSingleton<DecoratorsState>();
         _pipelinesWithDecoratorsProvider = servicesWithDecorators.BuildServiceProvider();
     }
-    
+
     [GlobalSetup(Target = nameof(PipelinesReflection))]
     public void SetupPipelinesReflection()
     {
@@ -140,15 +147,11 @@ public class PipelinesBenchmark
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
             .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
                 assembly)
-            .WithDecorator(typeof(LoggingDecorator<,>))
-            .WithDecorator(typeof(TracingDecorator<,>))
-            .WithDecorators(x =>
-            {
-                x.WithImplementedInterface<IDecorator>();
-                x.WithInheritedClass<BaseDecorator>();
-                x.WithAttribute<DecoratorAttribute>();
-                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
-            }, assembly)
+            .WithDecorator(typeof(ExampleRequestDecoratorOne<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorTwo<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorThree<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorFourUniqueNameForSearch<,>))
+            .WithDecorator(typeof(ExampleRequestDecoratorFive<,>))
             .Build();
         servicesWithDecorators.AddSingleton<DecoratorsState>();
         _pipelinesReflectionWithDecoratorsProvider = servicesWithDecorators.BuildServiceProvider();
@@ -173,8 +176,6 @@ public class PipelinesBenchmark
         var services = new ServiceCollection();
         services.AddSingleton<DecoratorsState>();
         services.AddMediatR(x => x.RegisterServicesFromAssembly(assembly))
-            .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
-            .AddScoped(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourOne<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourTwo<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExampleRequestBehaviourThree<,>))
@@ -184,14 +185,14 @@ public class PipelinesBenchmark
 
         _mediatorWithBehavioursProvider = services.BuildServiceProvider();
     }
-    
+
     [Benchmark]
     public async Task<List<ExampleCommandResult>> WrapperDispatcherGeneratorWithDecorators()
     {
         var dispatcher = _pipelinesWithDecoratorsProvider.GetRequiredService<IRequestDispatcher>();
 
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _pipelinesRequests)
         {
             var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
@@ -207,7 +208,7 @@ public class PipelinesBenchmark
         var dispatcher = _pipelinesProvider.GetRequiredService<IRequestDispatcher>();
 
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _pipelinesRequests)
         {
             var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
@@ -216,14 +217,14 @@ public class PipelinesBenchmark
 
         return responses;
     }
-    
+
     [Benchmark]
     public async Task<List<ExampleCommandResult>> PipelinesReflectionWithDecorators()
     {
         var dispatcher = _pipelinesReflectionWithDecoratorsProvider.GetRequiredService<IRequestDispatcher>();
 
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _pipelinesRequests)
         {
             var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
@@ -239,7 +240,7 @@ public class PipelinesBenchmark
         var dispatcher = _pipelinesReflectionProvider.GetRequiredService<IRequestDispatcher>();
 
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _pipelinesRequests)
         {
             var response = await dispatcher.SendAsync(pipelinesRequest, new CancellationToken());
@@ -253,7 +254,7 @@ public class PipelinesBenchmark
     public async Task<List<ExampleCommandResult>> MediatR()
     {
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _mediatorRequests)
         {
             using var scope = _mediatorProvider.CreateScope();
@@ -269,7 +270,7 @@ public class PipelinesBenchmark
     public async Task<List<ExampleCommandResult>> MediatRWithBehaviours()
     {
         var responses = new List<ExampleCommandResult>();
-        
+
         foreach (var pipelinesRequest in _mediatorRequests)
         {
             using var scope = _mediatorWithBehavioursProvider.CreateScope();
