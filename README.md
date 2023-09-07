@@ -1,4 +1,6 @@
-# Pipelines
+![Pipelines](docs/assets/pipelines_purple_512w.png#gh-light-mode-only)
+![Pipelines](docs/assets/pipelines_white_512w.png#gh-dark-mode-only)
+
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
 
