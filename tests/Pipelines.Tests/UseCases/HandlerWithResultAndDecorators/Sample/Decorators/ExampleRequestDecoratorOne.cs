@@ -3,7 +3,7 @@ using Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Types;
 namespace Pipelines.Tests.UseCases.HandlerWithResultAndDecorators.Sample.Decorators;
 
 public class
-    ExampleRequestDecoratorOne : IRequestHandler<ExampleRequest,
+    ExampleRequestDecoratorOne : BaseDecorator, IRequestHandler<ExampleRequest,
         ExampleCommandResult>, IDecorator
 {
     private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;

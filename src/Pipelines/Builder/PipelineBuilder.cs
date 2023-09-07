@@ -135,7 +135,9 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
         Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
-        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
+        var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies)
+            .Distinct()
+            .ToList();
 
         if (decoratorOptions.StrictMode)
         {
