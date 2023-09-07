@@ -1,6 +1,12 @@
-# Pipelines
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
+
+-----
+
+<p align="center">
+  <img src="docs/assets/pipelines_purple.svg#gh-light-mode-only" alt="Pipelines"/>
+  <img src="docs/assets/pipelines_white.svg#gh-dark-mode-only" alt="Pipelines"/>
+</p>
 
 ------
 
@@ -219,5 +225,9 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # 🥟💡 The Dumplings Behind the Magic
 Hey there! We're Dumplings Devs, made up of <a href="https://pl.linkedin.com/in/matwroblewski">Mateusz Wróblewski</a> and <a href="https://pl.linkedin.com/in/kamil-bytner">Kamil Bytner</a>. We're passionate about software and always up for a coding challenge. 
 
+---
 
-
+<p align="center">
+  <img src="docs/assets/dumplings_purple.svg#gh-light-mode-only" alt="DumplingsDevs"/>
+  <img src="docs/assets/dumplings_white.svg#gh-dark-mode-only" alt="DumplingsDevs"/>
+</p>
