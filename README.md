@@ -1,9 +1,13 @@
-![Pipelines](docs/assets/pipelines_purple.svg#gh-light-mode-only)
-![Pipelines](docs/assets/pipelines_white.svg#gh-dark-mode-only)
-
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
 
+![Pipelines](docs/assets/pipelines_purple.svg#gh-light-mode-only)
+![Pipelines](docs/assets/pipelines_white.svg#gh-dark-mode-only)
+
+<p align="center">
+  <img src="docs/assets/pipelines_purple.svg#gh-light-mode-only" alt="Pipelines"/>
+  <img src="docs/assets/pipelines_white.svg#gh-dark-mode-only" alt="Pipelines"/>
+</p>
 ------
 
 📝 <i>``` In almost every project I've been a part of, we had a set of reusable code that was used across multiple microservices. Each time, to maintain full control over types, I had to provide my own implementation for Commands, Queries, or Domain Events. This year was no different - a new client and once again the need to implement the same solution. That's why we decided to create 'Pipelines'.```</i>
