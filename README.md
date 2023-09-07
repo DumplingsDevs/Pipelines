@@ -225,6 +225,8 @@ public static void CreateExampleEndpoint(this WebApplication app)
 # 🥟💡 The Dumplings Behind the Magic
 Hey there! We're Dumplings Devs, made up of <a href="https://pl.linkedin.com/in/matwroblewski">Mateusz Wróblewski</a> and <a href="https://pl.linkedin.com/in/kamil-bytner">Kamil Bytner</a>. We're passionate about software and always up for a coding challenge. 
 
+---
+
 <p align="center">
   <img src="docs/assets/dumplings_purple.svg#gh-light-mode-only" alt="DumplingsDevs"/>
   <img src="docs/assets/dumplings_white.svg#gh-dark-mode-only" alt="DumplingsDevs"/>
