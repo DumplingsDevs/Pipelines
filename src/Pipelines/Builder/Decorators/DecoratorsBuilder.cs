@@ -11,6 +11,6 @@ internal static class DecoratorsBuilder
 
         action(builder);
         
-        return builder.GetDecoratorTypes().ToList();
+        return builder.GetDecoratorTypes().Distinct().ToList();
     }
 }
