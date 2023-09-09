@@ -47,7 +47,7 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
     {
         bool Predicate(Type t) => t.GetCustomAttribute(typeof(T)) != null;
         
-        var sorter = new DecoratorSorter<T>();
+        var sorter = new AttributeDecoratorSorter<T>();
         
         var filter = new DecoratorFilter(Predicate, sorter);
 
