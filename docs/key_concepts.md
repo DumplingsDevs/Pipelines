@@ -11,7 +11,7 @@ In this section of the documentation, you'll learn about the core components of 
   - [1.2 Handler](#12-handler)
   - [1.3 Dispatcher](#13-dispatcher)
   - [1.4 Decorators](#14-decorators)
-  - [1.4.1 WithAttributes]
+    - [1.4.1 WithAttributes](#141-withattribute)
 - [2. Constraints on type parameters](#2-constraints-on-type-parameters)
 - [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
 - [4. Execution Flow](#4-execution-flow)
