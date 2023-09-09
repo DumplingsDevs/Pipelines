@@ -1,11 +1,24 @@
 namespace Pipelines.Builder.Decorators;
 
 /// <summary>
-/// Allows to add sorting logic using OrderBy function.
+/// Allows to add sorting logic.
 /// </summary>
 /// <typeparam name="TSource"></typeparam>
 public interface IDecoratorSorter<out TSource>
 {
-    IDecoratorSorter<TSource> OrderBy(Func<TSource, object> func);
-    IDecoratorSorter<TSource> OrderByDescending(Func<TSource, object> func);
+    /// <summary>
+    /// Sorts the decorators in ascending order according to a key.
+    /// </summary>
+    /// <param name="keySelector">A function to extract a key from an element.</param>
+    /// <typeparam name="TKey">Selected key that will be used to sort decorators.</typeparam>
+    /// <returns></returns>
+    IDecoratorSorter<TSource> OrderBy<TKey>(Func<TSource, TKey> keySelector);
+    
+    /// <summary>
+    /// Sorts the decorators in descending order according to a key.
+    /// </summary>
+    /// <param name="keySelector">A function to extract a key from an element.</param>
+    /// <typeparam name="TKey">Selected key that will be used to sort decorators.</typeparam>
+    /// <returns></returns>
+    IDecoratorSorter<TSource> OrderByDescending<TKey>(Func<TSource, TKey> keySelector);
 }

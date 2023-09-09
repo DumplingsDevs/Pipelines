@@ -1,4 +1,5 @@
 using System.Reflection;
+using Pipelines.Builder.Decorators.Attributes;
 using Pipelines.Builder.Interfaces;
 using Pipelines.Utils;
 
@@ -46,9 +47,9 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
     public IDecoratorSorter<T> WithAttribute<T>() where T : Attribute
     {
         bool Predicate(Type t) => t.GetCustomAttribute(typeof(T)) != null;
-        
+
         var sorter = new AttributeDecoratorSorter<T>();
-        
+
         var filter = new DecoratorFilter(Predicate, sorter);
 
         _predicates.Add(filter);
@@ -68,6 +69,7 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
         return _predicates.SelectMany(x => _assemblies.SelectMany(y =>
             {
                 var enumerable = y.GetTypes().Where(x.Predicate);
+
                 if (x.DecoratorSorter is not null)
                 {
                     enumerable = x.DecoratorSorter.Sort(enumerable);
