@@ -11,6 +11,7 @@ In this section of the documentation, you'll learn about the core components of 
   - [1.2 Handler](#12-handler)
   - [1.3 Dispatcher](#13-dispatcher)
   - [1.4 Decorators](#14-decorators)
+  - [1.4.1 WithAttributes]
 - [2. Constraints on type parameters](#2-constraints-on-type-parameters)
 - [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
 - [4. Execution Flow](#4-execution-flow)
@@ -238,6 +239,43 @@ public class
 
         return result;
     }
+```
+
+#### 1.4.1 WithAttribute
+
+When registering decorators with attribute, it can be helpful to sort decorators with attribute value. To do that, there
+are `OrderBy` and `OrderByDescending` methods exposed in `WithAttribute` builder method:
+
+```csharp
+x.WithAttribute<DecoratorAttribute>().OrderBy(attr => attr.Index);
+
+x.WithAttribute<DecoratorAttribute>().OrderByDescending(attr => attr.Index);
+```
+
+Let's check example:
+```csharp
+public class DecoratorAttribute : Attribute
+{
+    public DecoratorAttribute(int index)
+    {
+        Index = index;
+    }
+
+    public int Index { get; }
+}
+```
+
+With this attribute you can define, which decorators should be trigger in specific order:
+```csharp
+[Decorator(1)]
+public class
+    FirstDecorator : IHandler<Input, InputResult>
+{ ... }
+
+[Decorator(2)]
+public class
+    SecondDecorator : IHandler<Input, InputResult>
+{ ... }
 ```
 
 ## 2. Constraints on type parameters
