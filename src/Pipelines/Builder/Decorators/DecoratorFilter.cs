@@ -1,6 +1,17 @@
 namespace Pipelines.Builder.Decorators;
 
-public record DecoratorFilter(Func<Type, bool> Predicate)
+internal class DecoratorFilter
 {
-    public Func<Type, bool> Predicate { get; } = Predicate;
+    public DecoratorFilter(Func<Type, bool> predicate, DecoratorSorterBase decoratorSorter)
+    {
+        Predicate = predicate;
+        DecoratorSorter = decoratorSorter;
+    }
+    public DecoratorFilter(Func<Type, bool> predicate)
+    {
+        Predicate = predicate;
+    }
+
+    public Func<Type, bool> Predicate { get; }
+    public DecoratorSorterBase? DecoratorSorter { get; } 
 }

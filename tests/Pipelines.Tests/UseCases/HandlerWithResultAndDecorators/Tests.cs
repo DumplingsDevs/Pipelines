@@ -27,12 +27,11 @@ public class Tests
             {
                 x.WithImplementedInterface<IDecorator>();
                 x.WithInheritedClass<BaseDecorator>();
-                x.WithAttribute<DecoratorAttribute>();
+                x.WithAttribute<DecoratorAttribute>().OrderBy(attr => attr.Index);
                 x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
             }, Assembly.GetExecutingAssembly()));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();
-
         _dependencyContainer.BuildContainer();
         _requestDispatcher = _dependencyContainer.GetService<IRequestDispatcher>();
         _state = _dependencyContainer.GetService<DecoratorsState>();
@@ -56,10 +55,12 @@ public class Tests
             nameof(ExampleRequestDecoratorFive),
             nameof(ExampleRequestDecoratorOne),
             nameof(ExampleRequestDecoratorTwo),
-            nameof(ExampleRequestDecoratorThree),
+            nameof(ExampleRequestDecoratorThreeTwo),
+            nameof(ExampleRequestDecoratorThreeOne),
             nameof(ExampleRequestDecoratorFourUniqueNameForSearch),
             nameof(ExampleRequestDecoratorFourUniqueNameForSearch),
-            nameof(ExampleRequestDecoratorThree),
+            nameof(ExampleRequestDecoratorThreeOne),
+            nameof(ExampleRequestDecoratorThreeTwo),
             nameof(ExampleRequestDecoratorTwo),
             nameof(ExampleRequestDecoratorOne),
             nameof(ExampleRequestDecoratorFive),

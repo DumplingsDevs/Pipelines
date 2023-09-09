@@ -43,13 +43,17 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
         _predicates.Add(filter);
     }
 
-    public void WithAttribute<T>()
+    public IDecoratorSorter<T> WithAttribute<T>() where T : Attribute
     {
         bool Predicate(Type t) => t.GetCustomAttribute(typeof(T)) != null;
-
-        var filter = new DecoratorFilter(Predicate);
+        
+        var sorter = new DecoratorSorter<T>();
+        
+        var filter = new DecoratorFilter(Predicate, sorter);
 
         _predicates.Add(filter);
+
+        return sorter;
     }
 
     public void With(Func<Type, bool> func)
@@ -61,8 +65,16 @@ internal class ClosedTypeDecoratorsBuilder : IPipelineClosedTypeDecoratorBuilder
 
     public IEnumerable<Type> GetDecoratorTypes()
     {
-        // TO DO - check if decorator implementers handler type 
-        return _predicates.SelectMany(x => _assemblies.SelectMany(y => y.GetTypes().Where(x.Predicate)))
+        return _predicates.SelectMany(x => _assemblies.SelectMany(y =>
+            {
+                var enumerable = y.GetTypes().Where(x.Predicate);
+                if (x.DecoratorSorter is not null)
+                {
+                    enumerable = x.DecoratorSorter.Sort(enumerable);
+                }
+
+                return enumerable;
+            }))
             .WhereConstructorHasCompatibleGenericType(_handlerType);
     }
 }
