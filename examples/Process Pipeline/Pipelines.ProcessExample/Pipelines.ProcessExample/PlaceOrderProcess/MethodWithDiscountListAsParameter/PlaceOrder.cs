@@ -1,0 +1,6 @@
+using Pipelines.ProcessExample.PlaceOrderProcess.MethodWithDiscountListAsParameter.Dtos;
+using Pipelines.ProcessExample.PlaceOrderProcess.MethodWithDiscountListAsParameter.PipelinesInterfaces;
+
+namespace Pipelines.ProcessExample.PlaceOrderProcess.MethodWithDiscountListAsParameter;
+
+public record PlaceOrder(List<ProductDto> Products, string DiscountCode) : IPlaceOrderInput;
