@@ -11,7 +11,7 @@ To accomplish this, you'll need to define three separate Pipelines, each tailore
 
 ## Command Pipeline
 
-<img src="./img/command.png" width="500" height="500">
+<img src="./img/command.png" width="500" height="500" align="center" />
 
 - Ensures that a given Command contains all the necessary fields for processing the request.
 - Validates whether the application layer's required rules are satisfied.
@@ -26,7 +26,7 @@ Here's how to implement it:
 
 ## Query Pipeline
 
-<img src="./img/query.png" width="500" height="500">
+<img src="./img/query.png" width="500" height="500" align="center" />
 
 - Ensures that the Query data includes all the required fields for processing the request.
 
@@ -39,7 +39,7 @@ Here's how to implement it:
 
 ## Domain Event Pipeline
 
-<img src="./img/domain_event.png" width="500" height="400">
+<img src="./img/domain_event.png" width="500" height="400" align="center" />
 
 - No specific requirements apart from locating the appropriate handler for the domain event.
 
