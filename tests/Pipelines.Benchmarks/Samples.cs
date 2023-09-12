@@ -6,7 +6,7 @@ internal class Samples
 {
     internal static void GenerateRegistrations()
     {
-        var count = 200;
+        var count = 500;
         var rootPath =
             Path.GetDirectoryName(
                 Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())));
@@ -21,7 +21,7 @@ internal class Samples
 
     internal static void GeneratePipelinesSamples()
     {
-        var count = 200;
+        var count = 500;
         var rootPath =
             Path.GetDirectoryName(
                 Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())));
@@ -59,7 +59,7 @@ public class MediatorExampleRequestHandler{i} : IRequestHandler<MediatorExampleR
 ");
         }
 
-        using var writer4 = new StreamWriter($"{rootPath}/RequestHandlersMediator.cs");
+        using var writer4 = new StreamWriter($"{rootPath}/RequestHandlers.cs");
         writer4.WriteLine("using Pipelines.Benchmarks.Types;");
         writer4.WriteLine("namespace Pipelines.Benchmarks.Sample;");
         for (int i = 1; i <= count; i++)
@@ -74,5 +74,23 @@ public class ExampleRequestHandler{i} : IRequestHandler<ExampleRequest{i}, Examp
 }}
 ");
         }
+        
+        using var writer5 = new StreamWriter($"{rootPath}/RequestDefinitions.cs");  
+        writer5.WriteLine("private readonly List<Types.IRequest<ExampleCommandResult>> _pipelinesRequests = new()");
+        writer5.WriteLine("{");
+        for (int i = 1; i < count; i += 20)
+        {
+            writer5.WriteLine($@"    new ExampleRequest{i}(""My test request {i}""),");
+        }
+        writer5.WriteLine("};");
+        
+        using var writer6 = new StreamWriter($"{rootPath}/MediatorRequestDefinitions.cs");  
+        writer6.WriteLine("private readonly List<MediatR.IRequest<ExampleCommandResult>> _mediatorRequests = new()");
+        writer6.WriteLine("{");
+        for (int i = 1; i < count; i += 20)
+        {
+            writer6.WriteLine($@"    new MediatorExampleRequest{i}(""My test request {i}""),");
+        }
+        writer6.WriteLine("};");
     }
 }

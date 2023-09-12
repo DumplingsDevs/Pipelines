@@ -1,0 +1,5 @@
+# CODEOWNERS file
+# Requires at least one of the users, Karasini or KmlPro, to approve code review.
+
+# All files and directories
+* @Karasini @KmlPro

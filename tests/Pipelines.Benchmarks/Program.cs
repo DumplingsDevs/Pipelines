@@ -9,12 +9,12 @@ using Pipelines.Benchmarks;
 using Pipelines.Benchmarks.Sample;
 using Pipelines.Benchmarks.Sample.Mediator;
 using Pipelines.Benchmarks.Types;
-// Samples.GenerateRegistrations();
+// Samples.GeneratePipelinesSamples();
 BenchmarkRunner.Run(typeof(Program).Assembly);
 //
 // var benchmark = new PipelinesBenchmark();
 // benchmark.SetupPipelines();
-// await benchmark.Pipelines();
+// await benchmark.WrapperDispatcherGenerator();
 // for (int i = 0; i < 10000; i++)
 // {
 //     

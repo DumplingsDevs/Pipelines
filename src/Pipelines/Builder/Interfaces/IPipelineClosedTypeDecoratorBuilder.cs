@@ -1,3 +1,5 @@
+using Pipelines.Builder.Decorators;
+
 namespace Pipelines.Builder.Interfaces;
 
 public interface IPipelineClosedTypeDecoratorBuilder
@@ -24,7 +26,7 @@ public interface IPipelineClosedTypeDecoratorBuilder
     /// Add a predicate to filter types that have a specific attribute.
     /// </summary>
     /// <typeparam name="T">The attribute type to match.</typeparam>
-    void WithAttribute<T>();
+    IDecoratorSorter<T> WithAttribute<T>() where T : Attribute;
     
     /// <summary>
     /// Adds a custom function as a predicate to filter types.
