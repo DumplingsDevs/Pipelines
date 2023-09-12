@@ -12,7 +12,7 @@ public static class PipelineConfiguration
             .AddHandler(typeof(IPlaceOrderV2Handler<>), processAssembly)
             .AddDispatcher<IPlaceOrderV2Dispatcher>(processAssembly)
             .WithDecorators(x =>
-                x.WithAttribute<OrderStepV2>().OrderBy(z => z.StepNumber))
+                x.WithAttribute<OrderStepV2>().OrderBy(z => z.StepNumber), processAssembly)
             .Build();
 
         services.AddScoped<DiscountState>();

@@ -12,7 +12,7 @@ public static class PipelineConfiguration
             .AddHandler(typeof(IPlaceOrderHandler<>), processAssembly)
             .AddDispatcher<IPlaceOrderDispatcher>(processAssembly)
             .WithDecorators(x =>
-                x.WithAttribute<OrderStep>().OrderBy(z => z.StepNumber))
+                x.WithAttribute<OrderStep>().OrderBy(z => z.StepNumber), processAssembly)
             .Build();
     }
 }
