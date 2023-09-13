@@ -1,0 +1,4 @@
+namespace Pipelines.ProcessExample.PlaceOrderProcess.MethodWithDiscountListAsParameter.PipelinesInterfaces;
+
+public interface IPlaceOrderInput
+{ }
