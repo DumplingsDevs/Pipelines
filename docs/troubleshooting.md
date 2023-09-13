@@ -35,7 +35,8 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [HandlerNotRegisteredException](#handlernotregisteredexception)
   - [InputNullReferenceException](#inputnullreferenceexception)
   - [CannotCreateDispatcherWrapperException](#inputnullreferenceexception)
-   
+  - [AssemblyNotProvidedException](#assemblynotprovidedexception)
+  
 - [3. Cannot build project - how to debug](#3-cannot-build-project---how-to-debug)
 
 ------
@@ -908,6 +909,58 @@ var result = await _dispatcher.SendAsync(request, new CancellationToken());
 Something went wrong with source generator and generated Dispatcher. Please create issue on [Github](https://github.com/DumplingsDevs/Pipelines/issues) with types and builder description.
 
 ---
+
+### AssemblyNotProvidedException
+
+#### What happened?
+
+At least one assembly is not provided to `AddHandler()` method or `WithDecorators`
+
+#### Bad example
+
+```csharp
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>))
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true,dispatcherAssembly))
+    .Build()
+```
+
+```csharp
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>), assembly)
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true, dispatcherAssembly))
+    .WithDecorators(x => x.WithNameContaining("Attribute"))
+    .Build()
+```
+
+#### How to fix
+Ensure that you provided at least one assembly to `AddHandler()` or `WithDecorators`.
+
+```csharp
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>), handlersAssembly)
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true,dispatcherAssembly))
+    .Build()
+```
+
+```csharp
+services
+    .AddPipeline()
+    .AddInput(typeof(ICommand<>))
+    .AddHandler(typeof(ICommandHandler<,>), handlersAssembly)
+    .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(true, dispatcherAssembly))
+    .WithDecorators(x => x.WithNameContaining("Attribute")), decoratorsAssembly)
+    .Build()
+```
+
+---
+
 
 ## 3. Cannot build project - how to debug
 
