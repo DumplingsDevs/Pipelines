@@ -39,6 +39,7 @@ public interface IPipelineDecoratorBuilder : IPipelineBuildBuilder
     /// <returns>An IPipelineDecoratorBuilder instance that allows for further pipeline configuration.</returns>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.Constructor.Exceptions.ConstructorValidationException"></exception>
     /// <exception cref="Pipelines.Builder.Validators.Decorator.ImplementsInterface.Exceptions.InterfaceImplementationException"></exception>
+    /// <exception cref="Pipelines.Exceptions.AssemblyNotProvidedException">At least one assembly is not provided to `AddHandler()` method. See the <a href="https://github.com/DumplingsDevs/Pipelines/blob/main/docs/troubleshooting.md#assemblynotprovidedexception">documentation</a> for troubleshooting details. </exception>
     IPipelineDecoratorBuilder WithDecorators(Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies);
 

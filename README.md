@@ -10,7 +10,7 @@
 
 
 
-🛠 ```We belief that a good library should adapt to your application, rather than forcing your application to adapt to it. We recognize that every software project is unique and may employ different architectural patterns and designs. With Pipelines, we found a library that enables us to build our applications around our preferred patterns, rather than constraining us to rigid structures imposed by external libraries. This flexibility not only streamlines our development process but also empowers us to make design choices that best suit our specific use cases.```
+🛠 ```We believe that a good library should adapt to your application, rather than forcing your application to adapt to it. We recognize that every software project is unique and may employ different architectural patterns and designs. With Pipelines, we found a library that enables us to build our applications around our preferred patterns, rather than constraining us to rigid structures imposed by external libraries. This flexibility not only streamlines our development process but also empowers us to make design choices that best suit our specific use cases.```
 
 💡 ```Pipelines empowers developers to leverage the potential of the Mediator pattern seamlessly, thanks to its flexible and adaptable foundations.```
 

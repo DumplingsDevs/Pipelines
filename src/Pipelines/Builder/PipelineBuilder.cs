@@ -14,6 +14,7 @@ using Pipelines.Builder.Validators.Handler.ResultTypes;
 using Pipelines.Builder.Validators.Shared.InterfaceConstraint;
 using Pipelines.Builder.Validators.Shared.MethodWithOneParameter;
 using Pipelines.Builder.Validators.Shared.OnlyOneHandleMethod;
+using Pipelines.Exceptions;
 using Pipelines.Utils;
 
 namespace Pipelines.Builder;
@@ -47,6 +48,11 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
 
     public IDispatcherBuilder AddHandler(Type handlerType, params Assembly[] assemblies)
     {
+        if (!assemblies.Any())
+        {
+            throw new AssemblyNotProvidedException(nameof(AddHandler));
+        }
+        
         _handlerInterfaceType = handlerType;
         _handlerAssemblies = assemblies;
         ProvidedTypeShouldBeInterface.Validate(_handlerInterfaceType);
@@ -135,6 +141,11 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
         Action<IPipelineClosedTypeDecoratorBuilder> action,
         params Assembly[] assemblies)
     {
+        if (!assemblies.Any())
+        {
+            throw new AssemblyNotProvidedException(nameof(WithDecorators));
+        }
+        
         var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
 
         if (decoratorOptions.StrictMode)
