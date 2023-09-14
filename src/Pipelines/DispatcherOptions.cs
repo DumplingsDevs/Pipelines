@@ -11,6 +11,8 @@ public class DispatcherOptions
     {
         UseReflectionProxyImplementation = false;
     }
-
-    public bool UseReflectionProxyImplementation { get; }
-};
+    
+    public bool UseReflectionProxyImplementation { get; set; }
+    public bool CreateDIScope { get; set; }
+    public bool ThrowExceptionIfHandlerNotFound { get; set; }
+}

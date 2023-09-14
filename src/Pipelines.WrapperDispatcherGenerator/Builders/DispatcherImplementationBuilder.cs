@@ -45,6 +45,7 @@ internal class DispatcherImplementationBuilder
         BuildRequestHandlerBase();
         BuildRequestHandlerWrapper();
         AddLine("   private readonly IServiceProvider _serviceProvider;");
+        AddLine("   private readonly DispatcherOptions _dispatcherOptions;");
         AddLine(
             $"   private readonly Dictionary<Type, {_dispatcherInterfaceName}RequestHandlerBase> _handlers = new();");
         BuildConstructor();
@@ -63,6 +64,8 @@ internal class DispatcherImplementationBuilder
         AddLine("using Pipelines.Builder.HandlerWrappers;");
         AddLine("using Microsoft.Extensions.DependencyInjection;");
         AddLine("using Pipelines.Exceptions;");
+        AddLine("using Pipelines;");
+        AddLine("using Pipelines.Builder.Options;");
     }
 
     private void BuildRequestHandlerBase()
@@ -205,10 +208,12 @@ internal class DispatcherImplementationBuilder
 
         AddLine($@"
     public {dispatcherInterface}Implementation(IServiceProvider serviceProvider,
-        IEnumerable<IHandlersRepository> handlerRepositories)
+        IEnumerable<IHandlersRepository> handlerRepositories, IEnumerable<DispatcherGeneratorOptions> generatorDispatcherOptions)
     {{
         _serviceProvider = serviceProvider;
         var handlerTypes = handlerRepositories.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).GetHandlers();
+        _dispatcherOptions = generatorDispatcherOptions.First(x => x.DispatcherType == typeof({_pipelineConfig.DispatcherType})).Options;
+
         foreach (var handlerType in handlerTypes)
         {{
             var handlers = handlerType.GetInterfaces()
