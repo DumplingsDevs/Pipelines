@@ -187,17 +187,28 @@ internal class DispatcherImplementationBuilder
         string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            using var scope = serviceProvider.CreateScope();
-            var provider = scope.ServiceProvider;
+            if (dispatcherOptions.CreateDIScope)
+            {{
+                using var scope = serviceProvider.CreateScope();
+                var provider = scope.ServiceProvider;
 
-            var handlers = provider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
-            if (handlers.Count == 0) throw new HandlerNotRegisteredException(typeof({handlerTypeName}{handlerGenericParameters}));
-            foreach (var handler in handlers)
+                var handlers = provider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            
+                foreach (var handler in handlers)
                 {{
                     {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});;
-                }}";
+                }}
+            }}
+            else
+            {{
+                var handlers = serviceProvider.GetServices<{handlerTypeName}{handlerGenericParameters}>().ToList();
+            
+                foreach (var handler in handlers)
+                {{
+                    {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});;
+                }}
+            }}";
     }
-
 
     private string GetDispatcherMethodParametersTypeName()
     {
@@ -269,7 +280,20 @@ internal class DispatcherImplementationBuilder
         AddLine($"var requestType = {inputParameterName}.GetType();");
         AddLine("if (!_handlers.TryGetValue(requestType, out var handlerWrapper))");
         AddLine("{");
-        AddLine("throw new HandlerNotRegisteredException(requestType);");
+        if (hasResponse)
+        {
+            AddLine("throw new HandlerNotRegisteredException(requestType);");
+        }
+        else
+        {
+            AddLine(@"
+            if (_dispatcherOptions.ThrowExceptionIfHandlerNotFound)
+               {
+                  throw new HandlerNotRegisteredException(requestType);
+               }
+            return;");
+        }
+
         AddLine("}");
         AddLine(CallHandlerWrapperTemplate(hasResponse, hasMultipleResults, asyncModifier, dispatcherHandlerMethod,
             dispatcherResults));
@@ -297,7 +321,8 @@ internal class DispatcherImplementationBuilder
     private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
         List<ITypeSymbol> dispatcherResults)
     {
-        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider, _dispatcherOptions);";
+        return
+            $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider, _dispatcherOptions);";
     }
 
     private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
