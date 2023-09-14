@@ -87,7 +87,7 @@ internal class DispatcherImplementationBuilder
         AddLine(@$"
     private abstract class {_dispatcherInterfaceName}RequestHandlerBase
     {{
-        internal abstract {wrapperReturnType} Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider);
+        internal abstract {wrapperReturnType} Handle(object request, {methodParameters}{comma} IServiceProvider serviceProvider, DispatcherOptions dispatcherOptions);
     }}");
     }
 
@@ -134,10 +134,10 @@ internal class DispatcherImplementationBuilder
         {constrains}
         
     {{
-        internal override {wrapperReturnType} Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider) =>
-            {awaitOperator} Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider{handlerCallComma} {parameterNames}){configureAwait};
+        internal override {wrapperReturnType} Handle(object request, {methodParameters}{wrapperMethodDefinitionComma} IServiceProvider serviceProvider, DispatcherOptions dispatcherOptions) =>
+            {awaitOperator} Handle(({inputInterfaceWithDispatchersGeneric})request, serviceProvider, dispatcherOptions{handlerCallComma} {parameterNames}){configureAwait};
 
-        private {asyncModifier} {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider{wrapperMethodDefinitionComma}
+        private {asyncModifier} {handlerReturnType} Handle({inputInterfaceWithDispatchersGeneric} request, IServiceProvider serviceProvider, DispatcherOptions dispatcherOptions{wrapperMethodDefinitionComma}
             {methodParameters})
         {{
             {handleBody}
@@ -166,12 +166,21 @@ internal class DispatcherImplementationBuilder
         string returnStatement, string awaitOperator, string handlerCallComma, string parameterNames)
     {
         return @$"
-            using var scope = serviceProvider.CreateScope();
-            var provider = scope.ServiceProvider;
-            
-            var handler = provider.GetService<{handlerTypeName}{handlerGenericParameters}>();
+            if (dispatcherOptions.CreateDIScope)
+            {{
+                using var scope = serviceProvider.CreateScope();
+                var provider = scope.ServiceProvider;
 
-            {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});";
+                var handler = provider.GetService<{handlerTypeName}{handlerGenericParameters}>();
+
+                {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
+            }}
+            else
+            {{
+                var handler = serviceProvider.GetService<{handlerTypeName}{handlerGenericParameters}>();
+
+                {returnStatement} {awaitOperator} handler.{_handlerMethod.Name}((TRequest)request{handlerCallComma} {parameterNames});
+            }}";
     }
 
     private string HandlerCallWithoutResult(string handlerTypeName, string handlerGenericParameters,
@@ -288,14 +297,14 @@ internal class DispatcherImplementationBuilder
     private string NoneResponseHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
         List<ITypeSymbol> dispatcherResults)
     {
-        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);";
+        return $@"{@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider, _dispatcherOptions);";
     }
 
     private string MultipleResponsesHandlerWrapper(string @await, IMethodSymbol dispatcherMethod,
         List<ITypeSymbol> dispatcherResults)
     {
         return
-            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider, _dispatcherOptions);
 {GenerateMultipleArgumentReturn(dispatcherResults)};";
     }
 
@@ -303,7 +312,7 @@ internal class DispatcherImplementationBuilder
         List<ITypeSymbol> dispatcherResults)
     {
         return
-            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider);
+            $@"var result = {@await} handlerWrapper.Handle({GetParametersString(dispatcherMethod, 0)}, _serviceProvider, _dispatcherOptions);
 {GenerateSingleArgumentReturn(dispatcherResults)};";
     }
 
