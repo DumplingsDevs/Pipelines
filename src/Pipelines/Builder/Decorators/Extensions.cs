@@ -49,7 +49,7 @@ internal static class Extensions
             {
                 // there is no decorator for handler - register is as implementer handler's interface.
                 // TO DO - what if user wants to register handler with different lifetime e.g. Transient?
-                serviceCollection.AddScoped(genericTypeInterface, handlerType);
+                serviceCollection.AddTransient(genericTypeInterface, handlerType);
                 continue;
             }
 
@@ -63,12 +63,12 @@ internal static class Extensions
     {
         if (serviceCollection.All(x => x.ServiceType != handlerType))
         {
-            serviceCollection.AddScoped(handlerType);
+            serviceCollection.AddTransient(handlerType);
         }
 
         var lastDecorator = DecorateRecursively(serviceCollection, handlerType, genericTypeInterface, new Queue<Type>(compatibleDecorators));
 
-        serviceCollection.AddScoped(genericTypeInterface, lastDecorator);
+        serviceCollection.AddTransient(genericTypeInterface, lastDecorator);
     }
 
     private static List<Type> GetCompatibleDecorators(List<Type> decorators, Type @interface)
@@ -92,7 +92,7 @@ internal static class Extensions
             var closedDecorator = decoratorType.MakeGenericType(genericArguments);
 
             var closedImplementationFactory = DecoratorFactory.CreateDecorator(decoratedType, closedDecorator);
-            serviceCollection.AddScoped(closedDecorator, closedImplementationFactory);
+            serviceCollection.AddTransient(closedDecorator, closedImplementationFactory);
 
             if (compatibleDecorators.Count == 0)
             {
@@ -103,7 +103,7 @@ internal static class Extensions
         }
 
         var implementationFactory = DecoratorFactory.CreateDecorator(decoratedType, decoratorType);
-        serviceCollection.AddScoped(decoratorType, implementationFactory);
+        serviceCollection.AddTransient(decoratorType, implementationFactory);
         
         if (compatibleDecorators.Count == 0)
         {
