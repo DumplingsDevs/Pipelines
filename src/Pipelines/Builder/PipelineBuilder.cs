@@ -4,6 +4,7 @@ using Pipelines.Builder.Decorators;
 using Pipelines.Builder.Exceptions;
 using Pipelines.Builder.HandlerWrappers;
 using Pipelines.Builder.Interfaces;
+using Pipelines.Builder.Options;
 using Pipelines.Builder.Validators.CrossValidation.MethodParameters;
 using Pipelines.Builder.Validators.CrossValidation.ResultType;
 using Pipelines.Builder.Validators.Decorator;
@@ -201,6 +202,8 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
             foreach (var dispatcherImplementation in dispatcherImplementations)
             {
                 _serviceCollection.AddSingleton(_dispatcherInterfaceType, dispatcherImplementation);
+                _serviceCollection.AddSingleton<DispatcherGeneratorOptions>(x =>
+                    new DispatcherGeneratorOptions(_dispatcherInterfaceType, _dispatcherOptions));
             }
         }
         else
