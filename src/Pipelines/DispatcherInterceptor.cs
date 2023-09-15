@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.Exceptions;
+using Pipelines.Utils;
 
 namespace Pipelines;
 
@@ -10,15 +11,23 @@ internal class DispatcherInterceptor : DispatchProxy
     private Type _inputInterfaceType = null!;
     private IServiceProvider _serviceProvider = null!;
     private DispatcherOptions _dispatcherOptions = null!;
+    private bool _isVoidHandler = false;
+    private bool _isHandlerReturnsValue = false;
 
     public static T Create<T>(IServiceProvider serviceProvider, Type handlerInterfaceType, Type inputInterfaceType,
         DispatcherOptions dispatcherOptions)
     {
+        var handlerMethod = handlerInterfaceType.GetFirstMethodInfo();
+        var isVoidHandler = handlerMethod.IsVoidResultType();
+        var isTaskVoidHandler = handlerMethod.IsTaskResultType();
+        
         object proxy = Create<T, DispatcherInterceptor>()!;
         ((DispatcherInterceptor)proxy)._serviceProvider = serviceProvider;
         ((DispatcherInterceptor)proxy)._handlerInterfaceType = handlerInterfaceType;
         ((DispatcherInterceptor)proxy)._inputInterfaceType = inputInterfaceType;
         ((DispatcherInterceptor)proxy)._dispatcherOptions = dispatcherOptions;
+        ((DispatcherInterceptor)proxy)._isVoidHandler = isVoidHandler;
+        ((DispatcherInterceptor)proxy)._isHandlerReturnsValue = !isVoidHandler && !isTaskVoidHandler;
 
         return (T)proxy;
     }
@@ -47,23 +56,24 @@ internal class DispatcherInterceptor : DispatchProxy
     {
         var handlers = GetHandlerService(inputType, _inputInterfaceType, serviceProvider);
 
-        if (!handlers.Any())
-        {
-            return null;
-        }
-
         if (handlers.Count == 1)
         {
             var handler = handlers.First();
             var method = GetHandlerMethod(handlers.First(), _handlerInterfaceType);
             return method.Invoke(handler, args);
         }
-
+        
         object? result = null;
         foreach (var handler in handlers)
         {
             var method = GetHandlerMethod(handlers.First(), _handlerInterfaceType);
             result = method.Invoke(handler, args);
+        }
+        
+        //When there is no handlers, that means we allowed to do not have them. We allow them only in void and Task handlers. 
+        if (!handlers.Any())
+        {
+            return _isVoidHandler ? null : Task.CompletedTask;
         }
 
         return result;
@@ -97,7 +107,7 @@ internal class DispatcherInterceptor : DispatchProxy
 
         var handlerService = handlers.ToList();
 
-        if ((handlers is null || !handlerService.Any()) && _dispatcherOptions.ThrowExceptionIfHandlerNotFound)
+        if (!handlerService.Any() && _dispatcherOptions.ThrowExceptionIfHandlerNotFound || _isHandlerReturnsValue)
         {
             throw new HandlerNotRegisteredException(handlerTypeWithInput);
         }
