@@ -35,9 +35,9 @@ internal class DispatcherInterceptor : DispatchProxy
         ValidateArgs(args);
         var inputType = GetInputType(args);
 
-        if (!_dispatcherOptions.CreateDIScope) 
+        if (!_dispatcherOptions.CreateDIScope)
             return InvokeHandlers(args, inputType, _serviceProvider);
-        
+
         using var scope = _serviceProvider.CreateScope();
         var serviceProvider = scope.ServiceProvider;
         return InvokeHandlers(args, inputType, serviceProvider);
@@ -46,6 +46,11 @@ internal class DispatcherInterceptor : DispatchProxy
     private object? InvokeHandlers(object[] args, Type inputType, IServiceProvider serviceProvider)
     {
         var handlers = GetHandlerService(inputType, _inputInterfaceType, serviceProvider);
+
+        if (!handlers.Any())
+        {
+            return null;
+        }
 
         if (handlers.Count == 1)
         {
@@ -92,7 +97,7 @@ internal class DispatcherInterceptor : DispatchProxy
 
         var handlerService = handlers.ToList();
 
-        if (handlers is null || !handlerService.Any())
+        if ((handlers is null || !handlerService.Any()) && _dispatcherOptions.ThrowExceptionIfHandlerNotFound)
         {
             throw new HandlerNotRegisteredException(handlerTypeWithInput);
         }
