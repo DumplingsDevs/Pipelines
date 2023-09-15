@@ -107,7 +107,7 @@ internal class DispatcherInterceptor : DispatchProxy
 
         var handlerService = handlers.ToList();
 
-        if (!handlerService.Any() && _dispatcherOptions.ThrowExceptionIfHandlerNotFound || _isHandlerReturnsValue)
+        if (!handlerService.Any() && (_dispatcherOptions.ThrowExceptionIfHandlerNotFound || _isHandlerReturnsValue))
         {
             throw new HandlerNotRegisteredException(handlerTypeWithInput);
         }

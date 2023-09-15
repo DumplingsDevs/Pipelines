@@ -38,4 +38,9 @@
 
 
 
+
+    <ItemGroup>
+      <Folder Include="UseCases\CreateDIScope\Types\" />
+    </ItemGroup>
+
 </Project>
