@@ -42,7 +42,7 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
     public IHandlerBuilder AddInput(Type type)
     {
         ProvidedTypeShouldBeInterface.Validate(type);
-        
+
         _inputInterfaceType = type;
         return this;
     }
@@ -53,7 +53,7 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
         {
             throw new AssemblyNotProvidedException(nameof(AddHandler));
         }
-        
+
         _handlerInterfaceType = handlerType;
         _handlerAssemblies = assemblies;
         ProvidedTypeShouldBeInterface.Validate(_handlerInterfaceType);
@@ -92,7 +92,8 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
             _dispatcherHandleMethod);
 
         _dispatcherProxy = provider =>
-            DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType);
+            DispatcherInterceptor.Create<TDispatcher>(provider, _handlerInterfaceType, _inputInterfaceType,
+                _dispatcherOptions);
 
         _dispatcherOptions = options;
 
@@ -146,7 +147,7 @@ internal class PipelineBuilder : IInputBuilder, IHandlerBuilder, IDispatcherBuil
         {
             throw new AssemblyNotProvidedException(nameof(WithDecorators));
         }
-        
+
         var decorators = DecoratorsBuilder.BuildDecorators(action, _handlerInterfaceType, assemblies);
 
         if (decoratorOptions.StrictMode)

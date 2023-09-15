@@ -9,13 +9,16 @@ internal class DispatcherInterceptor : DispatchProxy
     private Type _handlerInterfaceType = null!;
     private Type _inputInterfaceType = null!;
     private IServiceProvider _serviceProvider = null!;
+    private DispatcherOptions _dispatcherOptions = null!;
 
-    public static T Create<T>(IServiceProvider serviceProvider, Type handlerInterfaceType, Type inputInterfaceType)
+    public static T Create<T>(IServiceProvider serviceProvider, Type handlerInterfaceType, Type inputInterfaceType,
+        DispatcherOptions dispatcherOptions)
     {
         object proxy = Create<T, DispatcherInterceptor>()!;
         ((DispatcherInterceptor)proxy)._serviceProvider = serviceProvider;
         ((DispatcherInterceptor)proxy)._handlerInterfaceType = handlerInterfaceType;
         ((DispatcherInterceptor)proxy)._inputInterfaceType = inputInterfaceType;
+        ((DispatcherInterceptor)proxy)._dispatcherOptions = dispatcherOptions;
 
         return (T)proxy;
     }
@@ -32,10 +35,18 @@ internal class DispatcherInterceptor : DispatchProxy
         ValidateArgs(args);
         var inputType = GetInputType(args);
 
+        if (!_dispatcherOptions.CreateDIScope) 
+            return InvokeHandlers(args, inputType, _serviceProvider);
+        
         using var scope = _serviceProvider.CreateScope();
         var serviceProvider = scope.ServiceProvider;
-            
+        return InvokeHandlers(args, inputType, serviceProvider);
+    }
+
+    private object? InvokeHandlers(object[] args, Type inputType, IServiceProvider serviceProvider)
+    {
         var handlers = GetHandlerService(inputType, _inputInterfaceType, serviceProvider);
+
         if (handlers.Count == 1)
         {
             var handler = handlers.First();
@@ -75,7 +86,7 @@ internal class DispatcherInterceptor : DispatchProxy
         {
             typesForGenericType.AddRange(resultType);
         }
-        
+
         var handlerTypeWithInput = _handlerInterfaceType.MakeGenericType(typesForGenericType.ToArray());
         var handlers = serviceProvider.GetServices(handlerTypeWithInput);
 
