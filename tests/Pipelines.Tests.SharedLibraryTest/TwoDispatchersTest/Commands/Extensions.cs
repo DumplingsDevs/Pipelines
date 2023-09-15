@@ -13,7 +13,7 @@ public static class Extensions
             .AddPipeline()
             .AddInput(typeof(ICommand<>))
             .AddHandler(typeof(ICommandHandler<,>), assembly)
-            .AddDispatcher<ICommandDispatcher>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
+            .AddDispatcher<ICommandDispatcher>(new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation},
                 sharedLibraryAssembly)
             .Build();
 

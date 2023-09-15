@@ -19,7 +19,7 @@ public class Tests
 
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IRequest<>))
             .AddHandler(typeof(IRequestHandler<,>), assembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation},
                 assembly)
             .WithDecorator(typeof(LoggingDecorator<,>))
             .WithDecorator(typeof(TracingDecorator<,>))

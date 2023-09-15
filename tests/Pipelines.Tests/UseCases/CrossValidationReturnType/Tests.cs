@@ -19,7 +19,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerStringResult<>), assembly)
                 .AddDispatcher<IDispatcherStringResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -35,7 +35,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskGenericResult<,>), assembly)
                 .AddDispatcher<IDispatcherTaskGenericResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -51,7 +51,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithConstrainedResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -67,7 +67,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputGenericType<>))
                 .AddHandler(typeof(IHandlerTaskInputGenericResult<,>), assembly)
                 .AddDispatcher<IDispatcherTaskInputGenericResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -83,7 +83,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithTwoConstrainedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
 
@@ -99,7 +99,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerStringResult<>), assembly)
                 .AddDispatcher<IDispatcherTaskStringResult>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -115,7 +115,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerStringResult<>), assembly)
                 .AddDispatcher<IDispatcherVoid>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -131,7 +131,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithClassConstraintedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -147,7 +147,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithTwoConstraintedResults<,,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithDifferentTwoConstraintedResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -163,7 +163,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
                 .AddDispatcher<IDispatcherTaskStringResult2>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -179,7 +179,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(typeof(IHandlerTaskWithConstrainedResult<,>), assembly)
                 .AddDispatcher<IDispatcherTaskWithMultipleResults>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
 }
