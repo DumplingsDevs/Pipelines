@@ -5,7 +5,7 @@ using Pipelines.CleanArchitecture.Infrastructure.Persistance;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Commands.Decorators;
 
-public class UnitOfWorkCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
+internal class UnitOfWorkCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
 {
     private readonly ToDoDbContext _dbContext;
     private readonly ICommandHandler<TCommand> _commandHandler;

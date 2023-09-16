@@ -8,7 +8,7 @@ using Pipelines.CleanArchitecture.Infrastructure.Utils.Exceptions;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Queries.Decorators;
 
-public class FluentValidationQueryDecorator<TQuery, TResult> : IQueryHandler<TQuery, TResult>
+internal class FluentValidationQueryDecorator<TQuery, TResult> : IQueryHandler<TQuery, TResult>
     where TQuery : IQuery<TResult>
 {
     private const string QUERY_VALIDATE_METHOD_NAME = "ValidateAsync";

@@ -1,0 +1,2 @@
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Pipelines.CleanArchitecture.Application.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Pipelines.CleanArchitecture.Infrastructure.Tests")]

@@ -31,10 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-6
 		docs\configuration.md = docs\configuration.md
 		docs\dispatcher_source_generator.md = docs\dispatcher_source_generator.md
 		docs\benchmarks.md = docs\benchmarks.md
-		docs\pipeline_design_guidelines.md = docs\pipeline_design_guidelines.md
-		docs\main_concepts.md = docs\main_concepts.md
-		docs\pipeline_cookbook.md = docs\pipeline_cookbook.md
 		docs\process_pipeline.md = docs\process_pipeline.md
+		docs\command_queries_events_example.md = docs\command_queries_events_example.md
 	EndProjectSection
 EndProject
 Global

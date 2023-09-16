@@ -4,7 +4,7 @@ using Pipelines.CleanArchitecture.Infrastructure.Persistance.Tables;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Persistance;
 
-public class ToDoDbContext : DbContext
+internal class ToDoDbContext : DbContext
 {
     public DbSet<ToDo> ToDos { get; set; }
     

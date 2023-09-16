@@ -41,7 +41,7 @@ Here's how to implement it:
 
 <img src="./img/domain_event.png" width="500" height="400" align="center" />
 
-- No specific requirements apart from locating the appropriate handler for the domain event.
+- Dispatcher should not create its own Dependency Injection scope (it should be inherited from parent, in that case, from Command Dispatcher)
 
 Here's how to implement it:
 
