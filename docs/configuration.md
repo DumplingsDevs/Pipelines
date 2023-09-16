@@ -1,6 +1,6 @@
 # Configuration
 
-In this section of the documentation, you'll learn how to configure Pipeline.
+This guide provides overview of the various options available in Pipeline.
 
 -----
 
