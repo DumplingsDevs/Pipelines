@@ -14,9 +14,6 @@ This page provides conventions and guidelines for defining and implementing Pipe
 
 - The `Input` must be the first parameter of the Dispatcher and Handler methods.
 
-<details>
-<summary style="color: green">📜 Show me example </summary>
-
 ```cs
 public interface IInput<TResult> where TResult: class{ } 
 
@@ -30,16 +27,11 @@ public interface IDispatcher
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
-
-</details>
 
 -------
 
 - Result types for the `Dispatcher` and `Handler` must match. If `generic arguments` defined in `Input`,  they must also align with those in the `Dispatcher` and `Handler` 
 
-<details>
-<summary style="color: green">📜 Show me example 1 </summary>
-
 ```cs
 
 public interface IInput<TResult> where TResult: class{ } 
@@ -54,11 +46,6 @@ public interface IDispatcher
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
-
-</details>
-
-<details>
-<summary style="color: green">📜 Show me example 2 </summary>
 
 ```cs
 public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
@@ -76,11 +63,6 @@ public interface IDispatcher
 }
 ```
 
-</details>
-
-<details>
-<summary style="color: green">📜 Show me example 3 </summary>
-
 ```cs
 public interface IInput { }
 
@@ -95,14 +77,9 @@ public interface IDispatcher
 }
 ```
 
-</details>
-
 -------
 
 - Method parameters for the `Dispatcher` and `Handler` must match.
-
-<details>
-<summary style="color: green">📜 Show me example 1 </summary>
 
 ```cs
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
@@ -115,11 +92,6 @@ public interface IDispatcher
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
-
-</details>
-
-<details>
-<summary style="color: green">📜 Show me example 2 </summary>
 
 ```cs
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
@@ -135,14 +107,9 @@ public interface IDispatcher
 }
 ```
 
-</details>
-
 -------
 
 - If the `Dispatcher/Handler` returns a non-generic type, then the `Input` will not have any Generic Arguments.
-
-<details>
-<summary style="color: green">📜 Show me example</summary>
 
 ```cs
 public interface IInput { }
@@ -157,14 +124,10 @@ public interface IDispatcher
     public Task<string> SendAsync(IInput inputWithResult, CancellationToken token);
 }
 ```
-</details>
 
 -------
 
 - The `Decorator` must implement the Handler interface and accept Handler as a constructor parameter.
-
-<details>
-<summary style="color: green">📜 Show me example</summary>
 
 ```cs
 public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
@@ -201,7 +164,5 @@ public interface IDispatcher
     public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
-
-</details>
 
 -------
