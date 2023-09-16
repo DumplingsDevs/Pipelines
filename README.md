@@ -37,7 +37,7 @@ If you want to learn more, please read the articles below.
 - [Main Concepts](docs/main_concepts.md)
 - [Pipeline Design Guidelines](docs/pipeline_design_guidelines.md)
 - [Configuration](docs/configuration.md)
-- [Code examples](docs/code_examples.md)
+- [Pipeline Cookbook](docs/pipeline_cookbook.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Benchmarks](docs/benchmarks.md)
