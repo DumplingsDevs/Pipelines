@@ -34,7 +34,7 @@ If you prefer learning through real examples, please check out the examples belo
 
 If you want to learn more, please read the articles below.
 
-- [Key Concepts](docs/key_concepts.md)
+- [Main Concepts](docs/main_concepts.md)
 - [Pipeline Design Guidelines](docs/pipeline_design_guidelines.md)
 - [Configuration](docs/configuration.md)
 - [Code examples](docs/code_examples.md)
