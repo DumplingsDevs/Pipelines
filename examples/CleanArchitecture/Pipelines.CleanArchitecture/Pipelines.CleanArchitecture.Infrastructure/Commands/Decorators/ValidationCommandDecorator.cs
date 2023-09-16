@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Commands.Decorators;
 
-public class ValidationCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand: ICommand
+internal class ValidationCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand: ICommand
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ICommandHandler<TCommand> _commandHandler;

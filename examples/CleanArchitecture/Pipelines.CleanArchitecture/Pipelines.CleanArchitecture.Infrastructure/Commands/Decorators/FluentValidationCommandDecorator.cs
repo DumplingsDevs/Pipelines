@@ -7,7 +7,7 @@ using Pipelines.CleanArchitecture.Abstractions.Errors;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Commands.Decorators;
 
-public class FluentValidationCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
+internal class FluentValidationCommandDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ICommandHandler<TCommand> _commandHandler;

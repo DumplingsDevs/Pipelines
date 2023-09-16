@@ -4,7 +4,7 @@ using Pipelines.CleanArchitecture.Domain.Repositories;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Persistance.Repositories;
 
-public class ToDoRepository : IToDoRepository
+internal class ToDoRepository : IToDoRepository
 {
     private ToDoDbContext _context;
 
