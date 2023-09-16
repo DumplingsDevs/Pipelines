@@ -47,7 +47,19 @@ internal static class MethodInfoExtensions
     internal static bool IsVoidOrTaskReturnType(this MethodInfo methodInfo)
     {
         var returnType = methodInfo.ReturnType;
-        return returnType == typeof(void) || returnType == typeof(Task);
+        return IsVoidResultType(methodInfo) || IsTaskResultType(methodInfo);
+    }
+    
+    internal static bool IsVoidResultType(this MethodInfo methodInfo)
+    {
+        var returnType = methodInfo.ReturnType;
+        return returnType == typeof(void);
+    }
+    
+    internal static bool IsTaskResultType(this MethodInfo methodInfo)
+    {
+        var returnType = methodInfo.ReturnType;
+        return returnType == typeof(Task);
     }
     
     internal static bool IsGenericTaskReturnType(this MethodInfo methodInfo)

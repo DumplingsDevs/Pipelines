@@ -27,7 +27,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInputType))
                 .AddHandler(handlerType, assembly)
                 .AddDispatcher<IDispatcher>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
     
@@ -51,7 +51,7 @@ public class Tests
             dependencyContainer.RegisterPipeline(builder => builder.AddInput(inputType)
                 .AddHandler(typeof(IHandler<>), assembly)
                 .AddDispatcher<IDispatcher>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
 }

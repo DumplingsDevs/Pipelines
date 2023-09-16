@@ -92,7 +92,7 @@ public class PipelinesBenchmark
         services.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions() { UseReflectionProxyImplementation = false },
                 executingAssembly)
             .Build();
         _pipelinesProvider = services.BuildServiceProvider();
@@ -108,7 +108,7 @@ public class PipelinesBenchmark
         servicesWithDecorators.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(false),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions() { UseReflectionProxyImplementation = false },
                 assembly)
             .WithDecorator(typeof(ExampleRequestDecoratorOne<,>))
             .WithDecorator(typeof(ExampleRequestDecoratorTwo<,>))
@@ -129,7 +129,7 @@ public class PipelinesBenchmark
         services.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), executingAssembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions() { UseReflectionProxyImplementation = true },
                 executingAssembly)
             .Build();
         _pipelinesReflectionProvider = services.BuildServiceProvider();
@@ -145,7 +145,7 @@ public class PipelinesBenchmark
         servicesWithDecorators.AddPipeline()
             .AddInput(typeof(Types.IRequest<>))
             .AddHandler((typeof(Types.IRequestHandler<,>)), assembly)
-            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions(true),
+            .AddDispatcher<IRequestDispatcher>(new DispatcherOptions() { UseReflectionProxyImplementation = true },
                 assembly)
             .WithDecorator(typeof(ExampleRequestDecoratorOne<,>))
             .WithDecorator(typeof(ExampleRequestDecoratorTwo<,>))

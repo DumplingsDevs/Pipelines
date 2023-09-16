@@ -14,7 +14,7 @@ public static class Extensions
             .AddPipeline()
             .AddInput(typeof(IQuery<>))
             .AddHandler(typeof(IQueryHandler<,>), assembly)
-            .AddDispatcher<IQueryDispatcher>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), sharedLibraryAssembly)
+            .AddDispatcher<IQueryDispatcher>(new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, sharedLibraryAssembly)
             .Build();
 
         return services;

@@ -27,7 +27,7 @@ public class Tests
             _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<>))
                 .AddHandler(typeof(IHandler<,>))
                 .AddDispatcher<IDispatcher>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
         });
     }
 
@@ -43,7 +43,7 @@ public class Tests
             _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(IInput<>))
                 .AddHandler(typeof(IHandler<,>), assembly)
                 .AddDispatcher<IDispatcher>(
-                    new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
+                    new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly)
                 .WithDecorators(x => x.WithNameContaining("Attribute")));
         });
     }

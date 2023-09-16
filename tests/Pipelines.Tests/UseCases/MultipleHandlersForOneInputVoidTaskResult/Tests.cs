@@ -19,7 +19,7 @@ public class Tests
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand))
             .AddHandler(typeof(ICommandHandler<>), assembly)
             .AddDispatcher<ICommandDispatcher>(
-                new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly)
+                new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly)
             .WithDecorator(typeof(LoggingDecorator<>)));
 
         _dependencyContainer.RegisterSingleton<DecoratorsState>();

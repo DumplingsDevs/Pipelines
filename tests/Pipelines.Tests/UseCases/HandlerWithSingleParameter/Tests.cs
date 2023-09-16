@@ -17,7 +17,7 @@ public class Tests
         _dependencyContainer.RegisterPipeline(builder => builder.AddInput(typeof(ICommand<>))
             .AddHandler(typeof(ICommandHandler<,>), assembly)
             .AddDispatcher<ICommandDispatcher>(
-                new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation), assembly));
+                new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation}, assembly));
 
         _dependencyContainer.BuildContainer();
         _commandDispatcher = _dependencyContainer.GetService<ICommandDispatcher>();

@@ -11,7 +11,7 @@ public class SharedLibraryTest
         services.AddPipeline()
             .AddInput(typeof(IInputShared<>))
             .AddHandler(typeof(IHandlerShared<,>), handlerAssembly)
-            .AddDispatcher<IDispatcherShared>(new DispatcherOptions(EnvVariables.UseReflectionProxyImplementation),
+            .AddDispatcher<IDispatcherShared>(new DispatcherOptions() {UseReflectionProxyImplementation = EnvVariables.UseReflectionProxyImplementation},
                 typeof(SharedLibraryTest).Assembly)
             .WithDecorator(typeof(LoggingDecorator<,>))
             .Build();
