@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Pipelines.CleanArchitecture.Domain;
 using Pipelines.CleanArchitecture.Domain.Repositories;
 
@@ -15,5 +16,10 @@ public class ToDoRepository : IToDoRepository
     public async Task AddAsync(ToDo toDo, CancellationToken token)
     {
         await _context.AddAsync(toDo, token);
+    }
+
+    public Task<ToDo?> GetAsync(Guid id, CancellationToken token)
+    {
+        return _context.ToDos.FirstOrDefaultAsync(x=> x.Id == id, token);
     }
 }

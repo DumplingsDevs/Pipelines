@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture.Api", "Pipelines.CleanArchitecture.Api\Pipelines.CleanArchitecture.Api.csproj", "{1E9D5F22-F36F-476B-AD03-D1D5CCA0DD9E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{904ED7BE-3295-4DDB-983A-CCFAB426F1BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipelines.CleanArchitecture.Application.Tests", "Pipelines.CleanArchitecture.Application.Tests\Pipelines.CleanArchitecture.Application.Tests.csproj", "{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,8 +42,13 @@ Global
 		{1E9D5F22-F36F-476B-AD03-D1D5CCA0DD9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E9D5F22-F36F-476B-AD03-D1D5CCA0DD9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E9D5F22-F36F-476B-AD03-D1D5CCA0DD9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BB714B4D-E8AE-4201-9E54-24AB0CF8E9BD} = {0DFCC116-3443-4F02-966F-014EACC83EA5}
+		{A46EB7D4-26AB-48CC-BAAE-33BA80E4D2D1} = {904ED7BE-3295-4DDB-983A-CCFAB426F1BA}
 	EndGlobalSection
 EndGlobal
