@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Pipelines.CleanArchitecture.Abstractions.DomainEvents;
 using Pipelines.CleanArchitecture.Application;
-using Pipelines.CleanArchitecture.Domain;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.DomainEvents;
 
@@ -15,7 +14,11 @@ public static class Extensions
         services.AddPipeline()
             .AddInput(typeof(IDomainEvent))
             .AddHandler(typeof(IDomainEventHandler<>), domainHandlersAssembly)
-            .AddDispatcher<IDomainEventDispatcher>(infrastructureAssembly)
+            .AddDispatcher<IDomainEventDispatcher>(new DispatcherOptions()
+            {
+                CreateDIScope = false,
+                ThrowExceptionIfHandlerNotFound = false
+            }, infrastructureAssembly)
             .Build();
 
         services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();

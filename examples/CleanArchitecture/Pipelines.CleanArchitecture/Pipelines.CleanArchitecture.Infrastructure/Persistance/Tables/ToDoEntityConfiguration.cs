@@ -4,7 +4,7 @@ using Pipelines.CleanArchitecture.Domain;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Persistance.Tables;
 
-public class ToDoEntityConfiguration: IEntityTypeConfiguration<ToDo>
+internal class ToDoEntityConfiguration: IEntityTypeConfiguration<ToDo>
 {
     public void Configure(EntityTypeBuilder<ToDo> builder)
     {

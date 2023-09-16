@@ -6,7 +6,7 @@ using Pipelines.CleanArchitecture.Infrastructure.Persistance;
 
 namespace Pipelines.CleanArchitecture.Infrastructure.Queries.Handlers;
 
-public class GetToDoHandler : IQueryHandler<GetToDoQuery, GetToDoResult>
+internal class GetToDoHandler : IQueryHandler<GetToDoQuery, GetToDoResult>
 {
     private readonly ToDoDbContext _dbContext;
 
