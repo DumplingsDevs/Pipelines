@@ -27,9 +27,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-615A-41E5-A7F4-995894B9A76C}"
 	ProjectSection(SolutionItems) = preProject
 		docs\troubleshooting.md = docs\troubleshooting.md
-		docs\code_examples.md = docs\code_examples.md
-		docs\conventions.md = docs\conventions.md
-		docs\key_concepts.md = docs\key_concepts.md
 		docs\adr.md = docs\adr.md
 		docs\configuration.md = docs\configuration.md
 		docs\dispatcher_source_generator.md = docs\dispatcher_source_generator.md

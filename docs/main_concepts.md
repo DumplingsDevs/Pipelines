@@ -1,4 +1,4 @@
-# Key Concepts
+# Main Concepts
 
 In this section of the documentation, you'll learn about the core components of our tool, including inputs, handlers, dispatchers, and decorators. Additionally, we'll explain how 'Pipeline' manages multiple handlers for a single input.
 

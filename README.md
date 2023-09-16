@@ -22,27 +22,25 @@ dotnet add package DumplingsDevs.Pipelines
 dotnet add package DumplingsDevs.Pipelines.WrapperDispatcherGenerator
 ```
 
----- 
+----
 
-# ☑️ Pipelines by Example
+# 📚 Documentation
 
+The [Quick Start](docs/quick_start.md) section will allow you to quickly create your first Pipeline.
 
+If you prefer learning through real examples, please check out the examples below:
 - [Multistep process](docs/process_pipeline.md)
 - [Commands, Queries and Domain Events Dispatching](docs/command_queries_events_example.md)
 
+If you want to learn more, please read the articles below.
 
-----
-
-# 📚 Detailed documentation
-
-- [Quick Start](docs/quick_start.md)
-- [Conventions](docs/conventions.md)
-- [Key Concepts](docs/key_concepts.md)
-- [Benchmarks](docs/benchmarks.md)
-- [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
-- [Code examples](docs/code_examples.md)
+- [Main Concepts](docs/main_concepts.md)
+- [Pipeline Design Guidelines](docs/pipeline_design_guidelines.md)
 - [Configuration](docs/configuration.md)
+- [Pipeline Cookbook](docs/pipeline_cookbook.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
+- [Benchmarks](docs/benchmarks.md)
 - [ADR](docs/adr.md)
 
 ---- 

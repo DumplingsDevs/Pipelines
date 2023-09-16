@@ -23,6 +23,7 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
 
 
 ## 1. Pipeline registration
+Registering a pipeline is a mandatory step to ensure its proper functioning. Below is an example demonstrating how you can achieve this:
 
 ```cs
 var handlersAssembly = //Assembly where handlers assembly are implemented
@@ -47,6 +48,8 @@ _services
 ```
 
 ## 2. Async Pipelines
+
+In this section, we showcase examples on how to create asynchronous pipelines in various scenarios. From straightforward task-based results to more intricate implementations like generic and tuple results.
 
 ### 2.1 Task result
 
@@ -403,6 +406,7 @@ public class LoggingDecorator<TInput> : IHandler<TInput>
 
 ## 3. Sync Pipelines
 
+In this section, we showcase examples on how to create synchronous pipelines in various scenarios. From straightforward task-based results to more intricate implementations like generic and tuple results.
 
 ----
 ### 3.1 Void Result

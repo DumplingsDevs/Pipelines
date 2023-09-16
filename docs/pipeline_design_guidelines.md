@@ -1,6 +1,6 @@
-# Conventions
+# Pipeline Design Guidelines
 
-This page provides conventions and examples for defining and implementing Pipelines.
+This page provides conventions and guidelines for defining and implementing Pipelines.
 
 ---
 
