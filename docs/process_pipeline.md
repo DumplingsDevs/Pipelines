@@ -14,11 +14,12 @@ Imagine you want implement make an order feature. But it's not so simple because
 ![Pipelines process](./img/place_order_process.png)
 
 Based on order process requirements, it can be structured as follows:
-•	Decorator: Check if product is in stock
-•	Decorator: Apply discount code
-•	Decorator: Apply loyalty discount
-•	Handler: Create order
-•	Decorator: Send email to customer
+
+- Decorator: Check if product is in stock
+- Decorator: Apply discount code
+- Decorator: Apply loyalty discount
+- Handler: Create order
+- Decorator: Send email to customer
 
 Discounts are created separately, not where you create the order. To use these discounts when you create an order, you have two options:
 
