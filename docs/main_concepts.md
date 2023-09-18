@@ -344,8 +344,6 @@ In situations where you have multiple handlers for a single type of input, the d
 
 5. The result (if any) is returned to the caller.
 
-Oczywiście, oto całość artykułu:
-
 ---
 
 ## 5. Pipelines rules
