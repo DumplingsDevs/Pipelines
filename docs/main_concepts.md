@@ -496,6 +496,4 @@ public interface IInput<TResult> where TResult: class { }
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 ```
 
-Oto poprawiony spis treści:
-
 ---
