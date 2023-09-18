@@ -16,6 +16,16 @@ In this section of the documentation, you'll learn about the core components of 
 - [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
 - [4. Execution Flow](#4-execution-flow)
 - [5. Pipelines rules](#5-pipelines-rules)
+  - [Rule 1: Input Parameter Ordering](#rule-1-input-parameter-ordering)
+  - [Rule 2: Result Type Alignment](#rule-2-result-type-alignment)
+    - [Example 1: Single Result Type](#example-1-single-result-type)
+    - [Example 2: Two Result Types](#example-2-two-result-types)
+    - [Example 3: No Generic Arguments in Input](#example-3-no-generic-arguments-in-input)
+  - [Rule 3: Method Parameter Matching](#rule-3-method-parameter-matching)
+    - [Example: Two Parameters in the Handle Method](#example-two-parameters-in-the-handle-method)
+    - [Example: Four Parameters in the Handle Method](#example-four-parameters-in-the-handle-method)
+  - [Rule 4: Non-Generic Return with Non-Generic Input](#rule-4-non-generic-return-with-non-generic-input)
+  - [Rule 5: Decorator Implementation](#rule-5-decorator-implementation)
 
 ------
 
@@ -334,124 +344,129 @@ In situations where you have multiple handlers for a single type of input, the d
 
 5. The result (if any) is returned to the caller.
 
+Oczywiście, oto całość artykułu:
+
+---
+
 ## 5. Pipelines rules
 
-
-- The `Input` must be the first parameter of the Dispatcher and Handler methods.
-
-<pre><code class="language-cs">public interface <span style="color:red; text-decoration:underline;">IInput&lt;TResult&gt; input</span> where TResult: class{ } 
-
-public interface IHandler&lt;in TInput, TResult&gt; where TInput : IInput&lt;TResult&gt; where TResult: class
-{
-    public Task&lt;TResult&gt; HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IDispatcher
-{
-    public Task&lt;TResult&gt; SendAsync(<span style="color:red; text-decoration:underline;">IInput&lt;TResult&gt; input</span>, CancellationToken token) where TResult : class;
-}</code></pre>
-
-
--------
-
-- Result types for the `Dispatcher` and `Handler` must match. If `generic arguments` defined in `Input`,  they must also align with those in the `Dispatcher` and `Handler`
+### Rule 1: Input Parameter Ordering
+The `Input` must be the first parameter of the Dispatcher and Handler methods.
 
 ```cs
-
-public interface IInput<TResult> where TResult: class{ } 
+public interface IInput<TResult> where TResult: class { } 
 
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
 
+### Rule 2: Result Type Alignment
+Result types for the `Dispatcher` and `Handler` must match. If `generic arguments` are defined in `Input`, they must also align with those in the `Dispatcher` and `Handler`.
+
+#### Example 1: Single Result Type
+```cs
+public interface IInput<TResult> where TResult: class { } 
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+}
+```
+
+#### Example 2: Two Result Types
 ```cs
 public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
 
 public interface IHandler<in TInput, TResult, TResult2>
     where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
 {
-    public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
+    Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+    Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
         CancellationToken token) where TResult : class where TResult2 : class;
 }
 ```
 
+#### Example 3: No Generic Arguments in Input
 ```cs
 public interface IInput { }
 
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task HandleAsync(TInput command, CancellationToken token);
+    Task HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task SendAsync(IInput input, CancellationToken token);
+    Task SendAsync(IInput input, CancellationToken token);
 }
 ```
 
--------
+### Rule 3: Method Parameter Matching
+Method parameters for the `Dispatcher` and `Handler` must match.
 
-- Method parameters for the `Dispatcher` and `Handler` must match.
-
+#### Example: Two Parameters in the Handle Method
 ```cs
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
 {
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
 }
 ```
 
+#### Example: Four Parameters in the Handle Method
 ```cs
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
 {
-    public Task<TResult> HandleAsync(TInput command, CancellationToken token, bool canDoSomething,
+    Task<TResult> HandleAsync(TInput input, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> fancyDictionary);
 }
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken t, bool canDoSomething,
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token, bool canDoSomething,
         Dictionary<string, string> dictionary) where TResult : class;
 }
 ```
 
--------
-
-- If the `Dispatcher/Handler` returns a non-generic type, then the `Input` will not have any Generic Arguments.
+### Rule 4: Non-Generic Return with Non-Generic Input
+If the `Dispatcher/Handler` returns a non-generic type, then the `Input` should not have any Generic Arguments.
 
 ```cs
 public interface IInput { }
 
 public interface IHandler<in TInput> where TInput : IInput
 {
-    public Task<string> HandleAsync(TInput command, CancellationToken token);
+    Task<string> HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<string> SendAsync(IInput inputWithResult, CancellationToken token);
+    Task<string> SendAsync(IInput input, CancellationToken token);
 }
 ```
 
--------
-
-- The `Decorator` must implement the Handler interface and accept Handler as a constructor parameter.
+### Rule 5: Decorator Implementation
+The `Decorator` must implement the Handler interface and accept a Handler as a constructor parameter.
 
 ```cs
 public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
@@ -476,15 +491,11 @@ public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
     }
 }
 
-public interface IInput<TResult> where TResult: class{ } 
+public interface IInput<TResult> where TResult: class { } 
 
 public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
-{
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IDispatcher
-{
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
-}
 ```
+
+Oto poprawiony spis treści:
+
+---
