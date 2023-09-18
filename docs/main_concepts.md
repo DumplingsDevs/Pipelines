@@ -15,7 +15,8 @@ In this section of the documentation, you'll learn about the core components of 
 - [2. Constraints on type parameters](#2-constraints-on-type-parameters)
 - [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
 - [4. Execution Flow](#4-execution-flow)
-- [5. Pipelines rules]
+- [5. Pipelines rules](#5-pipelines-rules)
+
 ------
 
 ## 1 Building blocks
@@ -335,24 +336,21 @@ In situations where you have multiple handlers for a single type of input, the d
 
 ## 5. Pipelines rules
 
-## 1 . Pipelines conventions
-
 
 - The `Input` must be the first parameter of the Dispatcher and Handler methods.
 
-```cs
-public interface IInput<TResult> where TResult: class{ } 
+<pre><code class="language-cs">public interface <span style="color:red; text-decoration:underline;">IInput&lt;TResult&gt; input</span> where TResult: class{ } 
 
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+public interface IHandler&lt;in TInput, TResult&gt; where TInput : IInput&lt;TResult&gt; where TResult: class
 {
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
+    public Task&lt;TResult&gt; HandleAsync(TInput input, CancellationToken token);
 }
 
 public interface IDispatcher
 {
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
-}
-```
+    public Task&lt;TResult&gt; SendAsync(<span style="color:red; text-decoration:underline;">IInput&lt;TResult&gt; input</span>, CancellationToken token) where TResult : class;
+}</code></pre>
+
 
 -------
 
