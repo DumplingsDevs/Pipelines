@@ -35,7 +35,6 @@ If you prefer learning through real examples, please check out the examples belo
 If you want to learn more, please read the articles below.
 
 - [Main Concepts](docs/main_concepts.md)
-- [Pipeline Design Guidelines](docs/pipeline_design_guidelines.md)
 - [Configuration](docs/configuration.md)
 - [Pipeline Cookbook](docs/pipeline_cookbook.md)
 - [Troubleshooting](docs/troubleshooting.md)
