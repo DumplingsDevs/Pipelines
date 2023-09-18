@@ -15,6 +15,18 @@ In this section of the documentation, you'll learn about the core components of 
 - [2. Constraints on type parameters](#2-constraints-on-type-parameters)
 - [3. Multiple handlers for same Input](#3-multiple-handlers-for-the-same-input)
 - [4. Execution Flow](#4-execution-flow)
+- [5. Pipelines rules](#5-pipelines-rules)
+  - [Rule 1: Input Parameter Ordering](#rule-1-input-parameter-ordering)
+  - [Rule 2: Result Type Alignment](#rule-2-result-type-alignment)
+    - [Example 1: Single Result Type](#example-1-single-result-type)
+    - [Example 2: Two Result Types](#example-2-two-result-types)
+    - [Example 3: No Generic Arguments in Input](#example-3-no-generic-arguments-in-input)
+  - [Rule 3: Method Parameter Matching](#rule-3-method-parameter-matching)
+    - [Example: Two Parameters in the Handle Method](#example-two-parameters-in-the-handle-method)
+    - [Example: Four Parameters in the Handle Method](#example-four-parameters-in-the-handle-method)
+  - [Rule 4: Non-Generic Return with Non-Generic Input](#rule-4-non-generic-return-with-non-generic-input)
+  - [Rule 5: Decorator Implementation](#rule-5-decorator-implementation)
+
 ------
 
 ## 1 Building blocks
@@ -331,3 +343,155 @@ In situations where you have multiple handlers for a single type of input, the d
 4. The Handler executes the primary logic.
 
 5. The result (if any) is returned to the caller.
+
+---
+
+## 5. Pipelines rules
+
+### Rule 1: Input Parameter Ordering
+The `Input` must be the first parameter of the Dispatcher and Handler methods.
+
+```cs
+public interface IInput<TResult> where TResult: class { } 
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+}
+```
+
+### Rule 2: Result Type Alignment
+Result types for the `Dispatcher` and `Handler` must match. If `generic arguments` are defined in `Input`, they must also align with those in the `Dispatcher` and `Handler`.
+
+#### Example 1: Single Result Type
+```cs
+public interface IInput<TResult> where TResult: class { } 
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+}
+```
+
+#### Example 2: Two Result Types
+```cs
+public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
+
+public interface IHandler<in TInput, TResult, TResult2>
+    where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
+{
+    Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
+        CancellationToken token) where TResult : class where TResult2 : class;
+}
+```
+
+#### Example 3: No Generic Arguments in Input
+```cs
+public interface IInput { }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task SendAsync(IInput input, CancellationToken token);
+}
+```
+
+### Rule 3: Method Parameter Matching
+Method parameters for the `Dispatcher` and `Handler` must match.
+
+#### Example: Two Parameters in the Handle Method
+```cs
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
+}
+```
+
+#### Example: Four Parameters in the Handle Method
+```cs
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
+{
+    Task<TResult> HandleAsync(TInput input, CancellationToken token, bool canDoSomething,
+        Dictionary<string, string> fancyDictionary);
+}
+
+public interface IDispatcher
+{
+    Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token, bool canDoSomething,
+        Dictionary<string, string> dictionary) where TResult : class;
+}
+```
+
+### Rule 4: Non-Generic Return with Non-Generic Input
+If the `Dispatcher/Handler` returns a non-generic type, then the `Input` should not have any Generic Arguments.
+
+```cs
+public interface IInput { }
+
+public interface IHandler<in TInput> where TInput : IInput
+{
+    Task<string> HandleAsync(TInput input, CancellationToken token);
+}
+
+public interface IDispatcher
+{
+    Task<string> SendAsync(IInput input, CancellationToken token);
+}
+```
+
+### Rule 5: Decorator Implementation
+The `Decorator` must implement the Handler interface and accept a Handler as a constructor parameter.
+
+```cs
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TInput, TResult> _handler;
+    private readonly ILogger<LoggingDecorator<TInput, TResult>> _logger;
+
+    public LoggingDecorator(IHandler<TInput, TResult> handler, ILogger<LoggingDecorator<TInput, TResult>> logger)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
+    {
+        _logger.Log(LogLevel.Information, "Executing handler for input {0}", typeof(TInput));
+        var result = await _handler.HandleAsync(request, token);
+        _logger.Log(LogLevel.Information, "Executed handler for input {0}", typeof(TInput));
+
+        return result;
+    }
+}
+
+public interface IInput<TResult> where TResult: class { } 
+
+public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
+```
+
+---
