@@ -62,8 +62,6 @@ If you want to learn more, please read the articles below.
 - [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
 - [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
 - [ ] **Support for Nullable Results**: Add functionality to handle nullable result types.
-- [x] **Configurable Dispatcher Behavior**: Implement configuration settings to decide if the dispatcher should throw an exception in case there's no handler for a given Input.
-- [x] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
 - [ ] **Multiple Inputs in Dispatcher**: Enhance the dispatcher handle method to accept a list of inputs instead of just one.
 - [ ] **Parallel Pipeline**: Introduce a pipeline to facilitate parallel execution of multiple handlers.
 - [ ] **Stream Pipeline**: Implement support for streaming pipelines.
