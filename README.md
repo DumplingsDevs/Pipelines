@@ -1,7 +1,7 @@
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
 
------
+---
 
 <p align="center">
   <img src="docs/assets/pipelines_purple.svg#gh-light-mode-only" alt="Pipelines"/>
@@ -9,10 +9,18 @@
 </p>
 
 
+# 📢 What is Pipelines?
 
-🛠 ```We believe that a good library should adapt to your application, rather than forcing your application to adapt to it. We recognize that every software project is unique and may employ different architectural patterns and designs. With Pipelines, we found a library that enables us to build our applications around our preferred patterns, rather than constraining us to rigid structures imposed by external libraries. This flexibility not only streamlines our development process but also empowers us to make design choices that best suit our specific use cases.```
+We believe that a good library should adapt to the application, not the other way. That is why Pipelines grants you the
+freedom to create any number of mediators within your application. Each of them can be tailored to specific use cases,
+ensuring maximum flexibility in programming. This is possible because:
 
-💡 ```Pipelines empowers developers to leverage the potential of the Mediator pattern seamlessly, thanks to its flexible and adaptable foundations.```
+- Pipelines does not expose its types - it does not require implementing an interface or inheriting from a class. You
+  have absolute control over input data and operation results.
+- Each mediator built with Pipelines is independent and decoupled from the others.
+- To maintain the best performance, we utilized the Source Generator mechanism, which minimizes the use of reflection.
+- Decorator support allows you to add additional effects like validation, logging, or even using the Unit of Work
+  pattern. Additionally, it enables the construction of the Chain of Responsibility pattern.
 
 -----
 
@@ -54,8 +62,6 @@ If you want to learn more, please read the articles below.
 - [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
 - [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
 - [ ] **Support for Nullable Results**: Add functionality to handle nullable result types.
-- [x] **Configurable Dispatcher Behavior**: Implement configuration settings to decide if the dispatcher should throw an exception in case there's no handler for a given Input.
-- [x] **Dependency Injection Scope Choice**: Provide an option to decide whether or not to create a Dependency Injection Scope in Dispatchers.
 - [ ] **Multiple Inputs in Dispatcher**: Enhance the dispatcher handle method to accept a list of inputs instead of just one.
 - [ ] **Parallel Pipeline**: Introduce a pipeline to facilitate parallel execution of multiple handlers.
 - [ ] **Stream Pipeline**: Implement support for streaming pipelines.

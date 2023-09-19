@@ -75,10 +75,11 @@ var dispatcherAssembly = //Assembly where AddPipeline gets invoked
 
 _services
     .AddPipeline()
-    .AddInput(typeof(IInput<>))
-            .AddHandler(typeof(IHandler<,>), handlersAssembly)
-            .AddDispatcher<IDispatcher>(dispatcherAssembly)
-              .WithDecorator(typeof(LoggingDecorator<,>));
+        .AddInput(typeof(IInput<>))
+        .AddHandler(typeof(IHandler<,>), handlersAssembly)
+        .AddDispatcher<IDispatcher>(dispatcherAssembly)
+        .WithDecorator(typeof(LoggingDecorator<,>))
+        .Build();
 ```
 
 ##  4️⃣ Implement first handler
@@ -114,5 +115,14 @@ public static void CreateExampleEndpoint(this WebApplication app)
         });
     }
 ```
+
+## 6️⃣ Next steps
+
+- [Main concepts](main_concepts.md)
+- [Pipelines cookbook](pipeline_cookbook.md)
+
+Advanced examples:
+- [Multistep process](docs/process_pipeline.md)
+- [Commands, Queries and Domain Events Dispatching](docs/command_queries_events_example.md)
 
 ---- 
