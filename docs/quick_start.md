@@ -116,4 +116,10 @@ public static void CreateExampleEndpoint(this WebApplication app)
     }
 ```
 
+## 6️⃣ More examples
+
+- [Pipelines cookbook](pipeline_cookbook.md)
+- [Multistep process](docs/process_pipeline.md)
+- [Commands, Queries and Domain Events Dispatching](docs/command_queries_events_example.md)
+
 ---- 
