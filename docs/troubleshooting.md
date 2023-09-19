@@ -11,12 +11,10 @@ In this section, you'll find descriptions of exceptions that may arise while usi
   - [HandlerMethodNotFoundException](#handlermethodnotfoundexception)
   - [MultipleHandlerMethodsException](#multiplehandlermethodsexception)
   - [MethodShouldHaveAtLeastOneParameterException](#methodshouldhaveatleastoneparameterexception)
-  - [GenericArgumentsLengthMismatchException](#genericargumentslengthmismatchexception)
   - [GenericArgumentsNotFoundException](#genericargumentsnotfoundexception)
   - [HandlerInputTypeMismatchException](#handlerinputtypemismatchexception)
   - [InvalidConstraintLengthException](#invalidconstraintlengthexception)
   - [ExpectedMethodWithResultException](#expectedmethodwithresultexception)
-  - [ExpectedVoidMethodException](#expectedvoidmethodexception)
   - [ResultTypeCountMismatchException](#resulttypecountmismatchexception)
   - [GenericTypeCountMismatchException](#generictypecountmismatchexception)
   - [GenericTypeMismatchException](#generictypemismatchexception)
@@ -55,9 +53,10 @@ public class SampleClass{}
 
 services
     .AddPipeline()
-    .AddInput(typeof(SampleClass))
-            .AddHandler(typeof(IHandler<>), handlersAssembly)
-            .AddDispatcher<IDispatcher>(dispatcherAssembly)
+      .AddInput(typeof(SampleClass))
+      .AddHandler(typeof(IHandler<>), handlersAssembly)
+      .AddDispatcher<IDispatcher>(dispatcherAssembly)
+    .Build();
 ...
 ```
 
@@ -70,9 +69,10 @@ public interface IInput{}
 
 services
     .AddPipeline()
-    .AddInput(typeof(IInput))
-            .AddHandler(typeof(IHandler<>), handlersAssembly)
-            .AddDispatcher<IDispatcher>(dispatcherAssembly)
+      .AddInput(typeof(IInput))
+      .AddHandler(typeof(IHandler<>), handlersAssembly)
+      .AddDispatcher<IDispatcher>(dispatcherAssembly)
+    .Build();
 ...
 ```
 ---
