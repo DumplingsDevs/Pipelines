@@ -75,10 +75,11 @@ var dispatcherAssembly = //Assembly where AddPipeline gets invoked
 
 _services
     .AddPipeline()
-    .AddInput(typeof(IInput<>))
-            .AddHandler(typeof(IHandler<,>), handlersAssembly)
-            .AddDispatcher<IDispatcher>(dispatcherAssembly)
-              .WithDecorator(typeof(LoggingDecorator<,>));
+        .AddInput(typeof(IInput<>))
+        .AddHandler(typeof(IHandler<,>), handlersAssembly)
+        .AddDispatcher<IDispatcher>(dispatcherAssembly)
+        .WithDecorator(typeof(LoggingDecorator<,>))
+        .Build();
 ```
 
 ##  4️⃣ Implement first handler
