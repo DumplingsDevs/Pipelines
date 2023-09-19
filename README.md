@@ -9,10 +9,18 @@
 </p>
 
 
+# 📢 What is Pipelines?
 
-🛠 ```We believe that a good library should adapt to your application, rather than forcing your application to adapt to it. We recognize that every software project is unique and may employ different architectural patterns and designs. With Pipelines, we found a library that enables us to build our applications around our preferred patterns, rather than constraining us to rigid structures imposed by external libraries. This flexibility not only streamlines our development process but also empowers us to make design choices that best suit our specific use cases.```
+We believe that a good library should adapt to the application, not the other way. That is why Pipelines grants you the
+freedom to create any number of mediators within your application. Each of them can be tailored to specific use cases,
+ensuring maximum flexibility in programming. This is possible because:
 
-💡 ```Pipelines empowers developers to leverage the potential of the Mediator pattern seamlessly, thanks to its flexible and adaptable foundations.```
+- Pipelines does not expose its types - it does not require implementing an interface or inheriting from a class. You
+  have absolute control over input data and operation results.
+- Each mediator built with Pipelines is independent and decoupled from the others.
+- To maintain the best performance, we utilized the Source Generator mechanism, which minimizes the use of reflection.
+- Decorator support allows you to add additional effects like validation, logging, or even using the Unit of Work
+  pattern. Additionally, it enables the construction of the Chain of Responsibility pattern.
 
 -----
 
