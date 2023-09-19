@@ -1,7 +1,6 @@
 [![CI-main](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/DumplingsDevs/Pipelines/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/v/DumplingsDevs.Pipelines.svg)](https://www.nuget.org/packages/DumplingsDevs.Pipelines/)
 
------
 
 <p align="center">
   <img src="docs/assets/pipelines_purple.svg#gh-light-mode-only" alt="Pipelines"/>
