@@ -289,3 +289,6 @@ public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> whe
 ```
 
 ---
+
+## 5. Next steps
+- [Pipelines cookbook](pipeline_cookbook.md)
