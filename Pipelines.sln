@@ -38,6 +38,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-6
 		docs\pipeline_cookbook.md = docs\pipeline_cookbook.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "adr", "{63FE8C6C-7BEB-4CC4-A7F2-568A2494698C}"
+	ProjectSection(SolutionItems) = preProject
+		adr\adr-002-dispatcher-generation.md = adr\adr-002-dispatcher-generation.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,5 +90,6 @@ Global
 		{6B8B5AB7-D155-4875-820F-722ADBD75CAE} = {46767E7B-DA07-4511-85DF-C453E4574153}
 		{3CF7A8C3-A8BF-4542-8751-76FCF1159383} = {46767E7B-DA07-4511-85DF-C453E4574153}
 		{5D26DFB1-615A-41E5-A7F4-995894B9A76C} = {74834919-89F5-49D9-8C3C-3257C0C531A8}
+		{63FE8C6C-7BEB-4CC4-A7F2-568A2494698C} = {74834919-89F5-49D9-8C3C-3257C0C531A8}
 	EndGlobalSection
 EndGlobal
