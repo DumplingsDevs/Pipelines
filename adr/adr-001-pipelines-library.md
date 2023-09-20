@@ -1,4 +1,4 @@
-# ADR #001: Choice of Mediator Implementation in .NET
+# ADR #001: Pipelines library
 
 **Date:** 2023-05-29
 
