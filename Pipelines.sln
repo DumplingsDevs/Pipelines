@@ -35,6 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5D26DFB1-6
 		docs\command_queries_events_example.md = docs\command_queries_events_example.md
 		docs\main_concepts.md = docs\main_concepts.md
 		docs\quick_start.md = docs\quick_start.md
+		docs\pipeline_cookbook.md = docs\pipeline_cookbook.md
 	EndProjectSection
 EndProject
 Global

@@ -17,7 +17,9 @@ In this section of the documentation, you'll find ready-to-copy examples of pipe
   - [3.2 Generic result](#32-generic-result)
   - [3.3 Generic Tuple result](#33-generic-tuple-result)
   - [3.4 No generic result](#34-no-generic-result)
-- [4. Example project](#4-example-project)
+- [4. Decorators](#4-decorators)
+  - [4.1 WithAttribute](#41-withattribute)
+- [5. Example project](#5-example-project)
 
 ------
 
@@ -705,8 +707,110 @@ public class LoggingDecorator<TInput> : IHandler<TInput>
 [Unit tests](../tests/Pipelines.Tests/UseCases/SyncNotGenericResult/)
 
 -----
+## 4. Decorators
+There is a lot of ways how to register Open/Closed Types Decorators:
 
-## 4. Example project
+```cs
+.AddDispatcher<IDispatcher>(dispatcherAssembly)
+    .WithDecorator(typeof(LoggingDecorator<,>))
+            .WithDecorators(x =>
+            {
+                x.WithImplementedInterface<IDecorator>();
+                x.WithInheritedClass<BaseDecorator>();
+                x.WithAttribute<DecoratorAttribute>();
+                x.WithNameContaining("ExampleRequestDecoratorFourUniqueNameForSearch");
+            }, decoratorsAssembly1, decoratorsAssembly2);
+```
+Open Type Decorator example:
+```cs
+public class LoggingDecorator<TInput, TResult> : IHandler<TInput, TResult>
+    where TInput : IInput<TResult> where TResult : class
+{
+    private readonly IHandler<TInput, TResult> _handler;
+   
+    public LoggingDecorator(IHandler<TInput, TResult> handler)
+    {
+        _handler = handler;
+        _logger = logger;
+    }
+
+    public async Task<TResult> HandleAsync(TInput request, CancellationToken token)
+    {
+        //Add logic here 
+        var result = await _handler.HandleAsync(request, token);
+       
+        //Add logic here 
+        return result;
+    }
+}
+```
+
+Closed Type Decorator example:
+```cs
+public class
+    ExampleRequestDecoratorFive : IDecorator, IRequestHandler<ExampleRequest,
+        ExampleCommandResult>
+{
+    private readonly IRequestHandler<ExampleRequest, ExampleCommandResult> _handler;
+
+    public ExampleRequestDecoratorFive(
+        IRequestHandler<ExampleRequest, ExampleCommandResult> handler)
+    {
+        _handler = handler;
+    }
+
+    public async Task<ExampleCommandResult> HandleAsync(ExampleRequest request,
+        CancellationToken token)
+    {
+        //Add logic here 
+        var result = await _handler.HandleAsync(request, token);
+
+        //Add logic here 
+
+        return result;
+    }
+```
+
+### 4.1 WithAttribute
+
+When registering decorators with attribute, it can be helpful to sort decorators with attribute value. To do that, there
+are `OrderBy` and `OrderByDescending` methods exposed in `WithAttribute` builder method:
+
+```csharp
+x.WithAttribute<DecoratorAttribute>().OrderBy(attr => attr.Index);
+
+x.WithAttribute<DecoratorAttribute>().OrderByDescending(attr => attr.Index);
+```
+
+Let's check example:
+```csharp
+public class DecoratorAttribute : Attribute
+{
+    public DecoratorAttribute(int index)
+    {
+        Index = index;
+    }
+
+    public int Index { get; }
+}
+```
+
+With this attribute you can define, which decorators should be trigger in specific order:
+```csharp
+[Decorator(1)]
+public class
+    FirstDecorator : IHandler<Input, InputResult>
+{ ... }
+
+[Decorator(2)]
+public class
+    SecondDecorator : IHandler<Input, InputResult>
+{ ... }
+```
+
+-----
+
+## 5. Example project
 
 In this repository, you'll find a fully functional project adhering to the principles of Clean Architecture that utilizes Pipelines.
 Want a quick dive into how Pipelines function? Simply download the example to your local computer, open it in your IDE, and hit 'Run'. No extra setup required. There are two exposed routes for you to play with and debug.
