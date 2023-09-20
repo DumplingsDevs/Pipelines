@@ -35,64 +35,10 @@ First method parameter in the Handler and Dispatcher methods, guiding the identi
 
 Generic Arguments defines result types. `Pipelines` supports handling with both void and results.
 
-Examples: 
-```cs
-public interface IInput {} 
-public interface IInput<TResult> where TResult: class{ } 
-public interface IInput<TResult, TResult2> where TResult : class where TResult2 : class { } 
-```
-
 ### 1.2 Handler
 The epicenter of your application logic. Handlers can yield synchronous (like void or simple types) or asynchronous results.
 
 In case, when all handlers will return exactly same return type, you don't need to define it on Input Generic Arguments. 
-
-Examples: 
-```cs
-public interface IHandler<in TInput> where TInput : IInput
-{
-    public void Handle(TInput input, CancellationToken token);
-}
-
-public interface IHandler<in TInput> where TInput : IInput
-{
-    public string Handle(TInput input, CancellationToken token);
-}
-
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult: class
-{
-    public TResult Handle(TInput input);
-}
-
-public interface IHandler<in TInput, TResult, TResult2> where TInput : IInput<TResult, TResult2>
-    where TResult : class where TResult2 : class
-{
-    public (TResult, TResult2) Handle(TInput input, CancellationToken token);
-}
-```
-
-```cs
-public interface IHandler<in TInput> where TInput : IInput
-{
-    public Task HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IHandler<in TInput> where TInput : IInput
-{
-    public Task<string> HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IHandler<in TInput, TResult> where TInput : IInput<TResult> where TResult : class
-{
-    public Task<TResult> HandleAsync(TInput input, CancellationToken token);
-}
-
-public interface IHandler<in TInput, TResult, TResult2>
-    where TInput : IInput<TResult, TResult2> where TResult : class where TResult2 : class
-{
-    public Task<(TResult, TResult2)> HandleAsync(TInput input, CancellationToken token);
-}
-```
 
 ### 1.3 Dispatcher
 Dispatcher implementation is provided by `Pipelines`. Dispatcher ensures the right Handler (with decorators) is triggered based on the Input.
@@ -101,54 +47,6 @@ NOTE:
 <i>
 Dispatcher is not resposible for apply Decorators by its own because Decorators gets applied on handlers during registering handlers in Dependency Injection Container.
 </i>
-
-Examples:
-
-```cs
-public interface IDispatcher
-{
-    public void Send(IInput input);
-}
-
-public interface IDispatcher
-{
-    public string Send(IInput input);
-}
-
-public interface IDispatcher
-{
-    public TResult Send<TResult>(IInput<TResult> input) where TResult : class;
-}
-
-public interface IDispatcher
-{
-    public (TResult, TResult2) Send<TResult, TResult2>(IInput<TResult, TResult2> input,
-        CancellationToken token) where TResult : class where TResult2 : class;
-}
-```
-
-```cs
-public interface IDispatcher
-{
-    public Task SendAsync(IInput input, CancellationToken token);
-}
-
-public interface IDispatcher
-{
-    public Task<string> SendAsync(IInput input, CancellationToken token);
-}
-
-public interface IDispatcher
-{
-    public Task<TResult> SendAsync<TResult>(IInput<TResult> input, CancellationToken token) where TResult : class;
-}
-
-public interface IDispatcher
-{
-    public Task<(TResult, TResult2)> SendAsync<TResult, TResult2>(IInput<TResult, TResult2> input,
-        CancellationToken token) where TResult : class where TResult2 : class;
-}
-```
 
 ### 1.4 Decorators
 Analogous to Middlewares in .NET. Decorators wrap around handlers to extend or modify their behavior. Think of them as layers of logic that execute before or after the handler. Decorators can be applied both for Open Types and Closed Types.
