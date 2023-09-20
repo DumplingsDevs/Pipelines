@@ -33,6 +33,12 @@ We have chosen option #2, which is to use a Source Generator. Despite the higher
 better performance and allows for better control over the types created by the user. Additionally, we plan to add
 configuration validators to minimize the risk of errors.
 
+However, it's worth noting that we have retained DispatchProxy for the following reasons:
+
+1. We have based our Proof of Concept (PoC) on DispatchProxy, so we already had an implementation in place.
+2. In case of any issues with generating the dispatcher using the Source Generator, we have the fallback option of using
+   DispatchProxy, which is less error-prone.
+
 ## Consequences
 
 - Choosing the Source Generator will impact the performance and type control in our library.
