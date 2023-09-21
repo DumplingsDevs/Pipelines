@@ -59,7 +59,7 @@ If you want to learn more, please read the articles below.
 -----
 
 # 🛤 Roadmap
-- [ ] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
+- [x] **ADR Documentation**: Record key architectural decisions made during implementation using ADRs.
 - [ ] **Code Cleanup**: Refine and tidy up the codebase post-MVP, paving the way for new feature development.
 - [ ] **Support for Nullable Results**: Add functionality to handle nullable result types.
 - [ ] **Multiple Inputs in Dispatcher**: Enhance the dispatcher handle method to accept a list of inputs instead of just one.
