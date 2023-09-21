@@ -1,40 +1,38 @@
 # ADR #003: Manage DI Scope in Dispatchers
 
-**Date:** 2023-09-01
+**Date:** 2023-09-11
 
 **Decision-makers:** Mateusz Wróblewski, Kamil Bytner
 
 **Status:** Approved
 
 ## Context
-Based on the architecture or coding approach chosen, we sometimes want handlers to run in isolation, meaning within their own scope. This is especially relevant for a modular monolith architecture, where each module has its own DI container, separate from the whole application.
-
-For simpler applications where the entire DI container is shared, there's no need to set up an isolated DI scope, as this consumes additional resources.
+In certain architectural setups or code configurations, we want our handlers to operate in their own scope. This is particularly important for a modular monolith structure, where each module has its distinct DI container, independent from the entire application. But in simpler applications with a shared DI container, creating isolated scopes might not be necessary.
 
 ## Problem
 Our primary advantage is delivering a fully functional dispatcher implementation. If we don't provide the capability to create a scope, it would ultimately require the developer to add an extra implementation, which is not what we aim for.
 
 ## Considered Options
 1. **Always create DI Scope during processing inputs:**
-    - Pros: Simple to implement.
+    - Pros: Straightforward for us to implement.
     - Cons: This is not always necessary, which could result in unnecessary resource consumption.
 
 2. **Allow the decision of whether to create a DI Scope during input processing or not:**
-    - Pros: DI Scope created only in dispatchers where it is necessary.
-    - Cons: Harder to implement given the nature of the Source Generator.
+    - Pros: DI Scope is created only when required.
+    - Cons: This approach is somewhat more complex for us to develop.
 
 ## Selected Option
-We chose the #2 option because we want to give developers as much freedom in use as possible
+We opted for the second option. We believe in providing flexibility to developers in key feature of `Pipelines`.
 
 ## Consequences
-- Each pipeline can be configured whether to create a DI scope or not. This is not a global configuration for all pipelines, so it may happen that some dispatchers in the application will create a DI scope and some will not.
+- Each pipeline can be individually set to create own DI scope or not. As a result, certain dispatchers within the application might create own DI scope, while others might not.
 
 ## Costs and Risks
-- By default, a DI Scope is always created. If this is not the desired behavior and the developer does not read the documentation, he may be unaware of this pipeline behavior.
+- A DI Scope is created automatically by default. Developers who might skip the documentation could miss this, leading to potential surprises in pipeline operation.
 
 ## Approved by
 Mateusz Wróblewski, Kamil Bytner
 
-**Approval Date:** 2023-05-29
+**Approval Date:** 2023-09-11
 
 **Links to other ADRs:** None
