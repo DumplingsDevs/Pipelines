@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "adr", "{63FE8C6C-7BE
 	ProjectSection(SolutionItems) = preProject
 		adr\adr-002-dispatcher-generation.md = adr\adr-002-dispatcher-generation.md
 		adr\adr-001-pipelines-library.md = adr\adr-001-pipelines-library.md
+		adr\adr-003-manage-di-scope-in-dispatchers.md = adr\adr-003-manage-di-scope-in-dispatchers.md
 	EndProjectSection
 EndProject
 Global
