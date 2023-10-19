@@ -49,6 +49,7 @@ If you want to learn more, please read the articles below.
 - [Proxy vs Generated Dispatcher](docs/dispatcher_source_generator.md)
 - [Benchmarks](docs/benchmarks.md)
 - [ADR](docs/adr.md)
+- [Articles](docs/articles.md)
 
 ---- 
 
